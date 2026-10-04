@@ -671,17 +671,21 @@
             e.preventDefault();
             const username = document.getElementById('loginUserSelect').value;
             const passwordInput = document.getElementById('loginPassword').value;
-
+        
             const found = users.find(u => u.name === username);
             if (!found || found.pass !== passwordInput) {
                 showToast("Invalid password!", "error");
                 return;
             }
-
+        
             currentUser = found;
             saveState();
             document.getElementById('loginPassword').value = '';
             showToast(`Welcome back, ${currentUser.name}!`, "success");
+            
+            // --- ADD THIS LINE BELOW ---
+            updateUI(); 
+            
             switchTab('dashboard');
         }
 
