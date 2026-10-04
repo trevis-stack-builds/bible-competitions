@@ -8,59 +8,29 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        brand: {
-                            50: '#f0f7ff',
-                            100: '#e0effe',
-                            500: '#3b82f6',
-                            600: '#2563eb',
-                            700: '#1d4ed8',
-                        }
-                    }
-                }
-            }
-        }
-    </script>
+    <!-- Supabase JS Client Library -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        .custom-scrollbar::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-            background: #f1f5f9;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 4px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
-        }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col font-sans antialiased selection:bg-amber-500 selection:text-white">
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col font-sans antialiased selection:bg-blue-500 selection:text-white">
 
     <header class="bg-slate-900 text-white shadow-md sticky top-0 z-40">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
             <div class="flex items-center gap-3 cursor-pointer" onclick="switchTab('dashboard')">
-                <div class="p-2 bg-gradient-to-br from-amber-600 to-amber-800 rounded-lg flex items-center justify-center text-white shadow-md border border-amber-500/30">
-                    <!-- SVG Bible / Holy Book Icon with Cross Emblem -->
-                    <svg class="w-6 h-6 text-amber-100 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M19 2H6c-1.2 0-2 .8-2 2v16c0 1.2.8 2 2 2h13c.6 0 1-.4 1-1V3c0-.6-.4-1-1-1zm-1 18H6c-.6 0-1-.4-1-1s.4-1 1-1h12v2zm1-3H6c-1.2 0-2-.8-2-2V5c0-.6.4-1 1-1h13v13z"/>
-                        <path d="M11 6h2v3h3v2h-3v5h-2v-5H8V9h3V6z"/>
-                    </svg>
+                <div class="p-2 bg-amber-600 rounded-lg flex items-center justify-center text-white shadow-inner">
+                    <i data-lucide="book-open-check" class="w-6 h-6 text-white"></i>
                 </div>
                 <div>
-                    <span class="font-bold text-lg tracking-wide bg-gradient-to-r from-amber-300 via-amber-200 to-amber-100 bg-clip-text text-transparent">Bible QuizCraft</span>
+                    <span class="font-bold text-lg tracking-wide bg-gradient-to-r from-amber-300 via-blue-300 to-indigo-200 bg-clip-text text-transparent">Bible QuizCraft</span>
                     <span class="text-xs text-slate-400 block -mt-1">Interactive Bible Q&A Platform</span>
                 </div>
             </div>
 
-            <!-- User Menu & Nav Links -->
             <div class="flex items-center gap-3">
                 <span id="publishingBadge" class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/30">
                     <i data-lucide="clock" class="w-3.5 h-3.5"></i> Creation Phase
@@ -69,21 +39,18 @@
                 <div id="userProfileHeader" class="hidden flex items-center gap-2 pl-3 border-l border-slate-700">
                     <div class="text-right hidden md:block">
                         <div id="headerUserName" class="text-sm font-semibold text-slate-100">Trevis</div>
-                        <div id="headerUserRole" class="text-xs text-amber-400 capitalize">Host</div>
+                        <div id="headerUserRole" class="text-xs text-slate-400 capitalize">Host</div>
                     </div>
-                    <!-- Settings Gear Icon (Functional for ALL logged in user accounts) -->
-                    <button onclick="openModal('settingsModal')" class="p-2 text-slate-300 hover:text-amber-300 hover:bg-slate-800 rounded-lg transition flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-amber-500" title="Account & Preferences Settings">
+                    <button onclick="openModal('settingsModal')" class="p-2 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition flex items-center justify-center" title="Account Settings">
                         <i data-lucide="settings" class="w-5 h-5"></i>
                     </button>
-                    <!-- Sign Out Button -->
-                    <button onclick="logout()" class="p-2 text-red-400 hover:text-red-300 hover:bg-slate-800 rounded-lg transition flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-red-500" title="Sign Out">
+                    <button onclick="logout()" class="p-2 text-red-400 hover:text-red-300 hover:bg-slate-800 rounded-lg transition flex items-center justify-center" title="Sign Out">
                         <i data-lucide="log-out" class="w-5 h-5"></i>
                     </button>
                 </div>
             </div>
         </div>
 
-        <!-- Navigation Tabs -->
         <nav id="appNav" class="hidden bg-slate-800 border-t border-slate-700 px-4 sm:px-6">
             <div class="max-w-7xl mx-auto flex space-x-1 sm:space-x-4 overflow-x-auto custom-scrollbar text-sm py-2">
                 <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-btn flex items-center gap-2 px-3 py-2 rounded-md font-medium text-slate-300 hover:text-white hover:bg-slate-700 transition whitespace-nowrap">
@@ -105,7 +72,6 @@
         </nav>
     </header>
 
-    <!-- Toast Container -->
     <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 max-w-sm w-full"></div>
 
     <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
@@ -113,28 +79,23 @@
         <!-- VIEW: LOGIN -->
         <section id="view-login" class="max-w-md mx-auto my-12 bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden">
             <div class="bg-slate-900 p-8 text-center text-white relative">
-                <div class="w-16 h-16 bg-gradient-to-br from-amber-500 to-amber-700 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-amber-600/30 border border-amber-400/30">
-                    <svg class="w-9 h-9 text-white fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M19 2H6c-1.2 0-2 .8-2 2v16c0 1.2.8 2 2 2h13c.6 0 1-.4 1-1V3c0-.6-.4-1-1-1zm-1 18H6c-.6 0-1-.4-1-1s.4-1 1-1h12v2zm1-3H6c-1.2 0-2-.8-2-2V5c0-.6.4-1 1-1h13v13z"/>
-                        <path d="M11 6h2v3h3v2h-3v5h-2v-5H8V9h3V6z"/>
-                    </svg>
+                <div class="w-16 h-16 bg-amber-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg shadow-amber-500/30">
+                    <i data-lucide="book-open" class="w-8 h-8 text-white"></i>
                 </div>
-                <h2 class="text-2xl font-bold tracking-tight">Bible QuizCraft</h2>
-                <p class="text-amber-200/80 text-sm mt-1">Select account and sign in to continue</p>
+                <h2 class="text-2xl font-bold">Bible QuizCraft</h2>
+                <p class="text-slate-400 text-sm mt-1">Select account and log in to continue</p>
             </div>
 
             <form id="loginForm" onsubmit="handleLogin(event)" class="p-6 space-y-5">
                 <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2">Select Account</label>
-                    <select id="loginUserSelect" class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-slate-50 text-slate-800 transition font-medium">
-                        <!-- Dynamic options -->
-                    </select>
+                    <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2">Select User Account</label>
+                    <select id="loginUserSelect" class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-slate-50 text-slate-800 transition font-medium"></select>
                 </div>
 
                 <div>
                     <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2">Password</label>
                     <div class="relative">
-                        <input type="password" id="loginPassword" required placeholder="Type your password" class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-slate-50 text-slate-800 transition">
+                        <input type="password" id="loginPassword" required placeholder="Default: 1234567" class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-slate-50 text-slate-800 transition">
                         <button type="button" onclick="togglePasswordVisibility('loginPassword')" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
                             <i data-lucide="eye" class="w-5 h-5"></i>
                         </button>
@@ -162,7 +123,6 @@
                         <button onclick="switchTab('take-quiz')" class="bg-amber-900/60 hover:bg-amber-900/80 border border-amber-400/30 text-white px-4 py-2.5 rounded-lg font-semibold text-sm transition flex items-center gap-2">
                             <i data-lucide="play" class="w-4 h-4"></i> Take Live Quiz
                         </button>
-                        <!-- Publish Quiz shortcut button for Host account -->
                         <button id="dashPublishBtn" onclick="togglePublishStatus()" class="hidden bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-lg font-semibold text-sm transition shadow flex items-center gap-2">
                             <i data-lucide="upload-cloud" class="w-4 h-4"></i> Publish Quiz Bank
                         </button>
@@ -173,9 +133,7 @@
             <!-- Stats Grid -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center gap-4">
-                    <div class="p-3 bg-blue-100 text-blue-600 rounded-xl">
-                        <i data-lucide="file-question" class="w-6 h-6"></i>
-                    </div>
+                    <div class="p-3 bg-blue-100 text-blue-600 rounded-xl"><i data-lucide="file-question" class="w-6 h-6"></i></div>
                     <div>
                         <div class="text-2xl font-bold text-slate-800" id="statMyCount">0</div>
                         <div class="text-xs text-slate-500 font-medium">My Uploaded Questions</div>
@@ -183,19 +141,15 @@
                 </div>
 
                 <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center gap-4">
-                    <div class="p-3 bg-emerald-100 text-emerald-600 rounded-xl">
-                        <i data-lucide="database" class="w-6 h-6"></i>
-                    </div>
+                    <div class="p-3 bg-emerald-100 text-emerald-600 rounded-xl"><i data-lucide="database" class="w-6 h-6"></i></div>
                     <div>
                         <div class="text-2xl font-bold text-slate-800" id="statPublishedCount">0</div>
-                        <div class="text-xs text-slate-500 font-medium font-medium">Published Questions in Bank</div>
+                        <div class="text-xs text-slate-500 font-medium">Published Questions in Bank</div>
                     </div>
                 </div>
 
                 <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center gap-4">
-                    <div class="p-3 bg-indigo-100 text-indigo-600 rounded-xl">
-                        <i data-lucide="check-circle" class="w-6 h-6"></i>
-                    </div>
+                    <div class="p-3 bg-indigo-100 text-indigo-600 rounded-xl"><i data-lucide="check-circle" class="w-6 h-6"></i></div>
                     <div>
                         <div class="text-2xl font-bold text-slate-800" id="statMyScore">N/A</div>
                         <div class="text-xs text-slate-500 font-medium">Last Quiz Score</div>
@@ -203,9 +157,7 @@
                 </div>
 
                 <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center gap-4">
-                    <div class="p-3 bg-amber-100 text-amber-600 rounded-xl">
-                        <i data-lucide="radio" class="w-6 h-6"></i>
-                    </div>
+                    <div class="p-3 bg-amber-100 text-amber-600 rounded-xl"><i data-lucide="radio" class="w-6 h-6"></i></div>
                     <div>
                         <div class="text-2xl font-bold text-slate-800" id="statQuizStatus">Draft</div>
                         <div class="text-xs text-slate-500 font-medium">Platform Status</div>
@@ -213,10 +165,7 @@
                 </div>
             </div>
 
-            <!-- Quiz Status Banner -->
-            <div id="dashStatusCard" class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
-                <!-- Dynamically updated status details -->
-            </div>
+            <div id="dashStatusCard" class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm"></div>
         </section>
 
         <!-- VIEW: MY QUESTIONS -->
@@ -226,21 +175,17 @@
                     <h2 class="text-2xl font-bold text-slate-800">My Question Repository</h2>
                     <p class="text-slate-500 text-sm">Questions you create remain confidential to your account until published by Host Trevis.</p>
                 </div>
-                <button onclick="openQuestionModal()" id="addQBtn" class="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2.5 rounded-lg font-medium text-sm shadow transition flex items-center gap-2">
+                <button onclick="openQuestionModal()" id="addQBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-lg font-medium text-sm shadow transition flex items-center gap-2">
                     <i data-lucide="plus" class="w-4 h-4"></i> Add New Question
                 </button>
             </div>
 
             <div id="questionsLockedNotice" class="hidden bg-amber-50 border border-amber-200 text-amber-800 px-4 py-3 rounded-lg flex items-center gap-3">
                 <i data-lucide="lock" class="w-5 h-5 text-amber-600 shrink-0"></i>
-                <div class="text-sm">
-                    <strong>Quiz Phase Locked:</strong> The host has published all questions. Editing and adding new questions is currently disabled.
-                </div>
+                <div class="text-sm"><strong>Quiz Phase Locked:</strong> The host has published all questions. Editing and adding new questions is currently disabled.</div>
             </div>
 
-            <div id="myQuestionsList" class="space-y-4">
-                <!-- Dynamic questions -->
-            </div>
+            <div id="myQuestionsList" class="space-y-4"></div>
         </section>
 
         <!-- VIEW: TAKE QUIZ -->
@@ -250,10 +195,7 @@
                     <i data-lucide="clock" class="w-8 h-8"></i>
                 </div>
                 <h3 class="text-xl font-bold text-slate-800 mb-2">Quiz is Not Published Yet</h3>
-                <p class="text-slate-600 text-sm mb-6">
-                    Participants are currently uploading Bible questions. The quiz will become available here once Host <strong class="text-slate-800">Trevis</strong> publishes all questions.
-                </p>
-                <div class="text-xs text-slate-400">Check back soon or contact your host!</div>
+                <p class="text-slate-600 text-sm mb-6">Participants are currently uploading questions. The quiz will become available here once Host <strong class="text-slate-800">Trevis</strong> publishes all questions.</p>
             </div>
 
             <div id="quizContainer" class="hidden space-y-6 max-w-3xl mx-auto">
@@ -262,20 +204,17 @@
                         <h2 class="text-2xl font-bold text-slate-800">Live Bible Quiz Assessment</h2>
                         <p class="text-slate-500 text-sm">Answer all questions below and click submit to receive immediate scoring.</p>
                     </div>
-                    <div class="bg-amber-50 text-amber-800 border border-amber-200 px-4 py-2 rounded-lg font-semibold text-sm flex items-center gap-2">
+                    <div class="bg-blue-50 text-blue-700 px-4 py-2 rounded-lg font-semibold text-sm flex items-center gap-2">
                         <i data-lucide="list-checks" class="w-4 h-4"></i>
                         <span id="quizTotalQuestionsCount">0</span> Questions
                     </div>
                 </div>
 
                 <form id="quizActiveForm" onsubmit="handleQuizSubmit(event)" class="space-y-6">
-                    <div id="quizQuestionsContainer" class="space-y-6">
-                        <!-- Dynamic assessment questions -->
-                    </div>
-
+                    <div id="quizQuestionsContainer" class="space-y-6"></div>
                     <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
                         <span class="text-sm text-slate-500">Ensure all answers are completed before submitting.</span>
-                        <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-6 py-3 rounded-lg shadow-lg shadow-emerald-600/20 transition flex items-center gap-2">
+                        <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-6 py-3 rounded-lg shadow-lg transition flex items-center gap-2">
                             <i data-lucide="check-circle-2" class="w-5 h-5"></i> Submit Quiz Answers
                         </button>
                     </div>
@@ -289,7 +228,7 @@
                 <i data-lucide="award" class="w-12 h-12 text-slate-300 mx-auto mb-3"></i>
                 <h3 class="text-lg font-bold text-slate-800">No Submission Found</h3>
                 <p class="text-slate-500 text-sm mt-1">You haven't submitted answers for the published quiz yet.</p>
-                <button onclick="switchTab('take-quiz')" class="mt-4 px-4 py-2 bg-amber-600 text-white text-sm font-medium rounded-lg hover:bg-amber-700 transition">Go to Quiz</button>
+                <button onclick="switchTab('take-quiz')" class="mt-4 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition">Go to Quiz</button>
             </div>
 
             <div id="resultsContent" class="hidden space-y-6 max-w-4xl mx-auto">
@@ -302,7 +241,7 @@
 
                     <div class="flex items-center gap-6 bg-slate-50 p-4 rounded-xl border border-slate-100">
                         <div class="text-center">
-                            <div id="resultScoreFraction" class="text-3xl font-black text-amber-600">0 / 0</div>
+                            <div id="resultScoreFraction" class="text-3xl font-black text-blue-600">0 / 0</div>
                             <div class="text-xs text-slate-500 font-medium">Correct Answers</div>
                         </div>
                         <div class="h-10 w-px bg-slate-200"></div>
@@ -315,16 +254,14 @@
 
                 <div class="flex items-center justify-between">
                     <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
-                        <i data-lucide="file-check-2" class="w-5 h-5 text-amber-600"></i> Solution Breakdown
+                        <i data-lucide="file-check-2" class="w-5 h-5 text-blue-600"></i> Solution Breakdown
                     </h3>
-                    <button onclick="switchTab('take-quiz')" class="text-sm font-medium text-amber-600 hover:text-amber-800 flex items-center gap-1">
+                    <button onclick="switchTab('take-quiz')" class="text-sm font-medium text-blue-600 hover:text-blue-800 flex items-center gap-1">
                         <i data-lucide="rotate-ccw" class="w-4 h-4"></i> Retake Quiz
                     </button>
                 </div>
 
-                <div id="solutionsBreakdownList" class="space-y-4">
-                    <!-- Detailed solutions -->
-                </div>
+                <div id="solutionsBreakdownList" class="space-y-4"></div>
             </div>
         </section>
 
@@ -337,7 +274,7 @@
                             <i data-lucide="shield" class="w-4 h-4"></i> Host Administrator Panel
                         </div>
                         <h2 class="text-2xl font-extrabold">Quiz & User Management</h2>
-                        <p class="text-slate-400 text-sm mt-1">Publish questions, manage account credentials, or reset platform data.</p>
+                        <p class="text-slate-400 text-sm mt-1">Publish questions, manage account credentials across devices.</p>
                     </div>
 
                     <div class="flex flex-wrap gap-3">
@@ -352,19 +289,16 @@
                 <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
                     <div class="text-xs text-slate-500 font-medium">Total Questions Uploaded</div>
                     <div id="hostTotalUploaded" class="text-3xl font-extrabold text-slate-800 mt-1">0</div>
-                    <div class="text-xs text-slate-400 mt-2">Across all accounts</div>
                 </div>
 
                 <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
                     <div class="text-xs text-slate-500 font-medium">Publish Status</div>
                     <div id="hostPublishStatusText" class="text-xl font-bold text-amber-600 mt-1">Unpublished (Creation Phase)</div>
-                    <div class="text-xs text-slate-400 mt-2">Click button above to publish</div>
                 </div>
 
                 <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-                    <div class="text-xs text-slate-500 font-medium">Total User Accounts</div>
+                    <div class="text-xs text-slate-500 font-medium">Total Active Users</div>
                     <div id="hostUserCount" class="text-3xl font-extrabold text-slate-800 mt-1">10</div>
-                    <div class="text-xs text-slate-400 mt-2">1 Host + 9 Participants</div>
                 </div>
             </div>
 
@@ -372,7 +306,7 @@
                 <div class="p-5 border-b border-slate-200 flex justify-between items-center">
                     <div>
                         <h3 class="font-bold text-slate-800">User Account Management</h3>
-                        <p class="text-xs text-slate-500">View registered user accounts and update passwords</p>
+                        <p class="text-xs text-slate-500">View user accounts and manage passwords</p>
                     </div>
                     <button onclick="openModal('addUserModal')" class="bg-slate-900 hover:bg-slate-800 text-white px-3.5 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5">
                         <i data-lucide="user-plus" class="w-4 h-4"></i> Add Account
@@ -389,9 +323,7 @@
                                 <th class="px-6 py-3 text-right">Actions</th>
                             </tr>
                         </thead>
-                        <tbody id="userManagementTable" class="divide-y divide-slate-100">
-                            <!-- Populated dynamically -->
-                        </tbody>
+                        <tbody id="userManagementTable" class="divide-y divide-slate-100"></tbody>
                     </table>
                 </div>
             </div>
@@ -404,17 +336,14 @@
         <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto custom-scrollbar shadow-2xl border border-slate-100">
             <div class="p-6 border-b border-slate-100 flex justify-between items-center sticky top-0 bg-white z-10">
                 <h3 id="modalQTitle" class="text-lg font-bold text-slate-800">Add New Question</h3>
-                <button onclick="closeModal('questionModal')" class="text-slate-400 hover:text-slate-600">
-                    <i data-lucide="x" class="w-6 h-6"></i>
-                </button>
+                <button onclick="closeModal('questionModal')" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-6 h-6"></i></button>
             </div>
 
             <form id="questionForm" onsubmit="handleSaveQuestion(event)" class="p-6 space-y-5">
                 <input type="hidden" id="qId">
-
                 <div>
                     <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2">Question Type</label>
-                    <select id="qType" onchange="renderQuestionTypeInputs()" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-amber-500 text-sm font-medium">
+                    <select id="qType" onchange="renderQuestionTypeInputs()" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 text-sm font-medium">
                         <option value="mcq">Multiple Choice Question (MCQ)</option>
                         <option value="fill">Fill in the Blanks</option>
                         <option value="matching">Matching Pairs</option>
@@ -423,81 +352,56 @@
 
                 <div>
                     <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2">Question Text / Prompt</label>
-                    <textarea id="qPrompt" required rows="3" placeholder="Enter your Bible question prompt here..." class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-amber-500 text-sm"></textarea>
+                    <textarea id="qPrompt" required rows="3" placeholder="Enter your question prompt here..." class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 text-sm"></textarea>
                 </div>
 
-                <div id="typeSpecificInputs" class="space-y-4 p-4 bg-slate-50 rounded-xl border border-slate-200">
-                    <!-- Dynamic inputs -->
-                </div>
+                <div id="typeSpecificInputs" class="space-y-4 p-4 bg-slate-50 rounded-xl border border-slate-200"></div>
 
                 <div>
                     <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2">Solution Explanation (Optional)</label>
-                    <input type="text" id="qExplanation" placeholder="Provide Biblical verse or explanation..." class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-amber-500 text-sm">
+                    <input type="text" id="qExplanation" placeholder="Explain why this answer is correct..." class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 text-sm">
                 </div>
 
                 <div class="flex justify-end gap-3 pt-4 border-t border-slate-100">
                     <button type="button" onclick="closeModal('questionModal')" class="px-4 py-2.5 border border-slate-300 text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-50">Cancel</button>
-                    <button type="submit" class="px-5 py-2.5 bg-amber-600 text-white rounded-lg text-sm font-medium hover:bg-amber-700 shadow">Save Question</button>
+                    <button type="submit" class="px-5 py-2.5 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 shadow">Save Question</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- MODAL: FUNCTIONAL ACCOUNT SETTINGS (ACCESSIBLE TO ALL 10 USER ACCOUNTS) -->
+    <!-- MODAL: ACCOUNT SETTINGS -->
     <div id="settingsModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-slate-100 overflow-hidden">
-            <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-900 text-white">
+            <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
                 <div class="flex items-center gap-2">
-                    <i data-lucide="settings" class="w-5 h-5 text-amber-400"></i>
-                    <h3 class="text-lg font-bold">Account Settings</h3>
+                    <i data-lucide="settings" class="w-5 h-5 text-slate-700"></i>
+                    <h3 class="text-lg font-bold text-slate-800">Account Settings</h3>
                 </div>
-                <button onclick="closeModal('settingsModal')" class="text-slate-400 hover:text-white">
-                    <i data-lucide="x" class="w-6 h-6"></i>
-                </button>
+                <button onclick="closeModal('settingsModal')" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-6 h-6"></i></button>
             </div>
 
-            <form onsubmit="handlePasswordUpdate(event)" class="p-6 space-y-5">
-                <div class="bg-amber-50 p-4 rounded-xl border border-amber-200/60 flex items-center justify-between">
+            <form onsubmit="handlePasswordUpdate(event)" class="p-6 space-y-4">
+                <div class="bg-blue-50 p-3 rounded-lg border border-blue-100 flex items-center justify-between">
                     <div>
-                        <span class="text-xs text-amber-700 font-medium block">Current Logged-in Account</span>
-                        <span id="settingsCurrentUserName" class="text-base font-bold text-slate-800">User</span>
+                        <span class="text-xs text-slate-500 block">Logged In Account</span>
+                        <span id="settingsCurrentUserName" class="text-base font-bold text-blue-900">User</span>
                     </div>
-                    <span id="settingsCurrentUserRole" class="px-3 py-1 bg-amber-200/80 text-amber-900 text-xs font-bold rounded-full capitalize">Participant</span>
+                    <span id="settingsCurrentUserRole" class="px-2.5 py-1 bg-blue-200 text-blue-800 text-xs font-bold rounded-full capitalize">Participant</span>
                 </div>
 
-                <!-- Update Password -->
                 <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2">Change Password</label>
+                    <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2">Update Password</label>
                     <div class="relative">
-                        <input type="password" id="newPasswordInput" required minlength="4" placeholder="Type new password" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-amber-500 text-sm">
+                        <input type="password" id="newPasswordInput" required minlength="4" placeholder="Enter new password" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 text-sm">
                         <button type="button" onclick="togglePasswordVisibility('newPasswordInput')" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
                             <i data-lucide="eye" class="w-4 h-4"></i>
                         </button>
                     </div>
                 </div>
 
-                <!-- Preferences Settings -->
-                <div class="space-y-3 pt-2 border-t border-slate-100">
-                    <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider">Preferences</label>
-                    
-                    <div class="flex items-center justify-between">
-                        <span class="text-sm text-slate-700 font-medium">Sound Effects</span>
-                        <input type="checkbox" id="prefSoundFx" checked class="w-4 h-4 text-amber-600 rounded focus:ring-amber-500">
-                    </div>
-
-                    <div class="flex items-center justify-between">
-                        <span class="text-sm text-slate-700 font-medium">Show Instant Question Hints</span>
-                        <input type="checkbox" id="prefInstantHints" checked class="w-4 h-4 text-amber-600 rounded focus:ring-amber-500">
-                    </div>
-                </div>
-
-                <div class="pt-4 border-t border-slate-100 flex justify-between items-center gap-2">
-                    <button type="button" onclick="confirmResetData()" class="text-xs text-red-600 hover:text-red-800 font-medium">
-                        Reset Demo Data
-                    </button>
-                    <button type="submit" class="px-4 py-2 bg-amber-600 text-white rounded-lg text-sm font-medium hover:bg-amber-700 shadow">
-                        Save Preferences
-                    </button>
+                <div class="pt-4 border-t border-slate-100 flex justify-end">
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 shadow">Update Password</button>
                 </div>
             </form>
         </div>
@@ -508,9 +412,7 @@
         <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-slate-100 overflow-hidden">
             <div class="p-6 border-b border-slate-100 flex justify-between items-center">
                 <h3 class="text-lg font-bold text-slate-800">Reset User Password</h3>
-                <button onclick="closeModal('resetUserPasswordModal')" class="text-slate-400 hover:text-slate-600">
-                    <i data-lucide="x" class="w-6 h-6"></i>
-                </button>
+                <button onclick="closeModal('resetUserPasswordModal')" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-6 h-6"></i></button>
             </div>
 
             <form onsubmit="handleAdminPasswordReset(event)" class="p-6 space-y-4">
@@ -522,7 +424,7 @@
 
                 <div>
                     <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2">New Password for User</label>
-                    <input type="password" id="adminNewPassword" required minlength="4" placeholder="Type new password" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-amber-500 text-sm">
+                    <input type="password" id="adminNewPassword" required minlength="4" placeholder="Enter new password" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 text-sm">
                 </div>
 
                 <div class="pt-4 flex justify-end gap-2">
@@ -538,79 +440,35 @@
         <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-slate-100 overflow-hidden">
             <div class="p-6 border-b border-slate-100 flex justify-between items-center">
                 <h3 class="text-lg font-bold text-slate-800">Add New User Account</h3>
-                <button onclick="closeModal('addUserModal')" class="text-slate-400 hover:text-slate-600">
-                    <i data-lucide="x" class="w-6 h-6"></i>
-                </button>
+                <button onclick="closeModal('addUserModal')" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-6 h-6"></i></button>
             </div>
 
             <form onsubmit="handleAddUserAccount(event)" class="p-6 space-y-4">
                 <div>
                     <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2">Account Name</label>
-                    <input type="text" id="newAccountName" required placeholder="e.g. Sarah" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-amber-500 text-sm">
+                    <input type="text" id="newAccountName" required placeholder="e.g. Sarah" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 text-sm">
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2">Initial Password</label>
-                    <input type="password" id="newAccountPassword" required placeholder="Type password" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-amber-500 text-sm">
+                    <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2">Password</label>
+                    <input type="password" id="newAccountPassword" required placeholder="Default password" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 text-sm">
                 </div>
 
                 <div class="pt-4 flex justify-end gap-2">
                     <button type="button" onclick="closeModal('addUserModal')" class="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg text-sm">Cancel</button>
-                    <button type="submit" class="px-4 py-2 bg-amber-600 text-white rounded-lg text-sm font-medium hover:bg-amber-700 shadow">Create Account</button>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 shadow">Create Account</button>
                 </div>
             </form>
         </div>
     </div>
 
     <script>
-        // Initial required 10 user accounts
-        const INITIAL_ACCOUNTS = [
-            { name: "Trevis", role: "host", pass: "1234567" },
-            { name: "John", role: "participant", pass: "1234567" },
-            { name: "Jeff", role: "participant", pass: "1234567" },
-            { name: "Dominic", role: "participant", pass: "1234567" },
-            { name: "Joshua", role: "participant", pass: "1234567" },
-            { name: "Ivan", role: "participant", pass: "1234567" },
-            { name: "Anonymous 1", role: "participant", pass: "1234567" },
-            { name: "Anonymous 2", role: "participant", pass: "1234567" },
-            { name: "Anonymous 3", role: "participant", pass: "1234567" },
-            { name: "Anonymous 4", role: "participant", pass: "1234567" }
-        ];
+        // --- CONFIGURE YOUR SUPABASE PROJECT HERE ---
+        const SUPABASE_URL = 'https://jevyqvtgljhfwqltrbgu.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpldnlxdnRnbGpoZndxbHRyYmd1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTExMjc1MzAsImV4cCI6MjEwNjcwMzUzMH0.O6IifPUuHuBdqdwEXTUypsJZN-GHaBh4iGLOFseKyZ8';
+        const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // Sample initial Bible questions
-        const INITIAL_QUESTIONS = [
-            {
-                id: "q-1",
-                author: "Trevis",
-                type: "mcq",
-                prompt: "Which book of the Bible is known as the book of songs and prayers?",
-                options: ["Genesis", "Psalms", "Proverbs", "Isaiah"],
-                correctAnswer: "1", // Index 1 = Psalms
-                explanation: "Psalms is a collection of 150 sacred songs, prayers, and poems."
-            },
-            {
-                id: "q-2",
-                author: "John",
-                type: "fill",
-                prompt: "In the Gospel of John, Jesus says: 'I am the way, the ____, and the life.'",
-                correctAnswer: "truth",
-                explanation: "John 14:6 - 'I am the way, the truth, and the life. No one comes to the Father except through me.'"
-            },
-            {
-                id: "q-3",
-                author: "Trevis",
-                type: "matching",
-                prompt: "Match the biblical figure with their significant role/event:",
-                pairs: [
-                    { item: "Moses", match: "Led Exodus" },
-                    { item: "David", match: "Defeated Goliath" },
-                    { item: "Noah", match: "Built the Ark" }
-                ],
-                explanation: "Moses led Israel out of Egypt, David defeated Goliath, and Noah built the Ark."
-            }
-        ];
-
-        // Global State
+        // Application State
         let users = [];
         let questions = [];
         let submissions = {};
@@ -618,42 +476,47 @@
         let currentUser = null;
         let activeTab = 'dashboard';
 
-        window.onload = function() {
-            loadState();
+        window.onload = async function() {
+            await fetchCloudState();
+            setupRealtimeSubscriptions();
+            
+            const savedCurrentUser = localStorage.getItem('quiz_current_user');
+            if (savedCurrentUser) currentUser = JSON.parse(savedCurrentUser);
+
             populateLoginDropdown();
             updateUI();
             lucide.createIcons();
         };
 
-        function loadState() {
-            const savedUsers = localStorage.getItem('quiz_users');
-            users = savedUsers ? JSON.parse(savedUsers) : INITIAL_ACCOUNTS;
+        async function fetchCloudState() {
+            // Fetch users
+            const { data: userData } = await _supabase.from('app_users').select('*');
+            if (userData) users = userData;
 
-            const savedQuestions = localStorage.getItem('quiz_questions');
-            questions = savedQuestions ? JSON.parse(savedQuestions) : INITIAL_QUESTIONS;
+            // Fetch questions
+            const { data: qData } = await _supabase.from('questions').select('*');
+            if (qData) questions = qData;
 
-            const savedPublished = localStorage.getItem('quiz_is_published');
-            isPublished = savedPublished ? JSON.parse(savedPublished) : false;
+            // Fetch app state
+            const { data: stateData } = await _supabase.from('app_state').select('is_published').eq('id', 1).single();
+            if (stateData) isPublished = stateData.is_published;
 
-            const savedSubmissions = localStorage.getItem('quiz_submissions');
-            submissions = savedSubmissions ? JSON.parse(savedSubmissions) : {};
-
-            const savedCurrentUser = localStorage.getItem('quiz_current_user');
-            if (savedCurrentUser) {
-                currentUser = JSON.parse(savedCurrentUser);
+            // Fetch submissions
+            const { data: subData } = await _supabase.from('submissions').select('*');
+            if (subData) {
+                submissions = {};
+                subData.forEach(s => submissions[s.username] = s);
             }
         }
 
-        function saveState() {
-            localStorage.setItem('quiz_users', JSON.stringify(users));
-            localStorage.setItem('quiz_questions', JSON.stringify(questions));
-            localStorage.setItem('quiz_is_published', JSON.stringify(isPublished));
-            localStorage.setItem('quiz_submissions', JSON.stringify(submissions));
-            if (currentUser) {
-                localStorage.setItem('quiz_current_user', JSON.stringify(currentUser));
-            } else {
-                localStorage.removeItem('quiz_current_user');
-            }
+        function setupRealtimeSubscriptions() {
+            _supabase.channel('public-db-changes')
+                .on('postgres_changes', { event: '*', schema: 'public' }, async () => {
+                    await fetchCloudState();
+                    populateLoginDropdown();
+                    updateUI();
+                })
+                .subscribe();
         }
 
         function populateLoginDropdown() {
@@ -667,31 +530,29 @@
             });
         }
 
-        function handleLogin(e) {
+        async function handleLogin(e) {
             e.preventDefault();
             const username = document.getElementById('loginUserSelect').value;
             const passwordInput = document.getElementById('loginPassword').value;
-        
+
             const found = users.find(u => u.name === username);
             if (!found || found.pass !== passwordInput) {
                 showToast("Invalid password!", "error");
                 return;
             }
-        
+
             currentUser = found;
-            saveState();
+            localStorage.setItem('quiz_current_user', JSON.stringify(currentUser));
             document.getElementById('loginPassword').value = '';
             showToast(`Welcome back, ${currentUser.name}!`, "success");
             
-            // --- ADD THIS LINE BELOW ---
-            updateUI(); 
-            
+            updateUI();
             switchTab('dashboard');
         }
 
         function logout() {
             currentUser = null;
-            saveState();
+            localStorage.removeItem('quiz_current_user');
             showToast("Logged out successfully.", "info");
             updateUI();
         }
@@ -778,7 +639,6 @@
 
         function renderCurrentView() {
             if (!currentUser) return;
-
             if (activeTab === 'dashboard') renderDashboard();
             else if (activeTab === 'my-questions') renderMyQuestions();
             else if (activeTab === 'take-quiz') renderTakeQuiz();
@@ -805,13 +665,11 @@
             if (isPublished) {
                 card.innerHTML = `
                     <div class="flex items-start gap-4">
-                        <div class="p-3 bg-emerald-100 text-emerald-700 rounded-xl shrink-0">
-                            <i data-lucide="check-circle-2" class="w-6 h-6"></i>
-                        </div>
+                        <div class="p-3 bg-emerald-100 text-emerald-700 rounded-xl shrink-0"><i data-lucide="check-circle-2" class="w-6 h-6"></i></div>
                         <div class="space-y-1">
                             <h4 class="font-bold text-slate-800">Bible Quiz Bank is Published</h4>
-                            <p class="text-sm text-slate-600">The host has compiled all submitted questions. You can now test your Bible knowledge!</p>
-                            <button onclick="switchTab('take-quiz')" class="mt-3 inline-flex items-center gap-2 text-sm font-semibold text-amber-600 hover:text-amber-800">
+                            <p class="text-sm text-slate-600">The host has compiled all submitted questions. You can now test your knowledge!</p>
+                            <button onclick="switchTab('take-quiz')" class="mt-3 inline-flex items-center gap-2 text-sm font-semibold text-blue-600 hover:text-blue-800">
                                 Take Quiz Now <i data-lucide="arrow-right" class="w-4 h-4"></i>
                             </button>
                         </div>
@@ -820,13 +678,11 @@
             } else {
                 card.innerHTML = `
                     <div class="flex items-start gap-4">
-                        <div class="p-3 bg-amber-100 text-amber-700 rounded-xl shrink-0">
-                            <i data-lucide="info" class="w-6 h-6"></i>
-                        </div>
+                        <div class="p-3 bg-amber-100 text-amber-700 rounded-xl shrink-0"><i data-lucide="info" class="w-6 h-6"></i></div>
                         <div class="space-y-1">
                             <h4 class="font-bold text-slate-800">Creation Phase Active</h4>
-                            <p class="text-sm text-slate-600">You can upload and edit your Bible questions. Other users cannot view your uploaded questions until Host <strong>Trevis</strong> publishes the full quiz bank.</p>
-                            <button onclick="switchTab('my-questions')" class="mt-3 inline-flex items-center gap-2 text-sm font-semibold text-amber-600 hover:text-amber-800">
+                            <p class="text-sm text-slate-600">You can upload and edit your questions. Other users cannot view your uploaded questions until Host <strong>Trevis</strong> publishes the full quiz bank.</p>
+                            <button onclick="switchTab('my-questions')" class="mt-3 inline-flex items-center gap-2 text-sm font-semibold text-blue-600 hover:text-blue-800">
                                 Create Questions <i data-lucide="arrow-right" class="w-4 h-4"></i>
                             </button>
                         </div>
@@ -867,32 +723,22 @@
                 <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm hover:border-slate-300 transition space-y-3">
                     <div class="flex justify-between items-start gap-4">
                         <div class="flex items-center gap-2">
-                            <span class="px-2.5 py-1 bg-amber-100 text-amber-800 font-bold text-xs rounded-md uppercase">
+                            <span class="px-2.5 py-1 bg-slate-100 text-slate-700 font-bold text-xs rounded-md uppercase">
                                 ${q.type === 'mcq' ? 'MCQ' : q.type === 'fill' ? 'Fill Blank' : 'Matching'}
                             </span>
                             <span class="text-xs text-slate-400">Question #${idx + 1}</span>
                         </div>
                         ${!isPublished ? `
                             <div class="flex items-center gap-1">
-                                <button onclick="editQuestion('${q.id}')" class="p-1.5 text-slate-500 hover:text-amber-600 rounded hover:bg-slate-100" title="Edit">
-                                    <i data-lucide="pencil" class="w-4 h-4"></i>
-                                </button>
-                                <button onclick="deleteQuestion('${q.id}')" class="p-1.5 text-slate-500 hover:text-red-600 rounded hover:bg-slate-100" title="Delete">
-                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
-                                </button>
+                                <button onclick="editQuestion('${q.id}')" class="p-1.5 text-slate-500 hover:text-blue-600 rounded hover:bg-slate-100" title="Edit"><i data-lucide="pencil" class="w-4 h-4"></i></button>
+                                <button onclick="deleteQuestion('${q.id}')" class="p-1.5 text-slate-500 hover:text-red-600 rounded hover:bg-slate-100" title="Delete"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
                             </div>
                         ` : ''}
                     </div>
 
                     <h4 class="font-semibold text-slate-800 text-base">${escapeHTML(q.prompt)}</h4>
-
                     ${renderQuestionDetailsPreview(q)}
-
-                    ${q.explanation ? `
-                        <div class="text-xs text-slate-500 bg-slate-50 p-2.5 rounded border border-slate-100">
-                            <strong>Explanation:</strong> ${escapeHTML(q.explanation)}
-                        </div>
-                    ` : ''}
+                    ${q.explanation ? `<div class="text-xs text-slate-500 bg-slate-50 p-2.5 rounded border border-slate-100"><strong>Explanation:</strong> ${escapeHTML(q.explanation)}</div>` : ''}
                 </div>
             `).join('');
         }
@@ -909,11 +755,7 @@
                     </div>
                 `;
             } else if (q.type === 'fill') {
-                return `
-                    <div class="text-xs bg-slate-50 p-2.5 rounded border border-slate-200 text-slate-700">
-                        <strong>Correct Answer:</strong> <code class="bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded font-mono font-bold">${escapeHTML(q.correctAnswer)}</code>
-                    </div>
-                `;
+                return `<div class="text-xs bg-slate-50 p-2.5 rounded border border-slate-200 text-slate-700"><strong>Correct Answer:</strong> <code class="bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded font-mono font-bold">${escapeHTML(q.correctAnswer)}</code></div>`;
             } else if (q.type === 'matching') {
                 return `
                     <div class="space-y-1.5 text-xs">
@@ -922,7 +764,7 @@
                             ${q.pairs.map(p => `
                                 <div class="p-2 bg-slate-50 rounded border border-slate-200 flex justify-between">
                                     <span class="font-medium text-slate-700">${escapeHTML(p.item)}</span>
-                                    <span class="text-amber-700 font-bold">→ ${escapeHTML(p.match)}</span>
+                                    <span class="text-blue-600 font-bold">→ ${escapeHTML(p.match)}</span>
                                 </div>
                             `).join('')}
                         </div>
@@ -971,19 +813,17 @@
                     <div class="space-y-2">
                         ${opts.map((opt, i) => `
                             <div class="flex items-center gap-2">
-                                <input type="radio" name="mcqCorrect" value="${i}" ${correctIdx === i ? 'checked' : ''} class="w-4 h-4 text-amber-600 focus:ring-amber-500">
+                                <input type="radio" name="mcqCorrect" value="${i}" ${correctIdx === i ? 'checked' : ''} class="w-4 h-4 text-blue-600">
                                 <input type="text" class="mcq-option-input w-full px-3 py-2 rounded border border-slate-300 text-sm" placeholder="Option ${String.fromCharCode(65 + i)}" value="${escapeHTML(opt)}" required>
                             </div>
                         `).join('')}
                     </div>
-                    <p class="text-xs text-slate-400 mt-1">Select the radio button corresponding to the correct answer.</p>
                 `;
             } else if (type === 'fill') {
                 const answer = existingQ && existingQ.type === 'fill' ? existingQ.correctAnswer : '';
                 container.innerHTML = `
                     <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-1">Expected Correct Text Answer</label>
                     <input type="text" id="fillCorrectAnswer" required value="${escapeHTML(answer)}" placeholder="e.g. truth" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-sm">
-                    <p class="text-xs text-slate-400 mt-1">Matches case-insensitively during evaluation.</p>
                 `;
             } else if (type === 'matching') {
                 const pairs = existingQ && existingQ.type === 'matching' ? existingQ.pairs : [
@@ -995,7 +835,7 @@
                 container.innerHTML = `
                     <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-1">Matching Pairs</label>
                     <div id="matchingPairsContainer" class="space-y-2">
-                        ${pairs.map((p, i) => `
+                        ${pairs.map(p => `
                             <div class="flex items-center gap-2 pair-row">
                                 <input type="text" class="pair-item w-1/2 px-3 py-2 rounded border border-slate-300 text-sm" placeholder="Item" value="${escapeHTML(p.item)}" required>
                                 <span class="text-slate-400 font-bold">→</span>
@@ -1003,7 +843,7 @@
                             </div>
                         `).join('')}
                     </div>
-                    <button type="button" onclick="addMatchingPairRow()" class="mt-2 text-xs font-semibold text-amber-700 hover:text-amber-900 flex items-center gap-1">
+                    <button type="button" onclick="addMatchingPairRow()" class="mt-2 text-xs font-semibold text-blue-600 hover:text-blue-800 flex items-center gap-1">
                         <i data-lucide="plus" class="w-3.5 h-3.5"></i> Add Another Pair
                     </button>
                 `;
@@ -1023,7 +863,7 @@
             container.appendChild(row);
         }
 
-        function handleSaveQuestion(e) {
+        async function handleSaveQuestion(e) {
             e.preventDefault();
             const id = document.getElementById('qId').value;
             const type = document.getElementById('qType').value;
@@ -1040,14 +880,9 @@
 
             if (type === 'mcq') {
                 const optInputs = document.querySelectorAll('.mcq-option-input');
-                const options = Array.from(optInputs).map(i => i.value.trim());
+                qData.options = Array.from(optInputs).map(i => i.value.trim());
                 const correct = document.querySelector('input[name="mcqCorrect"]:checked');
-
-                if (!correct) {
-                    showToast("Please select a correct option.", "error");
-                    return;
-                }
-                qData.options = options;
+                if (!correct) return showToast("Please select a correct option.", "error");
                 qData.correctAnswer = correct.value;
             } else if (type === 'fill') {
                 qData.correctAnswer = document.getElementById('fillCorrectAnswer').value.trim();
@@ -1059,48 +894,29 @@
                     const match = r.querySelector('.pair-match').value.trim();
                     if (item && match) pairs.push({ item, match });
                 });
-                if (pairs.length < 2) {
-                    showToast("Matching questions require at least 2 pairs.", "error");
-                    return;
-                }
+                if (pairs.length < 2) return showToast("Matching questions require at least 2 pairs.", "error");
                 qData.pairs = pairs;
             }
 
-            if (id) {
-                const idx = questions.findIndex(q => q.id === id);
-                if (idx !== -1) questions[idx] = qData;
-            } else {
-                questions.push(qData);
-            }
-
-            saveState();
-            closeModal('questionModal');
-            showToast(id ? "Question updated successfully!" : "New question added!", "success");
-            renderMyQuestions();
-            updateNavCounters();
-        }
-
-        function editQuestion(id) {
-            openQuestionModal(id);
-        }
-
-        function deleteQuestion(id) {
-            if (isPublished) {
-                showToast("Cannot delete questions after publishing.", "error");
+            // Upsert into Supabase
+            const { error } = await _supabase.from('questions').upsert(qData);
+            if (error) {
+                showToast("Failed to save question to cloud.", "error");
                 return;
             }
-            if (confirm("Are you sure you want to delete this question?")) {
-                questions = questions.filter(q => q.id !== id);
-                saveState();
-                showToast("Question deleted.", "info");
-                renderMyQuestions();
-                updateNavCounters();
-            }
+
+            closeModal('questionModal');
+            showToast(id ? "Question updated successfully!" : "New question added!", "success");
         }
 
-        function updateNavCounters() {
-            const myQs = questions.filter(q => q.author === currentUser.name);
-            document.getElementById('navMyQCount').textContent = myQs.length;
+        function editQuestion(id) { openQuestionModal(id); }
+
+        async function deleteQuestion(id) {
+            if (isPublished) return showToast("Cannot delete questions after publishing.", "error");
+            if (confirm("Are you sure you want to delete this question?")) {
+                await _supabase.from('questions').delete().eq('id', id);
+                showToast("Question deleted.", "info");
+            }
         }
 
         function renderTakeQuiz() {
@@ -1122,15 +938,12 @@
             qList.innerHTML = questions.map((q, idx) => `
                 <div class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm space-y-4">
                     <div class="flex justify-between items-center">
-                        <span class="text-xs font-bold text-amber-700 uppercase tracking-wider">Question ${idx + 1} of ${questions.length}</span>
+                        <span class="text-xs font-bold text-blue-600 uppercase tracking-wider">Question ${idx + 1} of ${questions.length}</span>
                         <span class="text-xs text-slate-400 bg-slate-100 px-2.5 py-1 rounded">Author: ${escapeHTML(q.author)}</span>
                     </div>
 
                     <h3 class="text-lg font-bold text-slate-800">${escapeHTML(q.prompt)}</h3>
-
-                    <div>
-                        ${renderQuizInputForType(q, idx)}
-                    </div>
+                    <div>${renderQuizInputForType(q, idx)}</div>
                 </div>
             `).join('');
 
@@ -1142,19 +955,15 @@
                 return `
                     <div class="space-y-2 mt-3">
                         ${q.options.map((opt, i) => `
-                            <label class="flex items-center gap-3 p-3 rounded-lg border border-slate-200 hover:bg-amber-50/40 cursor-pointer transition">
-                                <input type="radio" name="ans_${q.id}" value="${i}" required class="w-4 h-4 text-amber-600 focus:ring-amber-500">
-                                <span class="text-sm font-medium text-slate-700">${String.fromCharCode(65 + i)}. ${escapeHTML(opt)}</span>
+                            <label class="flex items-center gap-3 p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer transition">
+                                <input type="radio" name="ans_${q.id}" value="${i}" required class="w-4 h-4 text-blue-600 focus:ring-blue-500">
+                                <span class="text-sm font-medium text-slate-700">${String.fromCharCode(65 + i)}.${escapeHTML(opt)}</span>
                             </label>
                         `).join('')}
                     </div>
                 `;
             } else if (q.type === 'fill') {
-                return `
-                    <div class="mt-3">
-                        <input type="text" name="ans_${q.id}" required placeholder="Type your answer here..." class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-amber-500 text-sm">
-                    </div>
-                `;
+                return `<div class="mt-3"><input type="text" name="ans_${q.id}" required placeholder="Type your answer here..." class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 text-sm"></div>`;
             } else if (q.type === 'matching') {
                 const matchTargets = q.pairs.map(p => p.match);
                 return `
@@ -1163,7 +972,7 @@
                         ${q.pairs.map((p, pairIdx) => `
                             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3 bg-slate-50 rounded-lg border border-slate-200">
                                 <span class="text-sm font-semibold text-slate-800">${escapeHTML(p.item)}</span>
-                                <select name="ans_${q.id}_${pairIdx}" required class="px-3 py-2 rounded border border-slate-300 text-sm bg-white focus:ring-2 focus:ring-amber-500">
+                                <select name="ans_${q.id}_${pairIdx}" required class="px-3 py-2 rounded border border-slate-300 text-sm bg-white focus:ring-2 focus:ring-blue-500">
                                     <option value="">-- Choose Match --</option>
                                     ${matchTargets.map(target => `<option value="${escapeHTML(target)}">${escapeHTML(target)}</option>`).join('')}
                                 </select>
@@ -1175,7 +984,7 @@
             return '';
         }
 
-        function handleQuizSubmit(e) {
+        async function handleQuizSubmit(e) {
             e.preventDefault();
             const formData = new FormData(e.target);
             let score = 0;
@@ -1187,39 +996,30 @@
 
                 if (q.type === 'mcq') {
                     userVal = formData.get(`ans_${q.id}`);
-                    if (userVal === q.correctAnswer) {
-                        isCorrect = true;
-                    }
+                    if (userVal === q.correctAnswer) isCorrect = true;
                 } else if (q.type === 'fill') {
                     userVal = (formData.get(`ans_${q.id}`) || '').trim();
-                    if (userVal.toLowerCase() === q.correctAnswer.toLowerCase()) {
-                        isCorrect = true;
-                    }
+                    if (userVal.toLowerCase() === q.correctAnswer.toLowerCase()) isCorrect = true;
                 } else if (q.type === 'matching') {
                     userVal = [];
                     let matchingCorrect = true;
                     q.pairs.forEach((p, pIdx) => {
                         const selectedMatch = formData.get(`ans_${q.id}_${pIdx}`);
                         userVal.push({ item: p.item, selected: selectedMatch });
-                        if (selectedMatch !== p.match) {
-                            matchingCorrect = false;
-                        }
+                        if (selectedMatch !== p.match) matchingCorrect = false;
                     });
                     isCorrect = matchingCorrect;
                 }
 
                 if (isCorrect) score++;
-
-                answers[q.id] = {
-                    userVal,
-                    isCorrect
-                };
+                answers[q.id] = { userVal, isCorrect };
             });
 
             const total = questions.length;
             const percentage = total > 0 ? Math.round((score / total) * 100) : 0;
 
-            submissions[currentUser.name] = {
+            const submissionData = {
+                username: currentUser.name,
                 score,
                 total,
                 percentage,
@@ -1227,8 +1027,8 @@
                 timestamp: new Date().toLocaleString()
             };
 
-            saveState();
-            showToast(`Quiz Submitted! Score: ${score}/${total} (${percentage}%)`, "success");
+            await _supabase.from('submissions').upsert(submissionData);
+            showToast(`Quiz Submitted! You scored ${score}/${total} (${percentage}%)`, "success");
             switchTab('results');
         }
 
@@ -1269,16 +1069,8 @@
                         </div>
 
                         <h4 class="font-bold text-slate-800 text-base">${escapeHTML(q.prompt)}</h4>
-
-                        <div class="text-sm space-y-2">
-                            ${renderSolutionDetail(q, ansObj)}
-                        </div>
-
-                        ${q.explanation ? `
-                            <div class="text-xs bg-slate-50 p-3 rounded-lg border border-slate-200 text-slate-600">
-                                <strong>Solution Explanation:</strong> ${escapeHTML(q.explanation)}
-                            </div>
-                        ` : ''}
+                        <div class="text-sm space-y-2">${renderSolutionDetail(q, ansObj)}</div>
+                        ${q.explanation ? `<div class="text-xs bg-slate-50 p-3 rounded-lg border border-slate-200 text-slate-600"><strong>Solution Explanation:</strong> ${escapeHTML(q.explanation)}</div>` : ''}
                     </div>
                 `;
             }).join('');
@@ -1295,14 +1087,12 @@
                         <div class="p-2.5 rounded border bg-slate-50">
                             <span class="text-slate-500 block">Your Answer:</span>
                             <span class="font-semibold ${ansObj.isCorrect ? 'text-emerald-700' : 'text-red-600'}">
-                                ${isNaN(userChoiceIdx) ? 'No Answer' : `${String.fromCharCode(65 + userChoiceIdx)}. ${escapeHTML(q.options[userChoiceIdx])}`}
+                                ${isNaN(userChoiceIdx) ? 'No Answer' : `${String.fromCharCode(65 + userChoiceIdx)}.${escapeHTML(q.options[userChoiceIdx])}`}
                             </span>
                         </div>
                         <div class="p-2.5 rounded border bg-emerald-50 border-emerald-200">
                             <span class="text-emerald-800 block">Official Correct Answer:</span>
-                            <span class="font-bold text-emerald-900">
-                                ${String.fromCharCode(65 + correctIdx)}. ${escapeHTML(q.options[correctIdx])}
-                            </span>
+                            <span class="font-bold text-emerald-900">${String.fromCharCode(65 + correctIdx)}. ${escapeHTML(q.options[correctIdx])}</span>
                         </div>
                     </div>
                 `;
@@ -1311,15 +1101,11 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
                         <div class="p-2.5 rounded border bg-slate-50">
                             <span class="text-slate-500 block">Your Answer:</span>
-                            <span class="font-semibold ${ansObj.isCorrect ? 'text-emerald-700' : 'text-red-600'}">
-                                "${escapeHTML(ansObj.userVal || 'Empty')}"
-                            </span>
+                            <span class="font-semibold ${ansObj.isCorrect ? 'text-emerald-700' : 'text-red-600'}">"${escapeHTML(ansObj.userVal || 'Empty')}"</span>
                         </div>
                         <div class="p-2.5 rounded border bg-emerald-50 border-emerald-200">
                             <span class="text-emerald-800 block">Official Correct Answer:</span>
-                            <span class="font-bold text-emerald-900">
-                                "${escapeHTML(q.correctAnswer)}"
-                            </span>
+                            <span class="font-bold text-emerald-900">"${escapeHTML(q.correctAnswer)}"</span>
                         </div>
                     </div>
                 `;
@@ -1329,15 +1115,14 @@
                     <div class="space-y-1 text-xs">
                         <span class="font-semibold text-slate-600">Pairs Comparison:</span>
                         <div class="space-y-1.5">
-                            ${q.pairs.map((p, i) => {
+                            ${q.pairs.map(p => {
                                 const userSelection = userPairs.find(u => u.item === p.item)?.selected || 'Unselected';
                                 const pairCorrect = userSelection === p.match;
                                 return `
                                     <div class="p-2 rounded border flex flex-col sm:flex-row justify-between text-xs ${pairCorrect ? 'bg-emerald-50/60 border-emerald-200' : 'bg-red-50/60 border-red-200'}">
                                         <span class="font-medium text-slate-800">${escapeHTML(p.item)}</span>
                                         <div>
-                                            <span class="${pairCorrect ? 'text-emerald-700 font-semibold' : 'text-red-600 line-through'}">You: ${escapeHTML(userSelection)}</span>
-                                            ${!pairCorrect ? `<span class="text-emerald-800 font-bold ml-2">Correct: ${escapeHTML(p.match)}</span>` : ''}
+                                            <span class="${pairCorrect ? 'text-emerald-700 font-semibold' : 'text-red-600 line-through'}">You: ${escapeHTML(userSelection)}</span>${!pairCorrect ? `<span class="text-emerald-800 font-bold ml-2">Correct: ${escapeHTML(p.match)}</span>` : ''}
                                         </div>
                                     </div>
                                 `;
@@ -1386,9 +1171,7 @@
                         <td class="px-6 py-4 text-sm font-medium text-slate-700">${count} questions</td>
                         <td class="px-6 py-4 text-right space-x-2">
                             <button onclick="openAdminPasswordReset('${escapeHTML(u.name)}')" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded font-medium">Reset Pass</button>
-                            ${u.role !== 'host' ? `
-                                <button onclick="deleteUserAccount('${escapeHTML(u.name)}')" class="text-xs bg-red-50 hover:bg-red-100 text-red-600 px-3 py-1.5 rounded font-medium">Delete</button>
-                            ` : ''}
+                            ${u.role !== 'host' ? `<button onclick="deleteUserAccount('${escapeHTML(u.name)}')" class="text-xs bg-red-50 hover:bg-red-100 text-red-600 px-3 py-1.5 rounded font-medium">Delete</button>` : ''}
                         </td>
                     </tr>
                 `;
@@ -1397,19 +1180,13 @@
             lucide.createIcons();
         }
 
-        function togglePublishStatus() {
+        async function togglePublishStatus() {
             if (currentUser.role !== 'host') return;
+            if (!isPublished && questions.length === 0) return showToast("Cannot publish empty question bank!", "error");
 
-            if (!isPublished && questions.length === 0) {
-                showToast("Cannot publish empty question bank!", "error");
-                return;
-            }
-
-            isPublished = !isPublished;
-            saveState();
-            showToast(isPublished ? "All questions published! Bible Quiz is live." : "Quiz unpublished. Creation phase restored.", isPublished ? "success" : "info");
-            renderHostControls();
-            updateUI();
+            const newStatus = !isPublished;
+            await _supabase.from('app_state').update({ is_published: newStatus }).eq('id', 1);
+            showToast(newStatus ? "All questions published! Quiz is live." : "Quiz unpublished. Creation phase restored.", newStatus ? "success" : "info");
         }
 
         function openAdminPasswordReset(username) {
@@ -1419,116 +1196,74 @@
             openModal('resetUserPasswordModal');
         }
 
-        function handleAdminPasswordReset(e) {
+        async function handleAdminPasswordReset(e) {
             e.preventDefault();
             const target = document.getElementById('adminResetTargetUser').value;
             const newPass = document.getElementById('adminNewPassword').value;
 
-            const u = users.find(usr => usr.name === target);
-            if (u) {
-                u.pass = newPass;
-                saveState();
-                closeModal('resetUserPasswordModal');
-                showToast(`Password updated for ${target}!`, "success");
-            }
+            await _supabase.from('app_users').update({ pass: newPass }).eq('name', target);
+            closeModal('resetUserPasswordModal');
+            showToast(`Password updated for ${target}!`, "success");
         }
 
-        function handleAddUserAccount(e) {
+        async function handleAddUserAccount(e) {
             e.preventDefault();
             const name = document.getElementById('newAccountName').value.trim();
             const pass = document.getElementById('newAccountPassword').value.trim();
 
             if (users.some(u => u.name.toLowerCase() === name.toLowerCase())) {
-                showToast("Account name already exists!", "error");
-                return;
+                return showToast("Account name already exists!", "error");
             }
 
-            users.push({ name, role: 'participant', pass });
-            saveState();
-            populateLoginDropdown();
+            await _supabase.from('app_users').insert({ name, role: 'participant', pass });
             closeModal('addUserModal');
             showToast(`Account "${name}" created successfully!`, "success");
-            renderHostControls();
         }
 
-        function deleteUserAccount(username) {
+        async function deleteUserAccount(username) {
             if (confirm(`Are you sure you want to remove account "${username}"?`)) {
-                users = users.filter(u => u.name !== username);
-                saveState();
-                populateLoginDropdown();
+                await _supabase.from('app_users').delete().eq('name', username);
                 showToast(`Account "${username}" removed.`, "info");
-                renderHostControls();
             }
         }
 
-        function handlePasswordUpdate(e) {
+        async function handlePasswordUpdate(e) {
             e.preventDefault();
             const newPass = document.getElementById('newPasswordInput').value;
             if (currentUser) {
-                const u = users.find(usr => usr.name === currentUser.name);
-                if (u) {
-                    u.pass = newPass;
-                    currentUser.pass = newPass;
-                    saveState();
-                    closeModal('settingsModal');
-                    showToast("Your settings and password have been saved!", "success");
-                }
-            }
-        }
-
-        function confirmResetData() {
-            if (confirm("Reset all platform data back to initial default state? All newly created questions and user password changes will be lost.")) {
-                localStorage.clear();
-                loadState();
-                populateLoginDropdown();
+                await _supabase.from('app_users').update({ pass: newPass }).eq('name', currentUser.name);
+                currentUser.pass = newPass;
+                localStorage.setItem('quiz_current_user', JSON.stringify(currentUser));
                 closeModal('settingsModal');
-                showToast("Platform reset to default state.", "info");
-                updateUI();
+                showToast("Your password has been updated successfully!", "success");
             }
         }
 
         function openModal(modalId) {
             if (modalId === 'settingsModal' && currentUser) {
                 document.getElementById('settingsCurrentUserName').textContent = currentUser.name;
-                document.getElementById('settingsCurrentUserRole').textContent = currentUser.role === 'host' ? 'Host Account' : 'Participant Account';
+                document.getElementById('settingsCurrentUserRole').textContent = currentUser.role === 'host' ? 'Host Account' : 'Participant';
                 document.getElementById('newPasswordInput').value = '';
             }
             document.getElementById(modalId).classList.remove('hidden');
         }
 
-        function closeModal(modalId) {
-            document.getElementById(modalId).classList.add('hidden');
-        }
+        function closeModal(modalId) { document.getElementById(modalId).classList.add('hidden'); }
 
         function escapeHTML(str) {
             if (!str) return '';
-            return str.replace(/[&<>'"]/g, 
-                tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
-            );
+            return str.replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag));
         }
 
         function showToast(message, type = "info") {
             const container = document.getElementById('toastContainer');
             const toast = document.createElement('div');
-
             const bgClass = type === 'success' ? 'bg-emerald-600' : type === 'error' ? 'bg-red-600' : 'bg-slate-800';
             toast.className = `${bgClass} text-white px-4 py-3 rounded-lg shadow-xl text-sm font-medium flex items-center justify-between gap-3 transform transition-all duration-300 translate-y-2 opacity-0`;
-
-            toast.innerHTML = `
-                <span>${message}</span>
-                <button onclick="this.parentElement.remove()" class="text-white/80 hover:text-white">&times;</button>
-            `;
-
+            toast.innerHTML = `<span>${message}</span><button onclick="this.parentElement.remove()" class="text-white/80 hover:text-white">&times;</button>`;
             container.appendChild(toast);
-
-            setTimeout(() => {
-                toast.classList.remove('translate-y-2', 'opacity-0');
-            }, 10);
-
-            setTimeout(() => {
-                toast.classList.add('opacity-0');
-                setTimeout(() => toast.remove(), 300);
-            }, 4000);
+            setTimeout(() => toast.classList.remove('translate-y-2', 'opacity-0'), 10);
+            setTimeout(() => { toast.classList.add('opacity-0'); setTimeout(() => toast.remove(), 300); }, 4000);
         }
     </script>
 </body>
