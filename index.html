@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interactive Quiz & Learning Platform</title>
+    <title>Bible QuizCraft - Multi-User Interactive Platform</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Lucide Icons -->
@@ -47,12 +47,13 @@
     <header class="bg-slate-900 text-white shadow-md sticky top-0 z-40">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
             <div class="flex items-center gap-3 cursor-pointer" onclick="switchTab('dashboard')">
-                <div class="p-2 bg-blue-600 rounded-lg">
-                    <i data-lucide="help-circle" class="w-6 h-6 text-white"></i>
+                <div class="p-2 bg-amber-600 rounded-lg flex items-center justify-center text-white shadow-inner">
+                    <!-- Bible / Open Book Icon -->
+                    <i data-lucide="book-open-check" class="w-6 h-6 text-white"></i>
                 </div>
                 <div>
-                    <span class="font-bold text-lg tracking-wide bg-gradient-to-r from-blue-400 to-indigo-300 bg-clip-text text-transparent">QuizCraft</span>
-                    <span class="text-xs text-slate-400 block -mt-1">Multi-User Q&A Platform</span>
+                    <span class="font-bold text-lg tracking-wide bg-gradient-to-r from-amber-300 via-blue-300 to-indigo-200 bg-clip-text text-transparent">Bible QuizCraft</span>
+                    <span class="text-xs text-slate-400 block -mt-1">Interactive Bible Q&A Platform</span>
                 </div>
             </div>
 
@@ -67,10 +68,12 @@
                         <div id="headerUserName" class="text-sm font-semibold text-slate-100">Trevis</div>
                         <div id="headerUserRole" class="text-xs text-slate-400 capitalize">Host</div>
                     </div>
-                    <button onclick="openModal('settingsModal')" class="p-2 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition" title="Account Settings">
+                    <!-- Functional Setting Icon for ALL logged in accounts -->
+                    <button onclick="openModal('settingsModal')" class="p-2 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition flex items-center justify-center" title="Account Settings">
                         <i data-lucide="settings" class="w-5 h-5"></i>
                     </button>
-                    <button onclick="logout()" class="p-2 text-red-400 hover:text-red-300 hover:bg-slate-800 rounded-lg transition" title="Log Out">
+                    <!-- Sign Out Button -->
+                    <button onclick="logout()" class="p-2 text-red-400 hover:text-red-300 hover:bg-slate-800 rounded-lg transition flex items-center justify-center" title="Sign Out">
                         <i data-lucide="log-out" class="w-5 h-5"></i>
                     </button>
                 </div>
@@ -107,17 +110,17 @@
         <!-- VIEW: LOGIN -->
         <section id="view-login" class="max-w-md mx-auto my-12 bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden">
             <div class="bg-slate-900 p-8 text-center text-white relative">
-                <div class="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg shadow-blue-500/30">
-                    <i data-lucide="lock" class="w-8 h-8 text-white"></i>
+                <div class="w-16 h-16 bg-amber-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg shadow-amber-500/30">
+                    <i data-lucide="book-open" class="w-8 h-8 text-white"></i>
                 </div>
-                <h2 class="text-2xl font-bold">Welcome Back</h2>
-                <p class="text-slate-400 text-sm mt-1">Select your account or enter password to login</p>
+                <h2 class="text-2xl font-bold">Bible QuizCraft</h2>
+                <p class="text-slate-400 text-sm mt-1">Select account and log in to continue</p>
             </div>
 
             <form id="loginForm" onsubmit="handleLogin(event)" class="p-6 space-y-5">
                 <div>
                     <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2">Select User Account</label>
-                    <select id="loginUserSelect" class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-slate-50 text-slate-800 transition">
+                    <select id="loginUserSelect" class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-slate-50 text-slate-800 transition font-medium">
                         <!-- Options generated dynamically -->
                     </select>
                 </div>
@@ -125,15 +128,15 @@
                 <div>
                     <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2">Password</label>
                     <div class="relative">
-                        <input type="password" id="loginPassword" required placeholder="Default: 1234567" class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-slate-50 text-slate-800 transition">
+                        <input type="password" id="loginPassword" required placeholder="Default: 1234567" class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-slate-50 text-slate-800 transition">
                         <button type="button" onclick="togglePasswordVisibility('loginPassword')" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
                             <i data-lucide="eye" class="w-5 h-5"></i>
                         </button>
                     </div>
-                    <p class="text-xs text-slate-400 mt-1">Default password for all preset accounts: <code class="bg-slate-100 px-1 py-0.5 rounded text-slate-700">1234567</code></p>
+                    <p class="text-xs text-slate-400 mt-1">Default password for all accounts: <code class="bg-slate-100 px-1 py-0.5 rounded text-slate-700">1234567</code></p>
                 </div>
 
-                <button type="submit" class="w-full py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-lg shadow-blue-500/25 transition flex items-center justify-center gap-2">
+                <button type="submit" class="w-full py-3.5 bg-amber-600 hover:bg-amber-700 text-white font-semibold rounded-lg shadow-lg shadow-amber-600/25 transition flex items-center justify-center gap-2">
                     <i data-lucide="log-in" class="w-5 h-5"></i> Sign In
                 </button>
             </form>
@@ -141,18 +144,22 @@
 
         <!-- VIEW: DASHBOARD -->
         <section id="view-dashboard" class="space-y-6 hidden">
-            <div class="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-2xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden">
+            <div class="bg-gradient-to-r from-amber-700 via-amber-800 to-slate-900 rounded-2xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden">
                 <div class="relative z-10">
-                    <h1 class="text-2xl sm:text-3xl font-extrabold mb-2">Hello, <span id="dashUserName">User</span> 👋</h1>
-                    <p class="text-blue-100 text-sm sm:text-base max-w-2xl">
-                        Welcome to QuizCraft. Upload your questions confidentially during the Creation Phase. Once the Host publishes the quiz bank, test your knowledge!
+                    <h1 class="text-2xl sm:text-3xl font-extrabold mb-2">Hello, <span id="dashUserName">User</span> 👋🏻</h1>
+                    <p class="text-amber-100 text-sm sm:text-base max-w-2xl">
+                        Welcome to Bible QuizCraft. Upload your questions confidentially during the Creation Phase. Once Host Trevis publishes the quiz bank, test your Bible knowledge!
                     </p>
                     <div class="mt-6 flex flex-wrap gap-3">
-                        <button onclick="switchTab('my-questions')" class="bg-white text-blue-700 hover:bg-blue-50 px-4 py-2.5 rounded-lg font-semibold text-sm transition shadow flex items-center gap-2">
+                        <button onclick="switchTab('my-questions')" class="bg-white text-amber-900 hover:bg-amber-50 px-4 py-2.5 rounded-lg font-semibold text-sm transition shadow flex items-center gap-2">
                             <i data-lucide="plus-circle" class="w-4 h-4"></i> Manage My Questions
                         </button>
-                        <button onclick="switchTab('take-quiz')" class="bg-blue-800/60 hover:bg-blue-800/80 border border-blue-400/30 text-white px-4 py-2.5 rounded-lg font-semibold text-sm transition flex items-center gap-2">
+                        <button onclick="switchTab('take-quiz')" class="bg-amber-900/60 hover:bg-amber-900/80 border border-amber-400/30 text-white px-4 py-2.5 rounded-lg font-semibold text-sm transition flex items-center gap-2">
                             <i data-lucide="play" class="w-4 h-4"></i> Take Live Quiz
+                        </button>
+                        <!-- Publish Quiz shortcut button for Host account -->
+                        <button id="dashPublishBtn" onclick="togglePublishStatus()" class="hidden bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-lg font-semibold text-sm transition shadow flex items-center gap-2">
+                            <i data-lucide="upload-cloud" class="w-4 h-4"></i> Publish Quiz Bank
                         </button>
                     </div>
                 </div>
@@ -212,7 +219,7 @@
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
                     <h2 class="text-2xl font-bold text-slate-800">My Question Repository</h2>
-                    <p class="text-slate-500 text-sm">Questions you create remain confidential to your account until published by the host.</p>
+                    <p class="text-slate-500 text-sm">Questions you create remain confidential to your account until published by Host Trevis.</p>
                 </div>
                 <button onclick="openQuestionModal()" id="addQBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-lg font-medium text-sm shadow transition flex items-center gap-2">
                     <i data-lucide="plus" class="w-4 h-4"></i> Add New Question
@@ -250,7 +257,7 @@
                 <!-- Header Info -->
                 <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex flex-wrap justify-between items-center gap-4">
                     <div>
-                        <h2 class="text-2xl font-bold text-slate-800">Live Quiz Assessment</h2>
+                        <h2 class="text-2xl font-bold text-slate-800">Live Bible Quiz Assessment</h2>
                         <p class="text-slate-500 text-sm">Answer all questions below and click submit to receive immediate scoring.</p>
                     </div>
                     <div class="bg-blue-50 text-blue-700 px-4 py-2 rounded-lg font-semibold text-sm flex items-center gap-2">
@@ -444,33 +451,39 @@
         </div>
     </div>
 
-    <!-- MODAL: ACCOUNT SETTINGS / UPDATE PASSWORD -->
+    <!-- MODAL: ACCOUNT SETTINGS / UPDATE PASSWORD (ACCESSIBLE TO ALL ACCOUNTS) -->
     <div id="settingsModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-slate-100 overflow-hidden">
-            <div class="p-6 border-b border-slate-100 flex justify-between items-center">
-                <h3 class="text-lg font-bold text-slate-800">Account Settings</h3>
+            <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="settings" class="w-5 h-5 text-slate-700"></i>
+                    <h3 class="text-lg font-bold text-slate-800">Account Settings</h3>
+                </div>
                 <button onclick="closeModal('settingsModal')" class="text-slate-400 hover:text-slate-600">
                     <i data-lucide="x" class="w-6 h-6"></i>
                 </button>
             </div>
 
             <form onsubmit="handlePasswordUpdate(event)" class="p-6 space-y-4">
-                <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-1">Logged In As</label>
-                    <div id="settingsCurrentUserName" class="text-base font-bold text-slate-800">User</div>
+                <div class="bg-blue-50 p-3 rounded-lg border border-blue-100 flex items-center justify-between">
+                    <div>
+                        <span class="text-xs text-slate-500 block">Logged In Account</span>
+                        <span id="settingsCurrentUserName" class="text-base font-bold text-blue-900">User</span>
+                    </div>
+                    <span id="settingsCurrentUserRole" class="px-2.5 py-1 bg-blue-200 text-blue-800 text-xs font-bold rounded-full capitalize">Participant</span>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2">New Password</label>
+                    <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2">Update Password</label>
                     <div class="relative">
                         <input type="password" id="newPasswordInput" required minlength="4" placeholder="Enter new password" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 text-sm">
-                        <button type="button" onclick="togglePasswordVisibility('newPasswordInput')" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">
+                        <button type="button" onclick="togglePasswordVisibility('newPasswordInput')" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
                             <i data-lucide="eye" class="w-4 h-4"></i>
                         </button>
                     </div>
                 </div>
 
-                <div class="pt-4 border-t border-slate-100 flex justify-between items-center">
+                <div class="pt-4 border-t border-slate-100 flex justify-between items-center gap-2">
                     <button type="button" onclick="confirmResetData()" class="text-xs text-red-600 hover:text-red-800 font-medium">
                         Reset All Demo Data
                     </button>
@@ -556,36 +569,36 @@
             { name: "Anonymous 4", role: "participant", pass: "1234567" }
         ];
 
-        // Default sample questions pre-created for testing
+        // Sample Bible questions
         const INITIAL_QUESTIONS = [
             {
                 id: "q-1",
                 author: "Trevis",
                 type: "mcq",
-                prompt: "Which protocol is primarily used for secure web communication?",
-                options: ["HTTP", "HTTPS", "FTP", "SMTP"],
-                correctAnswer: "1", // Index 1 = HTTPS
-                explanation: "HTTPS encrypts communications using TLS/SSL."
+                prompt: "Which book of the Bible is known as the book of songs and prayers?",
+                options: ["Genesis", "Psalms", "Proverbs", "Isaiah"],
+                correctAnswer: "1", // Index 1 = Psalms
+                explanation: "Psalms is a collection of 150 sacred songs, prayers, and poems."
             },
             {
                 id: "q-2",
                 author: "John",
                 type: "fill",
-                prompt: "The JavaScript array method used to create a new array filled with the results of calling a provided function is ____.",
-                correctAnswer: "map",
-                explanation: "Array.prototype.map() creates a new array with transformed items."
+                prompt: "In the Gospel of John, Jesus says: 'I am the way, the ____, and the life.'",
+                correctAnswer: "truth",
+                explanation: "John 14:6 - 'I am the way, the truth, and the life. No one comes to the Father except through me.'"
             },
             {
                 id: "q-3",
                 author: "Trevis",
                 type: "matching",
-                prompt: "Match the web technology to its primary purpose:",
+                prompt: "Match the biblical figure with their significant role/event:",
                 pairs: [
-                    { item: "HTML", match: "Structure" },
-                    { item: "CSS", match: "Styling" },
-                    { item: "JavaScript", match: "Interactivity" }
+                    { item: "Moses", match: "Led Exodus" },
+                    { item: "David", match: "Defeated Goliath" },
+                    { item: "Noah", match: "Built the Ark" }
                 ],
-                explanation: "HTML provides structure, CSS handles styling, and JS powers behavior."
+                explanation: "Moses led Israel out of Egypt, David defeated Goliath, and Noah built the Ark."
             }
         ];
 
@@ -728,10 +741,14 @@
 
                 // Host button visibility
                 const hostNavBtn = document.getElementById('nav-host-controls');
+                const dashPublishBtn = document.getElementById('dashPublishBtn');
+
                 if (currentUser.role === 'host') {
                     hostNavBtn.classList.remove('hidden');
+                    dashPublishBtn.classList.remove('hidden');
                 } else {
                     hostNavBtn.classList.add('hidden');
+                    dashPublishBtn.classList.add('hidden');
                 }
 
                 // Status Badge
@@ -785,8 +802,8 @@
                             <i data-lucide="check-circle-2" class="w-6 h-6"></i>
                         </div>
                         <div class="space-y-1">
-                            <h4 class="font-bold text-slate-800">Quiz Bank is Currently Published</h4>
-                            <p class="text-sm text-slate-600">The host has compiled all questions into the active quiz bank. You can now test your knowledge!</p>
+                            <h4 class="font-bold text-slate-800">Bible Quiz Bank is Published</h4>
+                            <p class="text-sm text-slate-600">The host has compiled all submitted questions. You can now test your knowledge!</p>
                             <button onclick="switchTab('take-quiz')" class="mt-3 inline-flex items-center gap-2 text-sm font-semibold text-blue-600 hover:text-blue-800">
                                 Take Quiz Now <i data-lucide="arrow-right" class="w-4 h-4"></i>
                             </button>
@@ -801,7 +818,7 @@
                         </div>
                         <div class="space-y-1">
                             <h4 class="font-bold text-slate-800">Creation Phase Active</h4>
-                            <p class="text-sm text-slate-600">You can upload, edit, or remove your questions. Other users cannot view your questions during this stage. Once complete, Host <strong>Trevis</strong> will publish all questions.</p>
+                            <p class="text-sm text-slate-600">You can upload and edit your questions. Other users cannot view your uploaded questions until Host <strong>Trevis</strong> publishes the full quiz bank.</p>
                             <button onclick="switchTab('my-questions')" class="mt-3 inline-flex items-center gap-2 text-sm font-semibold text-blue-600 hover:text-blue-800">
                                 Create Questions <i data-lucide="arrow-right" class="w-4 h-4"></i>
                             </button>
@@ -816,7 +833,7 @@
             const lockedNotice = document.getElementById('questionsLockedNotice');
             const addBtn = document.getElementById('addQBtn');
 
-            // Strictly filter questions created by current user
+            // Filter questions created by current user
             const myQs = questions.filter(q => q.author === currentUser.name);
 
             if (isPublished) {
@@ -834,7 +851,7 @@
                     <div class="bg-white rounded-xl p-8 text-center border border-slate-200">
                         <i data-lucide="help-circle" class="w-10 h-10 text-slate-300 mx-auto mb-2"></i>
                         <h4 class="font-bold text-slate-700">No Questions Uploaded Yet</h4>
-                        <p class="text-xs text-slate-500 mt-1">Click "Add New Question" above to start contributing to the quiz bank.</p>
+                        <p class="text-xs text-slate-500 mt-1">Click "Add New Question" above to start contributing.</p>
                     </div>
                 `;
                 return;
@@ -960,7 +977,7 @@
                 const answer = existingQ && existingQ.type === 'fill' ? existingQ.correctAnswer : '';
                 container.innerHTML = `
                     <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-1">Expected Correct Text Answer</label>
-                    <input type="text" id="fillCorrectAnswer" required value="${escapeHTML(answer)}" placeholder="e.g. map or Paris" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-sm">
+                    <input type="text" id="fillCorrectAnswer" required value="${escapeHTML(answer)}" placeholder="e.g. truth" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-sm">
                     <p class="text-xs text-slate-400 mt-1">Matches case-insensitively during evaluation.</p>
                 `;
             } else if (type === 'matching') {
@@ -975,9 +992,9 @@
                     <div id="matchingPairsContainer" class="space-y-2">
                         ${pairs.map((p, i) => `
                             <div class="flex items-center gap-2 pair-row">
-                                <input type="text" class="pair-item w-1/2 px-3 py-2 rounded border border-slate-300 text-sm" placeholder="Item (e.g. HTML)" value="${escapeHTML(p.item)}" required>
+                                <input type="text" class="pair-item w-1/2 px-3 py-2 rounded border border-slate-300 text-sm" placeholder="Item" value="${escapeHTML(p.item)}" required>
                                 <span class="text-slate-400 font-bold">→</span>
-                                <input type="text" class="pair-match w-1/2 px-3 py-2 rounded border border-slate-300 text-sm" placeholder="Matches With (e.g. Structure)" value="${escapeHTML(p.match)}" required>
+                                <input type="text" class="pair-match w-1/2 px-3 py-2 rounded border border-slate-300 text-sm" placeholder="Matches With" value="${escapeHTML(p.match)}" required>
                             </div>
                         `).join('')}
                     </div>
@@ -1134,7 +1151,6 @@
                     </div>
                 `;
             } else if (q.type === 'matching') {
-                // Shuffle options for matching dropdowns
                 const matchTargets = q.pairs.map(p => p.match);
                 return `
                     <div class="space-y-3 mt-3">
@@ -1470,6 +1486,7 @@
         function openModal(modalId) {
             if (modalId === 'settingsModal' && currentUser) {
                 document.getElementById('settingsCurrentUserName').textContent = currentUser.name;
+                document.getElementById('settingsCurrentUserRole').textContent = currentUser.role === 'host' ? 'Host Account' : 'Participant';
                 document.getElementById('newPasswordInput').value = '';
             }
             document.getElementById(modalId).classList.remove('hidden');
