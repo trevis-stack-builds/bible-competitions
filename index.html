@@ -1,0 +1,1514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Quiz & Learning Platform</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f7ff',
+                            100: '#e0effe',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col font-sans antialiased selection:bg-blue-500 selection:text-white">
+
+    <header class="bg-slate-900 text-white shadow-md sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3 cursor-pointer" onclick="switchTab('dashboard')">
+                <div class="p-2 bg-blue-600 rounded-lg">
+                    <i data-lucide="help-circle" class="w-6 h-6 text-white"></i>
+                </div>
+                <div>
+                    <span class="font-bold text-lg tracking-wide bg-gradient-to-r from-blue-400 to-indigo-300 bg-clip-text text-transparent">QuizCraft</span>
+                    <span class="text-xs text-slate-400 block -mt-1">Multi-User Q&A Platform</span>
+                </div>
+            </div>
+
+            <!-- User Menu & Nav Links -->
+            <div class="flex items-center gap-3">
+                <span id="publishingBadge" class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                    <i data-lucide="clock" class="w-3.5 h-3.5"></i> Creation Phase
+                </span>
+
+                <div id="userProfileHeader" class="hidden flex items-center gap-2 pl-3 border-l border-slate-700">
+                    <div class="text-right hidden md:block">
+                        <div id="headerUserName" class="text-sm font-semibold text-slate-100">Trevis</div>
+                        <div id="headerUserRole" class="text-xs text-slate-400 capitalize">Host</div>
+                    </div>
+                    <button onclick="openModal('settingsModal')" class="p-2 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition" title="Account Settings">
+                        <i data-lucide="settings" class="w-5 h-5"></i>
+                    </button>
+                    <button onclick="logout()" class="p-2 text-red-400 hover:text-red-300 hover:bg-slate-800 rounded-lg transition" title="Log Out">
+                        <i data-lucide="log-out" class="w-5 h-5"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <nav id="appNav" class="hidden bg-slate-800 border-t border-slate-700 px-4 sm:px-6">
+            <div class="max-w-7xl mx-auto flex space-x-1 sm:space-x-4 overflow-x-auto custom-scrollbar text-sm py-2">
+                <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-btn flex items-center gap-2 px-3 py-2 rounded-md font-medium text-slate-300 hover:text-white hover:bg-slate-700 transition whitespace-nowrap">
+                    <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Dashboard
+                </button>
+                <button onclick="switchTab('my-questions')" id="nav-my-questions" class="nav-btn flex items-center gap-2 px-3 py-2 rounded-md font-medium text-slate-300 hover:text-white hover:bg-slate-700 transition whitespace-nowrap">
+                    <i data-lucide="file-question" class="w-4 h-4"></i> My Questions (<span id="navMyQCount">0</span>)
+                </button>
+                <button onclick="switchTab('take-quiz')" id="nav-take-quiz" class="nav-btn flex items-center gap-2 px-3 py-2 rounded-md font-medium text-slate-300 hover:text-white hover:bg-slate-700 transition whitespace-nowrap">
+                    <i data-lucide="play-circle" class="w-4 h-4"></i> Take Quiz
+                </button>
+                <button onclick="switchTab('results')" id="nav-results" class="nav-btn flex items-center gap-2 px-3 py-2 rounded-md font-medium text-slate-300 hover:text-white hover:bg-slate-700 transition whitespace-nowrap">
+                    <i data-lucide="award" class="w-4 h-4"></i> Results & Submissions
+                </button>
+                <button onclick="switchTab('host-controls')" id="nav-host-controls" class="nav-btn flex items-center gap-2 px-3 py-2 rounded-md font-medium text-amber-400 hover:text-amber-300 hover:bg-slate-700 transition whitespace-nowrap">
+                    <i data-lucide="shield-alert" class="w-4 h-4"></i> Host Control Center
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Alert Banner System -->
+    <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 max-w-sm w-full"></div>
+
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
+
+        <!-- VIEW: LOGIN -->
+        <section id="view-login" class="max-w-md mx-auto my-12 bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden">
+            <div class="bg-slate-900 p-8 text-center text-white relative">
+                <div class="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg shadow-blue-500/30">
+                    <i data-lucide="lock" class="w-8 h-8 text-white"></i>
+                </div>
+                <h2 class="text-2xl font-bold">Welcome Back</h2>
+                <p class="text-slate-400 text-sm mt-1">Select your account or enter password to login</p>
+            </div>
+
+            <form id="loginForm" onsubmit="handleLogin(event)" class="p-6 space-y-5">
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2">Select User Account</label>
+                    <select id="loginUserSelect" class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-slate-50 text-slate-800 transition">
+                        <!-- Options generated dynamically -->
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2">Password</label>
+                    <div class="relative">
+                        <input type="password" id="loginPassword" required placeholder="Default: 1234567" class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-slate-50 text-slate-800 transition">
+                        <button type="button" onclick="togglePasswordVisibility('loginPassword')" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+                            <i data-lucide="eye" class="w-5 h-5"></i>
+                        </button>
+                    </div>
+                    <p class="text-xs text-slate-400 mt-1">Default password for all preset accounts: <code class="bg-slate-100 px-1 py-0.5 rounded text-slate-700">1234567</code></p>
+                </div>
+
+                <button type="submit" class="w-full py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-lg shadow-blue-500/25 transition flex items-center justify-center gap-2">
+                    <i data-lucide="log-in" class="w-5 h-5"></i> Sign In
+                </button>
+            </form>
+        </section>
+
+        <!-- VIEW: DASHBOARD -->
+        <section id="view-dashboard" class="space-y-6 hidden">
+            <div class="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-2xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden">
+                <div class="relative z-10">
+                    <h1 class="text-2xl sm:text-3xl font-extrabold mb-2">Hello, <span id="dashUserName">User</span> 👋</h1>
+                    <p class="text-blue-100 text-sm sm:text-base max-w-2xl">
+                        Welcome to QuizCraft. Upload your questions confidentially during the Creation Phase. Once the Host publishes the quiz bank, test your knowledge!
+                    </p>
+                    <div class="mt-6 flex flex-wrap gap-3">
+                        <button onclick="switchTab('my-questions')" class="bg-white text-blue-700 hover:bg-blue-50 px-4 py-2.5 rounded-lg font-semibold text-sm transition shadow flex items-center gap-2">
+                            <i data-lucide="plus-circle" class="w-4 h-4"></i> Manage My Questions
+                        </button>
+                        <button onclick="switchTab('take-quiz')" class="bg-blue-800/60 hover:bg-blue-800/80 border border-blue-400/30 text-white px-4 py-2.5 rounded-lg font-semibold text-sm transition flex items-center gap-2">
+                            <i data-lucide="play" class="w-4 h-4"></i> Take Live Quiz
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center gap-4">
+                    <div class="p-3 bg-blue-100 text-blue-600 rounded-xl">
+                        <i data-lucide="file-question" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <div class="text-2xl font-bold text-slate-800" id="statMyCount">0</div>
+                        <div class="text-xs text-slate-500 font-medium">My Uploaded Questions</div>
+                    </div>
+                </div>
+
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center gap-4">
+                    <div class="p-3 bg-emerald-100 text-emerald-600 rounded-xl">
+                        <i data-lucide="database" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <div class="text-2xl font-bold text-slate-800" id="statPublishedCount">0</div>
+                        <div class="text-xs text-slate-500 font-medium">Published Questions in Bank</div>
+                    </div>
+                </div>
+
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center gap-4">
+                    <div class="p-3 bg-indigo-100 text-indigo-600 rounded-xl">
+                        <i data-lucide="check-circle" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <div class="text-2xl font-bold text-slate-800" id="statMyScore">N/A</div>
+                        <div class="text-xs text-slate-500 font-medium">Last Quiz Score</div>
+                    </div>
+                </div>
+
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center gap-4">
+                    <div class="p-3 bg-amber-100 text-amber-600 rounded-xl">
+                        <i data-lucide="radio" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <div class="text-2xl font-bold text-slate-800" id="statQuizStatus">Draft</div>
+                        <div class="text-xs text-slate-500 font-medium">Platform Status</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quiz Status Banner -->
+            <div id="dashStatusCard" class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
+                <!-- Dynamically updated status details -->
+            </div>
+        </section>
+
+        <!-- VIEW: MY QUESTIONS -->
+        <section id="view-my-questions" class="space-y-6 hidden">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div>
+                    <h2 class="text-2xl font-bold text-slate-800">My Question Repository</h2>
+                    <p class="text-slate-500 text-sm">Questions you create remain confidential to your account until published by the host.</p>
+                </div>
+                <button onclick="openQuestionModal()" id="addQBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-lg font-medium text-sm shadow transition flex items-center gap-2">
+                    <i data-lucide="plus" class="w-4 h-4"></i> Add New Question
+                </button>
+            </div>
+
+            <!-- Lock Banner if Quiz is Published -->
+            <div id="questionsLockedNotice" class="hidden bg-amber-50 border border-amber-200 text-amber-800 px-4 py-3 rounded-lg flex items-center gap-3">
+                <i data-lucide="lock" class="w-5 h-5 text-amber-600 shrink-0"></i>
+                <div class="text-sm">
+                    <strong>Quiz Phase Locked:</strong> The host has published all questions. Editing and adding new questions is currently disabled.
+                </div>
+            </div>
+
+            <!-- Questions List -->
+            <div id="myQuestionsList" class="space-y-4">
+                <!-- Generated dynamically -->
+            </div>
+        </section>
+
+        <!-- VIEW: TAKE QUIZ -->
+        <section id="view-take-quiz" class="space-y-6 hidden">
+            <div id="quizNotPublishedScreen" class="bg-white rounded-2xl p-8 sm:p-12 text-center border border-slate-200 shadow-sm max-w-xl mx-auto">
+                <div class="w-16 h-16 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i data-lucide="clock" class="w-8 h-8"></i>
+                </div>
+                <h3 class="text-xl font-bold text-slate-800 mb-2">Quiz is Not Published Yet</h3>
+                <p class="text-slate-600 text-sm mb-6">
+                    Participants are currently uploading questions. The quiz will become available here once Host <strong class="text-slate-800">Trevis</strong> publishes all questions.
+                </p>
+                <div class="text-xs text-slate-400">Check back soon or contact your host!</div>
+            </div>
+
+            <div id="quizContainer" class="hidden space-y-6 max-w-3xl mx-auto">
+                <!-- Header Info -->
+                <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex flex-wrap justify-between items-center gap-4">
+                    <div>
+                        <h2 class="text-2xl font-bold text-slate-800">Live Quiz Assessment</h2>
+                        <p class="text-slate-500 text-sm">Answer all questions below and click submit to receive immediate scoring.</p>
+                    </div>
+                    <div class="bg-blue-50 text-blue-700 px-4 py-2 rounded-lg font-semibold text-sm flex items-center gap-2">
+                        <i data-lucide="list-checks" class="w-4 h-4"></i>
+                        <span id="quizTotalQuestionsCount">0</span> Questions
+                    </div>
+                </div>
+
+                <!-- Quiz Form -->
+                <form id="quizActiveForm" onsubmit="handleQuizSubmit(event)" class="space-y-6">
+                    <div id="quizQuestionsContainer" class="space-y-6">
+                        <!-- Questions render here -->
+                    </div>
+
+                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+                        <span class="text-sm text-slate-500">Ensure all answers are completed before submitting.</span>
+                        <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-6 py-3 rounded-lg shadow-lg shadow-emerald-600/20 transition flex items-center gap-2">
+                            <i data-lucide="check-circle-2" class="w-5 h-5"></i> Submit Quiz Answers
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- VIEW: RESULTS -->
+        <section id="view-results" class="space-y-6 hidden">
+            <div id="noResultsScreen" class="bg-white rounded-2xl p-10 text-center border border-slate-200 shadow-sm max-w-md mx-auto">
+                <i data-lucide="award" class="w-12 h-12 text-slate-300 mx-auto mb-3"></i>
+                <h3 class="text-lg font-bold text-slate-800">No Submission Found</h3>
+                <p class="text-slate-500 text-sm mt-1">You haven't submitted answers for the published quiz yet.</p>
+                <button onclick="switchTab('take-quiz')" class="mt-4 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition">Go to Quiz</button>
+            </div>
+
+            <div id="resultsContent" class="hidden space-y-6 max-w-4xl mx-auto">
+                <!-- Score Card Banner -->
+                <div id="scoreBanner" class="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200 shadow-md flex flex-col sm:flex-row items-center justify-between gap-6">
+                    <div class="space-y-2 text-center sm:text-left">
+                        <span class="px-3 py-1 bg-emerald-100 text-emerald-800 text-xs font-bold rounded-full uppercase tracking-wider">Quiz Completed</span>
+                        <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900">Your Quiz Results</h2>
+                        <p id="resultSubmittedTime" class="text-xs text-slate-400">Submitted on: -</p>
+                    </div>
+
+                    <div class="flex items-center gap-6 bg-slate-50 p-4 rounded-xl border border-slate-100">
+                        <div class="text-center">
+                            <div id="resultScoreFraction" class="text-3xl font-black text-blue-600">0 / 0</div>
+                            <div class="text-xs text-slate-500 font-medium">Correct Answers</div>
+                        </div>
+                        <div class="h-10 w-px bg-slate-200"></div>
+                        <div class="text-center">
+                            <div id="resultPercentage" class="text-3xl font-black text-emerald-600">0%</div>
+                            <div class="text-xs text-slate-500 font-medium">Accuracy</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Solution Breakdown Header -->
+                <div class="flex items-center justify-between">
+                    <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                        <i data-lucide="file-check-2" class="w-5 h-5 text-blue-600"></i> Solution Breakdown
+                    </h3>
+                    <button onclick="switchTab('take-quiz')" class="text-sm font-medium text-blue-600 hover:text-blue-800 flex items-center gap-1">
+                        <i data-lucide="rotate-ccw" class="w-4 h-4"></i> Retake Quiz
+                    </button>
+                </div>
+
+                <!-- Detailed Solutions Container -->
+                <div id="solutionsBreakdownList" class="space-y-4">
+                    <!-- Dynamic solution cards -->
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW: HOST CONTROL CENTER -->
+        <section id="view-host-controls" class="space-y-6 hidden">
+            <div class="bg-slate-900 text-white rounded-2xl p-6 sm:p-8 shadow-xl">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div>
+                        <div class="flex items-center gap-2 text-amber-400 font-semibold text-xs tracking-wider uppercase mb-1">
+                            <i data-lucide="shield" class="w-4 h-4"></i> Host Administrator Panel
+                        </div>
+                        <h2 class="text-2xl font-extrabold">Quiz & User Management</h2>
+                        <p class="text-slate-400 text-sm mt-1">Publish questions, manage 10 account credentials, or reset platform data.</p>
+                    </div>
+
+                    <div class="flex flex-wrap gap-3">
+                        <button id="publishAllBtn" onclick="togglePublishStatus()" class="px-5 py-3 rounded-xl font-bold text-sm shadow-lg transition flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white">
+                            <i data-lucide="upload-cloud" class="w-5 h-5"></i> Publish All Questions
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Overview Box -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                    <div class="text-xs text-slate-500 font-medium">Total Questions Uploaded</div>
+                    <div id="hostTotalUploaded" class="text-3xl font-extrabold text-slate-800 mt-1">0</div>
+                    <div class="text-xs text-slate-400 mt-2">Across all 10 user accounts</div>
+                </div>
+
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                    <div class="text-xs text-slate-500 font-medium">Publish Status</div>
+                    <div id="hostPublishStatusText" class="text-xl font-bold text-amber-600 mt-1">Unpublished (Creation Phase)</div>
+                    <div class="text-xs text-slate-400 mt-2">Click button above to publish</div>
+                </div>
+
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                    <div class="text-xs text-slate-500 font-medium">Total Active Users</div>
+                    <div id="hostUserCount" class="text-3xl font-extrabold text-slate-800 mt-1">10</div>
+                    <div class="text-xs text-slate-400 mt-2">1 Host + 9 Participants</div>
+                </div>
+            </div>
+
+            <!-- User Accounts Management Table -->
+            <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                <div class="p-5 border-b border-slate-200 flex justify-between items-center">
+                    <div>
+                        <h3 class="font-bold text-slate-800">User Account Management</h3>
+                        <p class="text-xs text-slate-500">View user accounts and manage passwords</p>
+                    </div>
+                    <button onclick="openModal('addUserModal')" class="bg-slate-900 hover:bg-slate-800 text-white px-3.5 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5">
+                        <i data-lucide="user-plus" class="w-4 h-4"></i> Add Account
+                    </button>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm text-slate-600">
+                        <thead class="bg-slate-50 text-xs uppercase text-slate-500 border-b border-slate-200">
+                            <tr>
+                                <th class="px-6 py-3">Account Name</th>
+                                <th class="px-6 py-3">Role</th>
+                                <th class="px-6 py-3">Uploaded Questions</th>
+                                <th class="px-6 py-3 text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="userManagementTable" class="divide-y divide-slate-100">
+                            <!-- Dynamically populated -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- MODAL: ADD/EDIT QUESTION -->
+    <div id="questionModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto custom-scrollbar shadow-2xl border border-slate-100">
+            <div class="p-6 border-b border-slate-100 flex justify-between items-center sticky top-0 bg-white z-10">
+                <h3 id="modalQTitle" class="text-lg font-bold text-slate-800">Add New Question</h3>
+                <button onclick="closeModal('questionModal')" class="text-slate-400 hover:text-slate-600">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+            </div>
+
+            <form id="questionForm" onsubmit="handleSaveQuestion(event)" class="p-6 space-y-5">
+                <input type="hidden" id="qId">
+
+                <!-- Question Type Selection -->
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2">Question Type</label>
+                    <select id="qType" onchange="renderQuestionTypeInputs()" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 text-sm font-medium">
+                        <option value="mcq">Multiple Choice Question (MCQ)</option>
+                        <option value="fill">Fill in the Blanks</option>
+                        <option value="matching">Matching Pairs</option>
+                    </select>
+                </div>
+
+                <!-- Common: Question Prompt -->
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2">Question Text / Prompt</label>
+                    <textarea id="qPrompt" required rows="3" placeholder="Enter your question prompt here..." class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 text-sm"></textarea>
+                </div>
+
+                <!-- Dynamic Container for Options / Answers -->
+                <div id="typeSpecificInputs" class="space-y-4 p-4 bg-slate-50 rounded-xl border border-slate-200">
+                    <!-- Dynamic rendering by JS based on type -->
+                </div>
+
+                <!-- Explanation (Optional) -->
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2">Solution Explanation (Optional)</label>
+                    <input type="text" id="qExplanation" placeholder="Explain why this answer is correct..." class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 text-sm">
+                </div>
+
+                <div class="flex justify-end gap-3 pt-4 border-t border-slate-100">
+                    <button type="button" onclick="closeModal('questionModal')" class="px-4 py-2.5 border border-slate-300 text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-50">Cancel</button>
+                    <button type="submit" class="px-5 py-2.5 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 shadow">Save Question</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: ACCOUNT SETTINGS / UPDATE PASSWORD -->
+    <div id="settingsModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-slate-100 overflow-hidden">
+            <div class="p-6 border-b border-slate-100 flex justify-between items-center">
+                <h3 class="text-lg font-bold text-slate-800">Account Settings</h3>
+                <button onclick="closeModal('settingsModal')" class="text-slate-400 hover:text-slate-600">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+            </div>
+
+            <form onsubmit="handlePasswordUpdate(event)" class="p-6 space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-1">Logged In As</label>
+                    <div id="settingsCurrentUserName" class="text-base font-bold text-slate-800">User</div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2">New Password</label>
+                    <div class="relative">
+                        <input type="password" id="newPasswordInput" required minlength="4" placeholder="Enter new password" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 text-sm">
+                        <button type="button" onclick="togglePasswordVisibility('newPasswordInput')" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">
+                            <i data-lucide="eye" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="pt-4 border-t border-slate-100 flex justify-between items-center">
+                    <button type="button" onclick="confirmResetData()" class="text-xs text-red-600 hover:text-red-800 font-medium">
+                        Reset All Demo Data
+                    </button>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 shadow">
+                        Update Password
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: ADMIN RESET USER PASSWORD -->
+    <div id="resetUserPasswordModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-slate-100 overflow-hidden">
+            <div class="p-6 border-b border-slate-100 flex justify-between items-center">
+                <h3 class="text-lg font-bold text-slate-800">Reset User Password</h3>
+                <button onclick="closeModal('resetUserPasswordModal')" class="text-slate-400 hover:text-slate-600">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+            </div>
+
+            <form onsubmit="handleAdminPasswordReset(event)" class="p-6 space-y-4">
+                <input type="hidden" id="adminResetTargetUser">
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-1">Target Account</label>
+                    <div id="adminResetUserName" class="text-base font-bold text-slate-800">-</div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2">New Password for User</label>
+                    <input type="password" id="adminNewPassword" required minlength="4" placeholder="Enter new password" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 text-sm">
+                </div>
+
+                <div class="pt-4 flex justify-end gap-2">
+                    <button type="button" onclick="closeModal('resetUserPasswordModal')" class="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg text-sm">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-amber-600 text-white rounded-lg text-sm font-medium hover:bg-amber-700 shadow">Save Password</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: HOST ADD NEW ACCOUNT -->
+    <div id="addUserModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-slate-100 overflow-hidden">
+            <div class="p-6 border-b border-slate-100 flex justify-between items-center">
+                <h3 class="text-lg font-bold text-slate-800">Add New User Account</h3>
+                <button onclick="closeModal('addUserModal')" class="text-slate-400 hover:text-slate-600">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+            </div>
+
+            <form onsubmit="handleAddUserAccount(event)" class="p-6 space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2">Account Name</label>
+                    <input type="text" id="newAccountName" required placeholder="e.g. Sarah" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 text-sm">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2">Password</label>
+                    <input type="password" id="newAccountPassword" required placeholder="Default password" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 text-sm">
+                </div>
+
+                <div class="pt-4 flex justify-end gap-2">
+                    <button type="button" onclick="closeModal('addUserModal')" class="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg text-sm">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 shadow">Create Account</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Default initial accounts state (10 required accounts)
+        const INITIAL_ACCOUNTS = [
+            { name: "Trevis", role: "host", pass: "1234567" },
+            { name: "John", role: "participant", pass: "1234567" },
+            { name: "Jeff", role: "participant", pass: "1234567" },
+            { name: "Dominic", role: "participant", pass: "1234567" },
+            { name: "Joshua", role: "participant", pass: "1234567" },
+            { name: "Ivan", role: "participant", pass: "1234567" },
+            { name: "Anonymous 1", role: "participant", pass: "1234567" },
+            { name: "Anonymous 2", role: "participant", pass: "1234567" },
+            { name: "Anonymous 3", role: "participant", pass: "1234567" },
+            { name: "Anonymous 4", role: "participant", pass: "1234567" }
+        ];
+
+        // Default sample questions pre-created for testing
+        const INITIAL_QUESTIONS = [
+            {
+                id: "q-1",
+                author: "Trevis",
+                type: "mcq",
+                prompt: "Which protocol is primarily used for secure web communication?",
+                options: ["HTTP", "HTTPS", "FTP", "SMTP"],
+                correctAnswer: "1", // Index 1 = HTTPS
+                explanation: "HTTPS encrypts communications using TLS/SSL."
+            },
+            {
+                id: "q-2",
+                author: "John",
+                type: "fill",
+                prompt: "The JavaScript array method used to create a new array filled with the results of calling a provided function is ____.",
+                correctAnswer: "map",
+                explanation: "Array.prototype.map() creates a new array with transformed items."
+            },
+            {
+                id: "q-3",
+                author: "Trevis",
+                type: "matching",
+                prompt: "Match the web technology to its primary purpose:",
+                pairs: [
+                    { item: "HTML", match: "Structure" },
+                    { item: "CSS", match: "Styling" },
+                    { item: "JavaScript", match: "Interactivity" }
+                ],
+                explanation: "HTML provides structure, CSS handles styling, and JS powers behavior."
+            }
+        ];
+
+        // Application State
+        let users = [];
+        let questions = [];
+        let submissions = {}; // username -> submission result
+        let isPublished = false;
+        let currentUser = null;
+        let activeTab = 'dashboard';
+
+        // Initialization
+        window.onload = function() {
+            loadState();
+            populateLoginDropdown();
+            updateUI();
+            lucide.createIcons();
+        };
+
+        function loadState() {
+            const savedUsers = localStorage.getItem('quiz_users');
+            users = savedUsers ? JSON.parse(savedUsers) : INITIAL_ACCOUNTS;
+
+            const savedQuestions = localStorage.getItem('quiz_questions');
+            questions = savedQuestions ? JSON.parse(savedQuestions) : INITIAL_QUESTIONS;
+
+            const savedPublished = localStorage.getItem('quiz_is_published');
+            isPublished = savedPublished ? JSON.parse(savedPublished) : false;
+
+            const savedSubmissions = localStorage.getItem('quiz_submissions');
+            submissions = savedSubmissions ? JSON.parse(savedSubmissions) : {};
+
+            const savedCurrentUser = localStorage.getItem('quiz_current_user');
+            if (savedCurrentUser) {
+                currentUser = JSON.parse(savedCurrentUser);
+            }
+        }
+
+        function saveState() {
+            localStorage.setItem('quiz_users', JSON.stringify(users));
+            localStorage.setItem('quiz_questions', JSON.stringify(questions));
+            localStorage.setItem('quiz_is_published', JSON.stringify(isPublished));
+            localStorage.setItem('quiz_submissions', JSON.stringify(submissions));
+            if (currentUser) {
+                localStorage.setItem('quiz_current_user', JSON.stringify(currentUser));
+            } else {
+                localStorage.removeItem('quiz_current_user');
+            }
+        }
+
+        function populateLoginDropdown() {
+            const select = document.getElementById('loginUserSelect');
+            select.innerHTML = '';
+            users.forEach(u => {
+                const opt = document.createElement('option');
+                opt.value = u.name;
+                opt.textContent = `${u.name} (${u.role === 'host' ? 'Host' : 'Participant'})`;
+                select.appendChild(opt);
+            });
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const username = document.getElementById('loginUserSelect').value;
+            const passwordInput = document.getElementById('loginPassword').value;
+
+            const found = users.find(u => u.name === username);
+            if (!found || found.pass !== passwordInput) {
+                showToast("Invalid password!", "error");
+                return;
+            }
+
+            currentUser = found;
+            saveState();
+            document.getElementById('loginPassword').value = '';
+            showToast(`Welcome back, ${currentUser.name}!`, "success");
+            switchTab('dashboard');
+        }
+
+        function logout() {
+            currentUser = null;
+            saveState();
+            showToast("Logged out successfully.", "info");
+            updateUI();
+        }
+
+        function togglePasswordVisibility(inputId) {
+            const input = document.getElementById(inputId);
+            input.type = input.type === 'password' ? 'text' : 'password';
+        }
+
+        function switchTab(tabId) {
+            if (!currentUser) return;
+            activeTab = tabId;
+
+            const views = ['login', 'dashboard', 'my-questions', 'take-quiz', 'results', 'host-controls'];
+            views.forEach(v => {
+                const el = document.getElementById(`view-${v}`);
+                if (el) el.classList.add('hidden');
+            });
+
+            const activeEl = document.getElementById(`view-${tabId}`);
+            if (activeEl) activeEl.classList.remove('hidden');
+
+            // Update Nav Highlight
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('bg-slate-700', 'text-white');
+                btn.classList.add('text-slate-300');
+            });
+
+            const currentNavBtn = document.getElementById(`nav-${tabId}`);
+            if (currentNavBtn) {
+                currentNavBtn.classList.add('bg-slate-700', 'text-white');
+                currentNavBtn.classList.remove('text-slate-300');
+            }
+
+            renderCurrentView();
+            lucide.createIcons();
+        }
+
+        function updateUI() {
+            const userHeader = document.getElementById('userProfileHeader');
+            const nav = document.getElementById('appNav');
+            const publishingBadge = document.getElementById('publishingBadge');
+
+            if (!currentUser) {
+                userHeader.classList.add('hidden');
+                nav.classList.add('hidden');
+                document.getElementById('view-login').classList.remove('hidden');
+                ['dashboard', 'my-questions', 'take-quiz', 'results', 'host-controls'].forEach(v => {
+                    document.getElementById(`view-${v}`).classList.add('hidden');
+                });
+            } else {
+                userHeader.classList.remove('hidden');
+                nav.classList.remove('hidden');
+                document.getElementById('view-login').classList.add('hidden');
+
+                document.getElementById('headerUserName').textContent = currentUser.name;
+                document.getElementById('headerUserRole').textContent = currentUser.role === 'host' ? 'Host Account' : 'Participant';
+
+                // Host button visibility
+                const hostNavBtn = document.getElementById('nav-host-controls');
+                if (currentUser.role === 'host') {
+                    hostNavBtn.classList.remove('hidden');
+                } else {
+                    hostNavBtn.classList.add('hidden');
+                }
+
+                // Status Badge
+                if (isPublished) {
+                    publishingBadge.className = "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30";
+                    publishingBadge.innerHTML = `<i data-lucide="check-circle" class="w-3.5 h-3.5"></i> Quiz Published`;
+                } else {
+                    publishingBadge.className = "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/30";
+                    publishingBadge.innerHTML = `<i data-lucide="clock" class="w-3.5 h-3.5"></i> Creation Phase`;
+                }
+
+                // Question Counter in Nav
+                const myQs = questions.filter(q => q.author === currentUser.name);
+                document.getElementById('navMyQCount').textContent = myQs.length;
+
+                switchTab(activeTab);
+            }
+            lucide.createIcons();
+        }
+
+        function renderCurrentView() {
+            if (!currentUser) return;
+
+            if (activeTab === 'dashboard') renderDashboard();
+            else if (activeTab === 'my-questions') renderMyQuestions();
+            else if (activeTab === 'take-quiz') renderTakeQuiz();
+            else if (activeTab === 'results') renderResults();
+            else if (activeTab === 'host-controls') renderHostControls();
+        }
+
+        function renderDashboard() {
+            document.getElementById('dashUserName').textContent = currentUser.name;
+
+            const myQs = questions.filter(q => q.author === currentUser.name);
+            document.getElementById('statMyCount').textContent = myQs.length;
+            document.getElementById('statPublishedCount').textContent = questions.length;
+            document.getElementById('statQuizStatus').textContent = isPublished ? "Live" : "Draft";
+
+            const userSub = submissions[currentUser.name];
+            if (userSub) {
+                document.getElementById('statMyScore').textContent = `${userSub.score}/${userSub.total} (${userSub.percentage}%)`;
+            } else {
+                document.getElementById('statMyScore').textContent = "Not Taken";
+            }
+
+            const card = document.getElementById('dashStatusCard');
+            if (isPublished) {
+                card.innerHTML = `
+                    <div class="flex items-start gap-4">
+                        <div class="p-3 bg-emerald-100 text-emerald-700 rounded-xl shrink-0">
+                            <i data-lucide="check-circle-2" class="w-6 h-6"></i>
+                        </div>
+                        <div class="space-y-1">
+                            <h4 class="font-bold text-slate-800">Quiz Bank is Currently Published</h4>
+                            <p class="text-sm text-slate-600">The host has compiled all questions into the active quiz bank. You can now test your knowledge!</p>
+                            <button onclick="switchTab('take-quiz')" class="mt-3 inline-flex items-center gap-2 text-sm font-semibold text-blue-600 hover:text-blue-800">
+                                Take Quiz Now <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            } else {
+                card.innerHTML = `
+                    <div class="flex items-start gap-4">
+                        <div class="p-3 bg-amber-100 text-amber-700 rounded-xl shrink-0">
+                            <i data-lucide="info" class="w-6 h-6"></i>
+                        </div>
+                        <div class="space-y-1">
+                            <h4 class="font-bold text-slate-800">Creation Phase Active</h4>
+                            <p class="text-sm text-slate-600">You can upload, edit, or remove your questions. Other users cannot view your questions during this stage. Once complete, Host <strong>Trevis</strong> will publish all questions.</p>
+                            <button onclick="switchTab('my-questions')" class="mt-3 inline-flex items-center gap-2 text-sm font-semibold text-blue-600 hover:text-blue-800">
+                                Create Questions <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        function renderMyQuestions() {
+            const list = document.getElementById('myQuestionsList');
+            const lockedNotice = document.getElementById('questionsLockedNotice');
+            const addBtn = document.getElementById('addQBtn');
+
+            // Strictly filter questions created by current user
+            const myQs = questions.filter(q => q.author === currentUser.name);
+
+            if (isPublished) {
+                lockedNotice.classList.remove('hidden');
+                addBtn.disabled = true;
+                addBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            } else {
+                lockedNotice.classList.add('hidden');
+                addBtn.disabled = false;
+                addBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+
+            if (myQs.length === 0) {
+                list.innerHTML = `
+                    <div class="bg-white rounded-xl p-8 text-center border border-slate-200">
+                        <i data-lucide="help-circle" class="w-10 h-10 text-slate-300 mx-auto mb-2"></i>
+                        <h4 class="font-bold text-slate-700">No Questions Uploaded Yet</h4>
+                        <p class="text-xs text-slate-500 mt-1">Click "Add New Question" above to start contributing to the quiz bank.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            list.innerHTML = myQs.map((q, idx) => `
+                <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm hover:border-slate-300 transition space-y-3">
+                    <div class="flex justify-between items-start gap-4">
+                        <div class="flex items-center gap-2">
+                            <span class="px-2.5 py-1 bg-slate-100 text-slate-700 font-bold text-xs rounded-md uppercase">
+                                ${q.type === 'mcq' ? 'MCQ' : q.type === 'fill' ? 'Fill Blank' : 'Matching'}
+                            </span>
+                            <span class="text-xs text-slate-400">Question #${idx + 1}</span>
+                        </div>
+                        ${!isPublished ? `
+                            <div class="flex items-center gap-1">
+                                <button onclick="editQuestion('${q.id}')" class="p-1.5 text-slate-500 hover:text-blue-600 rounded hover:bg-slate-100" title="Edit">
+                                    <i data-lucide="pencil" class="w-4 h-4"></i>
+                                </button>
+                                <button onclick="deleteQuestion('${q.id}')" class="p-1.5 text-slate-500 hover:text-red-600 rounded hover:bg-slate-100" title="Delete">
+                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                        ` : ''}
+                    </div>
+
+                    <h4 class="font-semibold text-slate-800 text-base">${escapeHTML(q.prompt)}</h4>
+
+                    ${renderQuestionDetailsPreview(q)}
+
+                    ${q.explanation ? `
+                        <div class="text-xs text-slate-500 bg-slate-50 p-2.5 rounded border border-slate-100">
+                            <strong>Explanation:</strong> ${escapeHTML(q.explanation)}
+                        </div>
+                    ` : ''}
+                </div>
+            `).join('');
+        }
+
+        function renderQuestionDetailsPreview(q) {
+            if (q.type === 'mcq') {
+                return `
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                        ${q.options.map((opt, i) => `
+                            <div class="p-2 rounded border ${parseInt(q.correctAnswer) === i ? 'bg-emerald-50 border-emerald-300 font-semibold text-emerald-800' : 'bg-slate-50 border-slate-200 text-slate-600'}">
+                                ${String.fromCharCode(65 + i)}. ${escapeHTML(opt)} ${parseInt(q.correctAnswer) === i ? '✓ (Correct)' : ''}
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            } else if (q.type === 'fill') {
+                return `
+                    <div class="text-xs bg-slate-50 p-2.5 rounded border border-slate-200 text-slate-700">
+                        <strong>Correct Answer:</strong> <code class="bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded font-mono font-bold">${escapeHTML(q.correctAnswer)}</code>
+                    </div>
+                `;
+            } else if (q.type === 'matching') {
+                return `
+                    <div class="space-y-1.5 text-xs">
+                        <div class="font-semibold text-slate-500">Matching Pairs:</div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            ${q.pairs.map(p => `
+                                <div class="p-2 bg-slate-50 rounded border border-slate-200 flex justify-between">
+                                    <span class="font-medium text-slate-700">${escapeHTML(p.item)}</span>
+                                    <span class="text-blue-600 font-bold">→ ${escapeHTML(p.match)}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+            return '';
+        }
+
+        function openQuestionModal(editId = null) {
+            if (isPublished) {
+                showToast("Cannot modify questions while quiz is published.", "error");
+                return;
+            }
+
+            const modal = document.getElementById('questionModal');
+            document.getElementById('questionForm').reset();
+            document.getElementById('qId').value = '';
+
+            if (editId) {
+                const q = questions.find(item => item.id === editId && item.author === currentUser.name);
+                if (!q) return;
+                document.getElementById('modalQTitle').textContent = "Edit Question";
+                document.getElementById('qId').value = q.id;
+                document.getElementById('qType').value = q.type;
+                document.getElementById('qPrompt').value = q.prompt;
+                document.getElementById('qExplanation').value = q.explanation || '';
+                renderQuestionTypeInputs(q);
+            } else {
+                document.getElementById('modalQTitle').textContent = "Add New Question";
+                renderQuestionTypeInputs();
+            }
+
+            openModal('questionModal');
+        }
+
+        function renderQuestionTypeInputs(existingQ = null) {
+            const type = document.getElementById('qType').value;
+            const container = document.getElementById('typeSpecificInputs');
+
+            if (type === 'mcq') {
+                const opts = existingQ && existingQ.type === 'mcq' ? existingQ.options : ['', '', '', ''];
+                const correctIdx = existingQ && existingQ.type === 'mcq' ? parseInt(existingQ.correctAnswer) : 0;
+
+                container.innerHTML = `
+                    <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2">Options & Correct Answer</label>
+                    <div class="space-y-2">
+                        ${opts.map((opt, i) => `
+                            <div class="flex items-center gap-2">
+                                <input type="radio" name="mcqCorrect" value="${i}" ${correctIdx === i ? 'checked' : ''} class="w-4 h-4 text-blue-600">
+                                <input type="text" class="mcq-option-input w-full px-3 py-2 rounded border border-slate-300 text-sm" placeholder="Option ${String.fromCharCode(65 + i)}" value="${escapeHTML(opt)}" required>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <p class="text-xs text-slate-400 mt-1">Select the radio button corresponding to the correct answer.</p>
+                `;
+            } else if (type === 'fill') {
+                const answer = existingQ && existingQ.type === 'fill' ? existingQ.correctAnswer : '';
+                container.innerHTML = `
+                    <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-1">Expected Correct Text Answer</label>
+                    <input type="text" id="fillCorrectAnswer" required value="${escapeHTML(answer)}" placeholder="e.g. map or Paris" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-sm">
+                    <p class="text-xs text-slate-400 mt-1">Matches case-insensitively during evaluation.</p>
+                `;
+            } else if (type === 'matching') {
+                const pairs = existingQ && existingQ.type === 'matching' ? existingQ.pairs : [
+                    { item: '', match: '' },
+                    { item: '', match: '' },
+                    { item: '', match: '' }
+                ];
+
+                container.innerHTML = `
+                    <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-1">Matching Pairs</label>
+                    <div id="matchingPairsContainer" class="space-y-2">
+                        ${pairs.map((p, i) => `
+                            <div class="flex items-center gap-2 pair-row">
+                                <input type="text" class="pair-item w-1/2 px-3 py-2 rounded border border-slate-300 text-sm" placeholder="Item (e.g. HTML)" value="${escapeHTML(p.item)}" required>
+                                <span class="text-slate-400 font-bold">→</span>
+                                <input type="text" class="pair-match w-1/2 px-3 py-2 rounded border border-slate-300 text-sm" placeholder="Matches With (e.g. Structure)" value="${escapeHTML(p.match)}" required>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <button type="button" onclick="addMatchingPairRow()" class="mt-2 text-xs font-semibold text-blue-600 hover:text-blue-800 flex items-center gap-1">
+                        <i data-lucide="plus" class="w-3.5 h-3.5"></i> Add Another Pair
+                    </button>
+                `;
+                lucide.createIcons();
+            }
+        }
+
+        function addMatchingPairRow() {
+            const container = document.getElementById('matchingPairsContainer');
+            const row = document.createElement('div');
+            row.className = "flex items-center gap-2 pair-row";
+            row.innerHTML = `
+                <input type="text" class="pair-item w-1/2 px-3 py-2 rounded border border-slate-300 text-sm" placeholder="Item" required>
+                <span class="text-slate-400 font-bold">→</span>
+                <input type="text" class="pair-match w-1/2 px-3 py-2 rounded border border-slate-300 text-sm" placeholder="Matches With" required>
+            `;
+            container.appendChild(row);
+        }
+
+        function handleSaveQuestion(e) {
+            e.preventDefault();
+            const id = document.getElementById('qId').value;
+            const type = document.getElementById('qType').value;
+            const prompt = document.getElementById('qPrompt').value.trim();
+            const explanation = document.getElementById('qExplanation').value.trim();
+
+            let qData = {
+                id: id || 'q-' + Date.now(),
+                author: currentUser.name,
+                type,
+                prompt,
+                explanation
+            };
+
+            if (type === 'mcq') {
+                const optInputs = document.querySelectorAll('.mcq-option-input');
+                const options = Array.from(optInputs).map(i => i.value.trim());
+                const correct = document.querySelector('input[name="mcqCorrect"]:checked');
+
+                if (!correct) {
+                    showToast("Please select a correct option.", "error");
+                    return;
+                }
+                qData.options = options;
+                qData.correctAnswer = correct.value;
+            } else if (type === 'fill') {
+                qData.correctAnswer = document.getElementById('fillCorrectAnswer').value.trim();
+            } else if (type === 'matching') {
+                const rows = document.querySelectorAll('.pair-row');
+                const pairs = [];
+                rows.forEach(r => {
+                    const item = r.querySelector('.pair-item').value.trim();
+                    const match = r.querySelector('.pair-match').value.trim();
+                    if (item && match) pairs.push({ item, match });
+                });
+                if (pairs.length < 2) {
+                    showToast("Matching questions require at least 2 pairs.", "error");
+                    return;
+                }
+                qData.pairs = pairs;
+            }
+
+            if (id) {
+                const idx = questions.findIndex(q => q.id === id);
+                if (idx !== -1) questions[idx] = qData;
+            } else {
+                questions.push(qData);
+            }
+
+            saveState();
+            closeModal('questionModal');
+            showToast(id ? "Question updated successfully!" : "New question added!", "success");
+            renderMyQuestions();
+            updateNavCounters();
+        }
+
+        function editQuestion(id) {
+            openQuestionModal(id);
+        }
+
+        function deleteQuestion(id) {
+            if (isPublished) {
+                showToast("Cannot delete questions after publishing.", "error");
+                return;
+            }
+            if (confirm("Are you sure you want to delete this question?")) {
+                questions = questions.filter(q => q.id !== id);
+                saveState();
+                showToast("Question deleted.", "info");
+                renderMyQuestions();
+                updateNavCounters();
+            }
+        }
+
+        function updateNavCounters() {
+            const myQs = questions.filter(q => q.author === currentUser.name);
+            document.getElementById('navMyQCount').textContent = myQs.length;
+        }
+
+        function renderTakeQuiz() {
+            const notPub = document.getElementById('quizNotPublishedScreen');
+            const container = document.getElementById('quizContainer');
+
+            if (!isPublished) {
+                notPub.classList.remove('hidden');
+                container.classList.add('hidden');
+                return;
+            }
+
+            notPub.classList.add('hidden');
+            container.classList.remove('hidden');
+
+            document.getElementById('quizTotalQuestionsCount').textContent = questions.length;
+
+            const qList = document.getElementById('quizQuestionsContainer');
+            qList.innerHTML = questions.map((q, idx) => `
+                <div class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm space-y-4">
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs font-bold text-blue-600 uppercase tracking-wider">Question ${idx + 1} of ${questions.length}</span>
+                        <span class="text-xs text-slate-400 bg-slate-100 px-2.5 py-1 rounded">Author: ${escapeHTML(q.author)}</span>
+                    </div>
+
+                    <h3 class="text-lg font-bold text-slate-800">${escapeHTML(q.prompt)}</h3>
+
+                    <div>
+                        ${renderQuizInputForType(q, idx)}
+                    </div>
+                </div>
+            `).join('');
+
+            lucide.createIcons();
+        }
+
+        function renderQuizInputForType(q, idx) {
+            if (q.type === 'mcq') {
+                return `
+                    <div class="space-y-2 mt-3">
+                        ${q.options.map((opt, i) => `
+                            <label class="flex items-center gap-3 p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer transition">
+                                <input type="radio" name="ans_${q.id}" value="${i}" required class="w-4 h-4 text-blue-600 focus:ring-blue-500">
+                                <span class="text-sm font-medium text-slate-700">${String.fromCharCode(65 + i)}. ${escapeHTML(opt)}</span>
+                            </label>
+                        `).join('')}
+                    </div>
+                `;
+            } else if (q.type === 'fill') {
+                return `
+                    <div class="mt-3">
+                        <input type="text" name="ans_${q.id}" required placeholder="Type your answer here..." class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 text-sm">
+                    </div>
+                `;
+            } else if (q.type === 'matching') {
+                // Shuffle options for matching dropdowns
+                const matchTargets = q.pairs.map(p => p.match);
+                return `
+                    <div class="space-y-3 mt-3">
+                        <p class="text-xs text-slate-500 font-medium">Select the matching pair for each item below:</p>
+                        ${q.pairs.map((p, pairIdx) => `
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3 bg-slate-50 rounded-lg border border-slate-200">
+                                <span class="text-sm font-semibold text-slate-800">${escapeHTML(p.item)}</span>
+                                <select name="ans_${q.id}_${pairIdx}" required class="px-3 py-2 rounded border border-slate-300 text-sm bg-white focus:ring-2 focus:ring-blue-500">
+                                    <option value="">-- Choose Match --</option>
+                                    ${matchTargets.map(target => `<option value="${escapeHTML(target)}">${escapeHTML(target)}</option>`).join('')}
+                                </select>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }
+            return '';
+        }
+
+        function handleQuizSubmit(e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            let score = 0;
+            const answers = {};
+
+            questions.forEach(q => {
+                let isCorrect = false;
+                let userVal = null;
+
+                if (q.type === 'mcq') {
+                    userVal = formData.get(`ans_${q.id}`);
+                    if (userVal === q.correctAnswer) {
+                        isCorrect = true;
+                    }
+                } else if (q.type === 'fill') {
+                    userVal = (formData.get(`ans_${q.id}`) || '').trim();
+                    if (userVal.toLowerCase() === q.correctAnswer.toLowerCase()) {
+                        isCorrect = true;
+                    }
+                } else if (q.type === 'matching') {
+                    userVal = [];
+                    let matchingCorrect = true;
+                    q.pairs.forEach((p, pIdx) => {
+                        const selectedMatch = formData.get(`ans_${q.id}_${pIdx}`);
+                        userVal.push({ item: p.item, selected: selectedMatch });
+                        if (selectedMatch !== p.match) {
+                            matchingCorrect = false;
+                        }
+                    });
+                    isCorrect = matchingCorrect;
+                }
+
+                if (isCorrect) score++;
+
+                answers[q.id] = {
+                    userVal,
+                    isCorrect
+                };
+            });
+
+            const total = questions.length;
+            const percentage = total > 0 ? Math.round((score / total) * 100) : 0;
+
+            submissions[currentUser.name] = {
+                score,
+                total,
+                percentage,
+                answers,
+                timestamp: new Date().toLocaleString()
+            };
+
+            saveState();
+            showToast(`Quiz Submitted! You scored ${score}/${total} (${percentage}%)`, "success");
+            switchTab('results');
+        }
+
+        function renderResults() {
+            const noRes = document.getElementById('noResultsScreen');
+            const resContent = document.getElementById('resultsContent');
+
+            const userSub = submissions[currentUser.name];
+
+            if (!userSub || !isPublished) {
+                noRes.classList.remove('hidden');
+                resContent.classList.add('hidden');
+                return;
+            }
+
+            noRes.classList.add('hidden');
+            resContent.classList.remove('hidden');
+
+            document.getElementById('resultScoreFraction').textContent = `${userSub.score} / ${userSub.total}`;
+            document.getElementById('resultPercentage').textContent = `${userSub.percentage}%`;
+            document.getElementById('resultSubmittedTime').textContent = `Submitted on: ${userSub.timestamp}`;
+
+            const breakdown = document.getElementById('solutionsBreakdownList');
+            breakdown.innerHTML = questions.map((q, idx) => {
+                const ansObj = userSub.answers[q.id] || { isCorrect: false, userVal: 'None' };
+                const isCorrect = ansObj.isCorrect;
+
+                return `
+                    <div class="bg-white rounded-xl border ${isCorrect ? 'border-emerald-200 bg-emerald-50/20' : 'border-red-200 bg-red-50/20'} p-6 shadow-sm space-y-4">
+                        <div class="flex justify-between items-start gap-2">
+                            <div class="flex items-center gap-2">
+                                <span class="px-2 py-0.5 rounded text-xs font-bold uppercase ${isCorrect ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-800'}">
+                                    ${isCorrect ? 'Correct ✓' : 'Incorrect ✗'}
+                                </span>
+                                <span class="text-xs text-slate-400">Question ${idx + 1}</span>
+                            </div>
+                            <span class="text-xs text-slate-400">By: ${escapeHTML(q.author)}</span>
+                        </div>
+
+                        <h4 class="font-bold text-slate-800 text-base">${escapeHTML(q.prompt)}</h4>
+
+                        <div class="text-sm space-y-2">
+                            ${renderSolutionDetail(q, ansObj)}
+                        </div>
+
+                        ${q.explanation ? `
+                            <div class="text-xs bg-slate-50 p-3 rounded-lg border border-slate-200 text-slate-600">
+                                <strong>Solution Explanation:</strong> ${escapeHTML(q.explanation)}
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }).join('');
+
+            lucide.createIcons();
+        }
+
+        function renderSolutionDetail(q, ansObj) {
+            if (q.type === 'mcq') {
+                const userChoiceIdx = parseInt(ansObj.userVal);
+                const correctIdx = parseInt(q.correctAnswer);
+                return `
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                        <div class="p-2.5 rounded border bg-slate-50">
+                            <span class="text-slate-500 block">Your Answer:</span>
+                            <span class="font-semibold ${ansObj.isCorrect ? 'text-emerald-700' : 'text-red-600'}">
+                                ${isNaN(userChoiceIdx) ? 'No Answer' : `${String.fromCharCode(65 + userChoiceIdx)}. ${escapeHTML(q.options[userChoiceIdx])}`}
+                            </span>
+                        </div>
+                        <div class="p-2.5 rounded border bg-emerald-50 border-emerald-200">
+                            <span class="text-emerald-800 block">Official Correct Answer:</span>
+                            <span class="font-bold text-emerald-900">
+                                ${String.fromCharCode(65 + correctIdx)}. ${escapeHTML(q.options[correctIdx])}
+                            </span>
+                        </div>
+                    </div>
+                `;
+            } else if (q.type === 'fill') {
+                return `
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                        <div class="p-2.5 rounded border bg-slate-50">
+                            <span class="text-slate-500 block">Your Answer:</span>
+                            <span class="font-semibold ${ansObj.isCorrect ? 'text-emerald-700' : 'text-red-600'}">
+                                "${escapeHTML(ansObj.userVal || 'Empty')}"
+                            </span>
+                        </div>
+                        <div class="p-2.5 rounded border bg-emerald-50 border-emerald-200">
+                            <span class="text-emerald-800 block">Official Correct Answer:</span>
+                            <span class="font-bold text-emerald-900">
+                                "${escapeHTML(q.correctAnswer)}"
+                            </span>
+                        </div>
+                    </div>
+                `;
+            } else if (q.type === 'matching') {
+                const userPairs = Array.isArray(ansObj.userVal) ? ansObj.userVal : [];
+                return `
+                    <div class="space-y-1 text-xs">
+                        <span class="font-semibold text-slate-600">Pairs Comparison:</span>
+                        <div class="space-y-1.5">
+                            ${q.pairs.map((p, i) => {
+                                const userSelection = userPairs.find(u => u.item === p.item)?.selected || 'Unselected';
+                                const pairCorrect = userSelection === p.match;
+                                return `
+                                    <div class="p-2 rounded border flex flex-col sm:flex-row justify-between text-xs ${pairCorrect ? 'bg-emerald-50/60 border-emerald-200' : 'bg-red-50/60 border-red-200'}">
+                                        <span class="font-medium text-slate-800">${escapeHTML(p.item)}</span>
+                                        <div>
+                                            <span class="${pairCorrect ? 'text-emerald-700 font-semibold' : 'text-red-600 line-through'}">You: ${escapeHTML(userSelection)}</span>
+                                            ${!pairCorrect ? `<span class="text-emerald-800 font-bold ml-2">Correct: ${escapeHTML(p.match)}</span>` : ''}
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+            return '';
+        }
+
+        function renderHostControls() {
+            if (currentUser.role !== 'host') return;
+
+            document.getElementById('hostTotalUploaded').textContent = questions.length;
+            document.getElementById('hostUserCount').textContent = users.length;
+
+            const statusTxt = document.getElementById('hostPublishStatusText');
+            const pubBtn = document.getElementById('publishAllBtn');
+
+            if (isPublished) {
+                statusTxt.textContent = "Published & Live";
+                statusTxt.className = "text-xl font-bold text-emerald-600 mt-1";
+                pubBtn.className = "px-5 py-3 rounded-xl font-bold text-sm shadow-lg transition flex items-center gap-2 bg-amber-600 hover:bg-amber-700 text-white";
+                pubBtn.innerHTML = `<i data-lucide="lock" class="w-5 h-5"></i> Unpublish Quiz Bank`;
+            } else {
+                statusTxt.textContent = "Unpublished (Creation Phase)";
+                statusTxt.className = "text-xl font-bold text-amber-600 mt-1";
+                pubBtn.className = "px-5 py-3 rounded-xl font-bold text-sm shadow-lg transition flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white";
+                pubBtn.innerHTML = `<i data-lucide="upload-cloud" class="w-5 h-5"></i> Publish All Questions`;
+            }
+
+            // User Management Table
+            const table = document.getElementById('userManagementTable');
+            table.innerHTML = users.map(u => {
+                const count = questions.filter(q => q.author === u.name).length;
+                return `
+                    <tr class="hover:bg-slate-50 transition">
+                        <td class="px-6 py-4 font-semibold text-slate-800 flex items-center gap-2">
+                            <i data-lucide="user" class="w-4 h-4 text-slate-400"></i> ${escapeHTML(u.name)}
+                        </td>
+                        <td class="px-6 py-4">
+                            <span class="px-2.5 py-1 text-xs font-bold rounded-full ${u.role === 'host' ? 'bg-amber-100 text-amber-800' : 'bg-slate-100 text-slate-700'}">
+                                ${u.role === 'host' ? 'Host' : 'Participant'}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 text-sm font-medium text-slate-700">${count} questions</td>
+                        <td class="px-6 py-4 text-right space-x-2">
+                            <button onclick="openAdminPasswordReset('${escapeHTML(u.name)}')" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded font-medium">Reset Pass</button>
+                            ${u.role !== 'host' ? `
+                                <button onclick="deleteUserAccount('${escapeHTML(u.name)}')" class="text-xs bg-red-50 hover:bg-red-100 text-red-600 px-3 py-1.5 rounded font-medium">Delete</button>
+                            ` : ''}
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            lucide.createIcons();
+        }
+
+        function togglePublishStatus() {
+            if (currentUser.role !== 'host') return;
+
+            if (!isPublished && questions.length === 0) {
+                showToast("Cannot publish empty question bank!", "error");
+                return;
+            }
+
+            isPublished = !isPublished;
+            saveState();
+            showToast(isPublished ? "All questions published! Quiz is live." : "Quiz unpublished. Creation phase restored.", isPublished ? "success" : "info");
+            renderHostControls();
+            updateUI();
+        }
+
+        function openAdminPasswordReset(username) {
+            document.getElementById('adminResetTargetUser').value = username;
+            document.getElementById('adminResetUserName').textContent = username;
+            document.getElementById('adminNewPassword').value = '';
+            openModal('resetUserPasswordModal');
+        }
+
+        function handleAdminPasswordReset(e) {
+            e.preventDefault();
+            const target = document.getElementById('adminResetTargetUser').value;
+            const newPass = document.getElementById('adminNewPassword').value;
+
+            const u = users.find(usr => usr.name === target);
+            if (u) {
+                u.pass = newPass;
+                saveState();
+                closeModal('resetUserPasswordModal');
+                showToast(`Password updated for ${target}!`, "success");
+            }
+        }
+
+        function handleAddUserAccount(e) {
+            e.preventDefault();
+            const name = document.getElementById('newAccountName').value.trim();
+            const pass = document.getElementById('newAccountPassword').value.trim();
+
+            if (users.some(u => u.name.toLowerCase() === name.toLowerCase())) {
+                showToast("Account name already exists!", "error");
+                return;
+            }
+
+            users.push({ name, role: 'participant', pass });
+            saveState();
+            populateLoginDropdown();
+            closeModal('addUserModal');
+            showToast(`Account "${name}" created successfully!`, "success");
+            renderHostControls();
+        }
+
+        function deleteUserAccount(username) {
+            if (confirm(`Are you sure you want to remove account "${username}"?`)) {
+                users = users.filter(u => u.name !== username);
+                saveState();
+                populateLoginDropdown();
+                showToast(`Account "${username}" removed.`, "info");
+                renderHostControls();
+            }
+        }
+
+        function handlePasswordUpdate(e) {
+            e.preventDefault();
+            const newPass = document.getElementById('newPasswordInput').value;
+            if (currentUser) {
+                const u = users.find(usr => usr.name === currentUser.name);
+                if (u) {
+                    u.pass = newPass;
+                    currentUser.pass = newPass;
+                    saveState();
+                    closeModal('settingsModal');
+                    showToast("Your password has been updated successfully!", "success");
+                }
+            }
+        }
+
+        function confirmResetData() {
+            if (confirm("Reset all platform data back to initial default state? All newly created questions and user password changes will be lost.")) {
+                localStorage.clear();
+                loadState();
+                populateLoginDropdown();
+                closeModal('settingsModal');
+                showToast("Platform reset to factory default state.", "info");
+                updateUI();
+            }
+        }
+
+        function openModal(modalId) {
+            if (modalId === 'settingsModal' && currentUser) {
+                document.getElementById('settingsCurrentUserName').textContent = currentUser.name;
+                document.getElementById('newPasswordInput').value = '';
+            }
+            document.getElementById(modalId).classList.remove('hidden');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.add('hidden');
+        }
+
+        function escapeHTML(str) {
+            if (!str) return '';
+            return str.replace(/[&<>'"]/g, 
+                tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
+            );
+        }
+
+        function showToast(message, type = "info") {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+
+            const bgClass = type === 'success' ? 'bg-emerald-600' : type === 'error' ? 'bg-red-600' : 'bg-slate-800';
+            toast.className = `${bgClass} text-white px-4 py-3 rounded-lg shadow-xl text-sm font-medium flex items-center justify-between gap-3 transform transition-all duration-300 translate-y-2 opacity-0`;
+
+            toast.innerHTML = `
+                <span>${message}</span>
+                <button onclick="this.parentElement.remove()" class="text-white/80 hover:text-white">&times;</button>
+            `;
+
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-2', 'opacity-0');
+            }, 10);
+
+            setTimeout(() => {
+                toast.classList.add('opacity-0');
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+    </script>
+</body>
+</html>
