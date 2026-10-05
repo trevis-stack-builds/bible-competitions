@@ -1,8 +1,8 @@
-# 🚀 App Name
+# 🚀 Web App - Bible QuizCraft
 
 A brief 1–2 sentence summary of what your web app does and who it's for.
 
-[👉 **View Live App**](https://your-username.github.io/your-repo-name/)
+[👉 **View Live App**](https://trevis-stack-builds.github.io/bible-competitions/)
 
 ---
 
