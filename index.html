@@ -679,6 +679,19 @@
             currentUser = null;
             localStorage.removeItem('quiz_current_user');
             if (timerInterval) clearInterval(timerInterval);
+        
+            // 1. Hide all application view sections explicitly
+            const views = ['dashboard', 'my-questions', 'past-paper-vault', 'take-quiz', 'results', 'achievements', 'host-controls'];
+            views.forEach(v => {
+                const el = document.getElementById(`view-${v}`);
+                if (el) el.classList.add('hidden');
+            });
+        
+            // 2. Reset activeTab back to default
+            activeTab = 'dashboard';
+        
+            // 3. Unhide login view and update header/nav bar
+            document.getElementById('view-login').classList.remove('hidden');
             showToast("Logged out successfully.", "info");
             updateUI();
         }
