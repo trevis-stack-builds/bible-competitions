@@ -10,7 +10,7 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <!-- Supabase JS Client Library -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <!-- SheetJS (xlsx) for Excel Batch Processing (.xlsx, .xls, .csv, .numbers, .gsheet) -->
+    <!-- SheetJS (xlsx) for Excel Batch Processing -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
         .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -40,8 +40,9 @@
                 </span>
 
                 <div id="userProfileHeader" class="hidden flex items-center gap-2 pl-3 border-l border-slate-700">
+                    <img id="headerUserAvatar" src="" class="w-8 h-8 rounded-full object-cover border border-amber-400 hidden" alt="Avatar">
                     <div class="text-right hidden md:block">
-                        <div id="headerUserName" class="text-sm font-semibold text-slate-100">Trevis</div>
+                        <div id="headerUserName" class="text-sm font-semibold text-slate-100">User</div>
                         <div id="headerUserRole" class="text-xs text-slate-400 capitalize">Host</div>
                     </div>
                     <button onclick="openModal('settingsModal')" class="p-2 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition flex items-center justify-center" title="Account Settings">
@@ -62,7 +63,6 @@
                 <button onclick="switchTab('my-questions')" id="nav-my-questions" class="nav-btn flex items-center gap-2 px-3 py-2 rounded-md font-medium text-slate-300 hover:text-white hover:bg-slate-700 transition whitespace-nowrap">
                     <i data-lucide="file-question" class="w-4 h-4"></i> My Questions (<span id="navMyQCount">0</span>)
                 </button>
-                <!-- NEW TAG: Past Paper Vault -->
                 <button onclick="switchTab('past-paper-vault')" id="nav-past-paper-vault" class="nav-btn flex items-center gap-2 px-3 py-2 rounded-md font-medium text-slate-300 hover:text-white hover:bg-slate-700 transition whitespace-nowrap">
                     <i data-lucide="archive" class="w-4 h-4"></i> Past Paper Vault
                 </button>
@@ -72,7 +72,6 @@
                 <button onclick="switchTab('results')" id="nav-results" class="nav-btn flex items-center gap-2 px-3 py-2 rounded-md font-medium text-slate-300 hover:text-white hover:bg-slate-700 transition whitespace-nowrap">
                     <i data-lucide="award" class="w-4 h-4"></i> Results & Submissions
                 </button>
-                <!-- NEW TAG: Achievements -->
                 <button onclick="switchTab('achievements')" id="nav-achievements" class="nav-btn flex items-center gap-2 px-3 py-2 rounded-md font-medium text-slate-300 hover:text-white hover:bg-slate-700 transition whitespace-nowrap">
                     <i data-lucide="trophy" class="w-4 h-4"></i> Achievements
                 </button>
@@ -106,7 +105,7 @@
                 <div>
                     <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2">Password</label>
                     <div class="relative">
-                        <input type="password" id="loginPassword" required placeholder="Enter your password" class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-slate-50 text-slate-800 transition">
+                        <input type="password" id="loginPassword" required placeholder="Default: 1234567" class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-slate-50 text-slate-800 transition">
                         <button type="button" onclick="togglePasswordVisibility('loginPassword')" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
                             <i data-lucide="eye" class="w-5 h-5"></i>
                         </button>
@@ -134,8 +133,9 @@
                         <button onclick="switchTab('take-quiz')" class="bg-amber-900/60 hover:bg-amber-900/80 border border-amber-400/30 text-white px-4 py-2.5 rounded-lg font-semibold text-sm transition flex items-center gap-2">
                             <i data-lucide="play" class="w-4 h-4"></i> Take Live Quiz
                         </button>
-                        <button id="dashPublishBtn" onclick="openPublishModal()" class="hidden bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-lg font-semibold text-sm transition shadow flex items-center gap-2">
-                            <i data-lucide="upload-cloud" class="w-4 h-4"></i> Publish Quiz Bank
+                        <!-- Synced Publish Button -->
+                        <button id="dashPublishBtn" onclick="openPublishModal()" class="hidden px-4 py-2.5 rounded-lg font-semibold text-sm transition shadow flex items-center gap-2 text-white">
+                            <i data-lucide="upload-cloud" class="w-4 h-4"></i> <span id="dashPublishBtnText">Publish Quiz Bank</span>
                         </button>
                     </div>
                 </div>
@@ -187,22 +187,22 @@
                     <p class="text-slate-500 text-sm">Questions you create remain confidential to your account until published.</p>
                 </div>
                 <div class="flex flex-wrap items-center gap-2">
-                    <!-- Filter by Question Type -->
                     <select id="myQTypeFilter" onchange="renderMyQuestions()" class="px-3 py-2 rounded-lg border border-slate-300 text-xs font-semibold bg-white shadow-sm focus:ring-2 focus:ring-blue-500">
                         <option value="ALL">All Question Types</option>
                         <option value="MCQ">MCQ</option>
+                        <option value="TF">TRUE / FALSE</option>
                         <option value="FILL">FILL BLANK</option>
                         <option value="MATCHING">MATCHING</option>
                     </select>
 
                     <button onclick="downloadBatchTemplate('mcq')" class="bg-slate-800 hover:bg-slate-900 text-white px-3 py-2 rounded-lg font-medium text-xs shadow transition flex items-center gap-1.5" title="Export MCQ Questions to Excel">
-                        <i data-lucide="download" class="w-3.5 h-3.5"></i> Export MCQ (.xlsx)
+                        <i data-lucide="download" class="w-3.5 h-3.5"></i> MCQ (.xlsx)
                     </button>
                     <button onclick="downloadBatchTemplate('fill')" class="bg-slate-800 hover:bg-slate-900 text-white px-3 py-2 rounded-lg font-medium text-xs shadow transition flex items-center gap-1.5" title="Export Fill Blank Questions to Excel">
-                        <i data-lucide="download" class="w-3.5 h-3.5"></i> Export Fill Blank (.xlsx)
+                        <i data-lucide="download" class="w-3.5 h-3.5"></i> Fill Blank (.xlsx)
                     </button>
                     <label class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg font-medium text-xs shadow transition flex items-center gap-1.5 cursor-pointer">
-                        <i data-lucide="file-up" class="w-3.5 h-3.5"></i> Batch Upload (.xlsx/.numbers/.csv)
+                        <i data-lucide="file-up" class="w-3.5 h-3.5"></i> Batch Upload
                         <input type="file" accept=".xlsx, .xls, .csv, .numbers, .gsheet" onchange="handleBatchFileUpload(event)" class="hidden">
                     </label>
                     <button onclick="openQuestionModal()" id="addQBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium text-xs shadow transition flex items-center gap-1.5">
@@ -226,6 +226,9 @@
                     <h2 class="text-2xl font-bold text-slate-800">Past Paper Vault</h2>
                     <p class="text-slate-500 text-sm">Historical question repository from past quiz sessions. Host can edit; Co-host and Participants are view-only.</p>
                 </div>
+                <button id="clearVaultBtn" onclick="clearPastPaperVault()" class="hidden bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium text-xs shadow transition flex items-center gap-1.5">
+                    <i data-lucide="trash" class="w-4 h-4"></i> Empty History
+                </button>
             </div>
             <div id="pastPaperVaultList" class="space-y-4"></div>
         </section>
@@ -319,13 +322,20 @@
             </div>
 
             <div id="achievementsContent" class="hidden space-y-6 max-w-4xl mx-auto">
-                <div class="bg-gradient-to-r from-amber-600 via-amber-700 to-indigo-900 rounded-2xl p-6 text-white shadow-xl flex justify-between items-center">
+                <div class="bg-gradient-to-r from-amber-600 via-amber-700 to-indigo-900 rounded-2xl p-6 text-white shadow-xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div>
                         <h2 class="text-2xl font-extrabold flex items-center gap-2">
                             <i data-lucide="trophy" class="w-7 h-7 text-amber-300"></i> Quiz Leaderboard & Achievements
                         </h2>
-                        <p class="text-amber-100 text-sm mt-1">Final participant rankings based on score and completion time.</p>
+                        <p class="text-amber-100 text-sm mt-1">Participant rankings based on accuracy and completion time.</p>
                     </div>
+
+                    <!-- Session Filter & Composite Modes -->
+                    <select id="achievementFilterSelect" onchange="renderAchievements()" class="px-4 py-2 rounded-xl bg-slate-900 text-white font-semibold text-xs border border-amber-400/40 focus:ring-2 focus:ring-amber-400 shadow">
+                        <option value="COMPOSITE_JOINED">Composite (Joined Quizzes Only)</option>
+                        <option value="COMPOSITE_ALL">Composite (All Published Quizzes)</option>
+                        <!-- Dynamic Session Options added in JS -->
+                    </select>
                 </div>
 
                 <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
@@ -336,6 +346,7 @@
                                 <th class="px-6 py-3.5">Participant</th>
                                 <th class="px-6 py-3.5">Score</th>
                                 <th class="px-6 py-3.5">Accuracy</th>
+                                <th class="px-6 py-3.5">Time Taken</th>
                                 <th class="px-6 py-3.5">Submitted Time</th>
                             </tr>
                         </thead>
@@ -354,12 +365,12 @@
                             <i data-lucide="shield" class="w-4 h-4"></i> Management Panel
                         </div>
                         <h2 class="text-2xl font-extrabold">Control Center</h2>
-                        <p class="text-slate-400 text-sm mt-1">Publish questions, set countdown timer, or manage user roles.</p>
+                        <p class="text-slate-400 text-sm mt-1">Publish questions, set due date/timer, or manage user roles.</p>
                     </div>
 
                     <div class="flex flex-wrap gap-3">
-                        <button id="publishAllBtn" onclick="openPublishModal()" class="px-5 py-3 rounded-xl font-bold text-sm shadow-lg transition flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white">
-                            <i data-lucide="upload-cloud" class="w-5 h-5"></i> Publish All Questions
+                        <button id="ctrlCenterPublishBtn" onclick="openPublishModal()" class="px-5 py-3 rounded-xl font-bold text-sm shadow-lg transition flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white">
+                            <i data-lucide="upload-cloud" class="w-5 h-5"></i> <span id="ctrlCenterPublishBtnText">Publish All Questions</span>
                         </button>
                     </div>
                 </div>
@@ -382,6 +393,37 @@
                 </div>
             </div>
 
+            <!-- Published Quiz Records Cluster -->
+            <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                <div class="p-5 border-b border-slate-200 flex justify-between items-center bg-slate-50">
+                    <div>
+                        <h3 class="font-bold text-slate-800 flex items-center gap-2">
+                            <i data-lucide="history" class="w-4 h-4 text-amber-600"></i> Historical Published Quiz Records
+                        </h3>
+                        <p class="text-xs text-slate-500">Summary analytics across all published quiz sessions</p>
+                    </div>
+                    <button id="resetQuizRecordsBtn" onclick="resetQuizRecords()" class="hidden bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1">
+                        <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Reset Records
+                    </button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm text-slate-600">
+                        <thead class="bg-slate-100 text-xs uppercase text-slate-500 border-b border-slate-200">
+                            <tr>
+                                <th class="px-6 py-3">Session</th>
+                                <th class="px-6 py-3">Total Questions</th>
+                                <th class="px-6 py-3">Participants</th>
+                                <th class="px-6 py-3">Avg Performance</th>
+                                <th class="px-6 py-3">Avg Time Spent</th>
+                                <th class="px-6 py-3">Champion</th>
+                            </tr>
+                        </thead>
+                        <tbody id="quizRecordsTableBody" class="divide-y divide-slate-100"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- User Account Management -->
             <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
                 <div class="p-5 border-b border-slate-200 flex justify-between items-center">
                     <div>
@@ -412,7 +454,7 @@
 
     </main>
 
-    <!-- MODAL: PUBLISH QUIZ WITH TIMER -->
+    <!-- MODAL: PUBLISH QUIZ WITH TIMER & DUE DATETIME -->
     <div id="publishModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-slate-100 overflow-hidden">
             <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
@@ -422,8 +464,13 @@
             <form onsubmit="confirmPublishQuiz(event)" class="p-6 space-y-4">
                 <div>
                     <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2">Countdown Duration (Minutes) - Optional</label>
-                    <input type="number" id="quizDurationInput" min="1" max="180" placeholder="e.g. 15 (Leave blank for no limit)" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-sm">
-                    <p class="text-xs text-slate-400 mt-1">If specified, all participants will have this time limit once taking the quiz.</p>
+                    <input type="number" id="quizDurationInput" min="1" max="180" placeholder="e.g. 15 (Leave blank for no timer limit)" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-sm">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2">Automatic Closure Due Date & Time - Optional</label>
+                    <input type="datetime-local" id="quizDueDateInput" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-sm">
+                    <p class="text-xs text-slate-400 mt-1">The quiz will automatically close and unpublish when this deadline passes.</p>
                 </div>
 
                 <div class="pt-4 flex justify-end gap-2">
@@ -450,6 +497,7 @@
                     <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2">Question Type</label>
                     <select id="qType" onchange="renderQuestionTypeInputs()" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 text-sm font-medium">
                         <option value="mcq">Multiple Choice Question (MCQ)</option>
+                        <option value="tf">True / False Question</option>
                         <option value="fill">Fill in the Blanks</option>
                         <option value="matching">Matching Pairs</option>
                     </select>
@@ -475,7 +523,7 @@
         </div>
     </div>
 
-    <!-- MODAL: ACCOUNT SETTINGS -->
+    <!-- MODAL: ACCOUNT SETTINGS (PROFILE EDITING) -->
     <div id="settingsModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-slate-100 overflow-hidden">
             <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
@@ -486,13 +534,30 @@
                 <button onclick="closeModal('settingsModal')" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-6 h-6"></i></button>
             </div>
 
-            <form onsubmit="handlePasswordUpdate(event)" class="p-6 space-y-4">
+            <form onsubmit="handleUserProfileUpdate(event)" class="p-6 space-y-4">
                 <div class="bg-blue-50 p-3 rounded-lg border border-blue-100 flex items-center justify-between">
-                    <div>
-                        <span class="text-xs text-slate-500 block">Logged In Account</span>
-                        <span id="settingsCurrentUserName" class="text-base font-bold text-blue-900">User</span>
+                    <div class="flex items-center gap-3">
+                        <img id="settingsAvatarPreview" src="" class="w-10 h-10 rounded-full object-cover border border-blue-200 hidden" alt="Preview">
+                        <div>
+                            <span class="text-xs text-slate-500 block">Logged In Account</span>
+                            <span id="settingsCurrentUserName" class="text-base font-bold text-blue-900">User</span>
+                        </div>
                     </div>
-                    <span id="settingsCurrentUserRole" class="px-2.5 py-1 bg-blue-200 text-blue-800 text-xs font-bold rounded-full capitalize">Participant</span>
+                    <!-- Dynamic Role Display -->
+                    <span id="settingsCurrentUserRole" class="px-2.5 py-1 bg-blue-200 text-blue-800 text-xs font-bold rounded-full uppercase">Participant</span>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2">Edit Account Name</label>
+                    <input type="text" id="editUserNameInput" required class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 text-sm font-medium">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2">Upload Personal Icon / Avatar</label>
+                    <div class="flex items-center gap-2">
+                        <input type="file" id="avatarFileInput" accept="image/*" onchange="handleAvatarFileSelect(event)" class="text-xs text-slate-500 file:mr-2 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                    </div>
+                    <p class="text-xs text-slate-400 mt-1">Upload a photo to represent you in the Quiz Leaderboard.</p>
                 </div>
 
                 <div>
@@ -506,7 +571,7 @@
                 </div>
 
                 <div class="pt-4 border-t border-slate-100 flex justify-end">
-                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 shadow">Update Password</button>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 shadow">Save Changes</button>
                 </div>
             </form>
         </div>
@@ -586,16 +651,22 @@
         let users = [];
         let questions = [];
         let pastQuestions = [];
-        let submissions = {};
+        let submissions = {}; // username -> array of submissions or dict
+        let quizRecords = [];
         let isPublished = false;
-        let quizDurationMins = 0; // Countdown timer
+        let quizDurationMins = 0;
+        let quizDueDate = null;
+        let currentQuizSession = 1;
         let currentUser = null;
         let activeTab = 'dashboard';
         let timerInterval = null;
+        let quizStartTime = null;
         let draggedUserIndex = null;
+        let tempAvatarBase64 = null;
 
         window.onload = async function() {
             await fetchCloudState();
+            checkAutoClosureDeadline();
             setupRealtimeSubscriptions();
             
             const savedCurrentUser = localStorage.getItem('quiz_current_user');
@@ -604,33 +675,49 @@
             populateLoginDropdown();
             updateUI();
             lucide.createIcons();
+
+            // Periodic deadline check every 10s
+            setInterval(checkAutoClosureDeadline, 10000);
         };
 
         async function fetchCloudState() {
-            // Fetch users (ordered by sort_order or index)
             const { data: userData } = await _supabase.from('app_users').select('*').order('sort_order', { ascending: true, nullsFirst: false });
             if (userData) users = userData;
 
-            // Fetch active questions
             const { data: qData } = await _supabase.from('questions').select('*').eq('is_vault', false);
             if (qData) questions = qData;
 
-            // Fetch past paper vault questions
             const { data: pastQData } = await _supabase.from('questions').select('*').eq('is_vault', true);
             if (pastQData) pastQuestions = pastQData;
 
-            // Fetch app state (is_published, duration)
             const { data: stateData } = await _supabase.from('app_state').select('*').eq('id', 1).single();
             if (stateData) {
                 isPublished = stateData.is_published;
                 quizDurationMins = stateData.duration_mins || 0;
+                quizDueDate = stateData.due_datetime || null;
+                currentQuizSession = stateData.current_quiz_session || 1;
             }
 
-            // Fetch submissions
             const { data: subData } = await _supabase.from('submissions').select('*');
             if (subData) {
                 submissions = {};
-                subData.forEach(s => submissions[s.username] = s);
+                subData.forEach(s => {
+                    if (!submissions[s.username]) submissions[s.username] = [];
+                    submissions[s.username].push(s);
+                });
+            }
+
+            const { data: recData } = await _supabase.from('quiz_records').select('*').order('quiz_session_id', { ascending: false });
+            if (recData) quizRecords = recData;
+        }
+
+        function checkAutoClosureDeadline() {
+            if (isPublished && quizDueDate) {
+                const now = new Date();
+                const deadline = new Date(quizDueDate);
+                if (now >= deadline) {
+                    unpublishQuiz(true); // Auto-close trigger
+                }
             }
         }
 
@@ -679,18 +766,15 @@
             currentUser = null;
             localStorage.removeItem('quiz_current_user');
             if (timerInterval) clearInterval(timerInterval);
-        
-            // 1. Hide all application view sections explicitly
+
+            // Hide all application view sections explicitly
             const views = ['dashboard', 'my-questions', 'past-paper-vault', 'take-quiz', 'results', 'achievements', 'host-controls'];
             views.forEach(v => {
                 const el = document.getElementById(`view-${v}`);
                 if (el) el.classList.add('hidden');
             });
-        
-            // 2. Reset activeTab back to default
+
             activeTab = 'dashboard';
-        
-            // 3. Unhide login view and update header/nav bar
             document.getElementById('view-login').classList.remove('hidden');
             showToast("Logged out successfully.", "info");
             updateUI();
@@ -729,6 +813,10 @@
                 currentNavBtn.classList.remove('text-slate-300');
             }
 
+            if (tabId === 'take-quiz' && isPublished) {
+                quizStartTime = new Date(); // Start timer tracking
+            }
+
             renderCurrentView();
             lucide.createIcons();
         }
@@ -750,6 +838,14 @@
                 document.getElementById('headerUserName').textContent = currentUser.name;
                 document.getElementById('headerUserRole').textContent = currentUser.role;
 
+                const avatarImg = document.getElementById('headerUserAvatar');
+                if (currentUser.avatar_url) {
+                    avatarImg.src = currentUser.avatar_url;
+                    avatarImg.classList.remove('hidden');
+                } else {
+                    avatarImg.classList.add('hidden');
+                }
+
                 const hostNavBtn = document.getElementById('nav-host-controls');
                 const dashPublishBtn = document.getElementById('dashPublishBtn');
 
@@ -761,18 +857,47 @@
                     dashPublishBtn.classList.add('hidden');
                 }
 
-                if (isPublished) {
-                    publishingBadge.className = "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30";
-                    publishingBadge.innerHTML = `<i data-lucide="check-circle" class="w-3.5 h-3.5"></i> Quiz Published${quizDurationMins ? ' (' + quizDurationMins + 'm)' : ''}`;
-                } else {
-                    publishingBadge.className = "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/30";
-                    publishingBadge.innerHTML = `<i data-lucide="clock" class="w-3.5 h-3.5"></i> Creation Phase`;
-                }
+                // FEATURE 7: Sync Publish / Unpublish Button
+                syncPublishButtonsUI();
 
                 const myQs = questions.filter(q => q.author === currentUser.name);
                 document.getElementById('navMyQCount').textContent = myQs.length;
 
                 switchTab(activeTab);
+            }
+            lucide.createIcons();
+        }
+
+        function syncPublishButtonsUI() {
+            const dashPublishBtn = document.getElementById('dashPublishBtn');
+            const dashPublishText = document.getElementById('dashPublishBtnText');
+            const ctrlPublishText = document.getElementById('ctrlCenterPublishBtnText');
+            const ctrlPublishBtn = document.getElementById('ctrlCenterPublishBtn');
+            const badge = document.getElementById('publishingBadge');
+
+            if (isPublished) {
+                dashPublishBtn.className = "bg-amber-600 hover:bg-amber-700 text-white px-4 py-2.5 rounded-lg font-semibold text-sm transition shadow flex items-center gap-2";
+                dashPublishText.textContent = "Unpublish Quiz Bank";
+
+                if (ctrlPublishBtn) {
+                    ctrlPublishBtn.className = "px-5 py-3 rounded-xl font-bold text-sm shadow-lg transition flex items-center gap-2 bg-amber-600 hover:bg-amber-700 text-white";
+                    ctrlPublishText.textContent = "Unpublish Quiz Bank";
+                }
+
+                let dueText = quizDueDate ? ` | Due: ${new Date(quizDueDate).toLocaleString()}` : '';
+                badge.className = "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30";
+                badge.innerHTML = `<i data-lucide="check-circle" class="w-3.5 h-3.5"></i> Quiz #${currentQuizSession} Live${dueText}`;
+            } else {
+                dashPublishBtn.className = "bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-lg font-semibold text-sm transition shadow flex items-center gap-2";
+                dashPublishText.textContent = "Publish Quiz Bank";
+
+                if (ctrlPublishBtn) {
+                    ctrlPublishBtn.className = "px-5 py-3 rounded-xl font-bold text-sm shadow-lg transition flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white";
+                    ctrlPublishText.textContent = "Publish All Questions";
+                }
+
+                badge.className = "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/30";
+                badge.innerHTML = `<i data-lucide="clock" class="w-3.5 h-3.5"></i> Creation Phase`;
             }
             lucide.createIcons();
         }
@@ -794,11 +919,13 @@
             const myQs = questions.filter(q => q.author === currentUser.name);
             document.getElementById('statMyCount').textContent = myQs.length;
             document.getElementById('statPublishedCount').textContent = questions.length;
-            document.getElementById('statQuizStatus').textContent = isPublished ? "Live" : "Draft";
+            document.getElementById('statQuizStatus').textContent = isPublished ? `Quiz #${currentQuizSession} Live` : "Draft";
 
-            const userSub = submissions[currentUser.name];
-            if (userSub) {
-                document.getElementById('statMyScore').textContent = `${userSub.score}/${userSub.total} (${userSub.percentage}%)`;
+            const userSubs = submissions[currentUser.name] || [];
+            const latestSub = userSubs.find(s => s.quiz_session_id === currentQuizSession) || userSubs[userSubs.length - 1];
+
+            if (latestSub) {
+                document.getElementById('statMyScore').textContent = `${latestSub.score}/${latestSub.total} (${latestSub.percentage}%)`;
             } else {
                 document.getElementById('statMyScore').textContent = "Not Taken";
             }
@@ -809,8 +936,11 @@
                     <div class="flex items-start gap-4">
                         <div class="p-3 bg-emerald-100 text-emerald-700 rounded-xl shrink-0"><i data-lucide="check-circle-2" class="w-6 h-6"></i></div>
                         <div class="space-y-1">
-                            <h4 class="font-bold text-slate-800">Bible Quiz Bank is Published</h4>
-                            <p class="text-sm text-slate-600">The quiz is live! ${quizDurationMins ? 'Timer limit: ' + quizDurationMins + ' minutes.' : 'No time limit.'}</p>
+                            <h4 class="font-bold text-slate-800">Quiz Bank #${currentQuizSession} is Live</h4>
+                            <p class="text-sm text-slate-600">
+                                ${quizDurationMins ? 'Timer limit: ' + quizDurationMins + ' minutes. ' : 'No timer limit. '}
+                                ${quizDueDate ? 'Due date: ' + new Date(quizDueDate).toLocaleString() : ''}
+                            </p>
                             <button onclick="switchTab('take-quiz')" class="mt-3 inline-flex items-center gap-2 text-sm font-semibold text-blue-600 hover:text-blue-800">
                                 Take Quiz Now <i data-lucide="arrow-right" class="w-4 h-4"></i>
                             </button>
@@ -833,7 +963,6 @@
             }
         }
 
-        // FEATURE 7: Filter by Question Type (MCQ, MATCHING, FILL BLANK)
         function renderMyQuestions() {
             const list = document.getElementById('myQuestionsList');
             const lockedNotice = document.getElementById('questionsLockedNotice');
@@ -871,7 +1000,7 @@
                     <div class="flex justify-between items-start gap-4">
                         <div class="flex items-center gap-2">
                             <span class="px-2.5 py-1 bg-slate-100 text-slate-700 font-bold text-xs rounded-md uppercase">
-                                ${q.type === 'mcq' ? 'MCQ' : q.type === 'fill' ? 'Fill Blank' : 'Matching'}
+                                ${q.type === 'mcq' ? 'MCQ' : q.type === 'tf' ? 'True/False' : q.type === 'fill' ? 'Fill Blank' : 'Matching'}
                             </span>
                             <span class="text-xs text-slate-400">Question #${idx + 1}</span>
                         </div>
@@ -891,10 +1020,14 @@
             lucide.createIcons();
         }
 
-        // FEATURE 6: Past Paper Vault
+        // FEATURE 6: Past Paper Vault with Quiz #i Tagging
         function renderPastPaperVault() {
             const list = document.getElementById('pastPaperVaultList');
-            const canEdit = currentUser && currentUser.role === 'host'; // Host can edit; Co-host and participants read-only
+            const clearBtn = document.getElementById('clearVaultBtn');
+            const canEdit = currentUser && currentUser.role === 'host';
+
+            if (canEdit) clearBtn.classList.remove('hidden');
+            else clearBtn.classList.add('hidden');
 
             if (pastQuestions.length === 0) {
                 list.innerHTML = `
@@ -912,9 +1045,10 @@
                     <div class="flex justify-between items-start gap-4">
                         <div class="flex items-center gap-2">
                             <span class="px-2.5 py-1 bg-amber-100 text-amber-800 font-bold text-xs rounded-md uppercase">
-                                ${q.type === 'mcq' ? 'MCQ' : q.type === 'fill' ? 'Fill Blank' : 'Matching'}
+                                ${q.type === 'mcq' ? 'MCQ' : q.type === 'tf' ? 'True/False' : q.type === 'fill' ? 'Fill Blank' : 'Matching'}
                             </span>
-                            <span class="text-xs text-slate-400">Vault Item #${idx + 1} | Original Author: ${escapeHTML(q.author)}</span>
+                            <span class="text-xs font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded">Quiz #${q.quiz_session_id || 1}</span>
+                            <span class="text-xs text-slate-400">| Original Author: ${escapeHTML(q.author)}</span>
                         </div>
                         ${canEdit ? `
                             <div class="flex items-center gap-1">
@@ -932,11 +1066,23 @@
             lucide.createIcons();
         }
 
-        // FEATURE 5: Achievements (Rankings shown ONLY after quiz is unpublished)
+        // FEATURE 10: Empty History Function for Host
+        async function clearPastPaperVault() {
+            if (currentUser.role !== 'host') return;
+            if (!confirm("Are you sure you want to permanently delete ALL historical questions from the Past Paper Vault?")) return;
+
+            await _supabase.from('questions').delete().eq('is_vault', true);
+            await fetchCloudState();
+            updateUI();
+            showToast("Past Paper Vault emptied successfully.", "info");
+        }
+
+        // FEATURE 4 & 5: Achievements with Session Filter, Composite Rankings, Time Spent & Profile Avatar
         function renderAchievements() {
             const locked = document.getElementById('achievementsLockedScreen');
             const content = document.getElementById('achievementsContent');
             const table = document.getElementById('achievementsLeaderboardTable');
+            const filterSelect = document.getElementById('achievementFilterSelect');
 
             if (isPublished) {
                 locked.classList.remove('hidden');
@@ -947,26 +1093,102 @@
             locked.classList.add('hidden');
             content.classList.remove('hidden');
 
-            const subList = Object.values(submissions);
-            subList.sort((a, b) => b.percentage - a.percentage || b.score - a.score);
+            // Populate Filter Select options
+            let optionsHTML = `
+                <option value="COMPOSITE_JOINED">Composite (Joined Quizzes Only)</option>
+                <option value="COMPOSITE_ALL">Composite (All Published Quizzes)</option>
+            `;
+            quizRecords.forEach(r => {
+                optionsHTML += `<option value="SESSION_${r.quiz_session_id}">Quiz #${r.quiz_session_id}</option>`;
+            });
+            filterSelect.innerHTML = optionsHTML;
 
-            if (subList.length === 0) {
-                table.innerHTML = `<tr><td colspan="5" class="px-6 py-8 text-center text-slate-400">No submissions recorded for the last quiz session.</td></tr>`;
+            const selectedFilter = filterSelect.value || "COMPOSITE_JOINED";
+            let leaderboardData = [];
+
+            const allSubmissionsList = Object.values(submissions).flat();
+
+            if (selectedFilter.startsWith("SESSION_")) {
+                const sessId = parseInt(selectedFilter.replace("SESSION_", ""));
+                leaderboardData = allSubmissionsList.filter(s => s.quiz_session_id === sessId);
+                leaderboardData.sort((a, b) => b.percentage - a.percentage || a.time_taken_seconds - b.time_taken_seconds);
+            } else if (selectedFilter === "COMPOSITE_JOINED") {
+                // Average across joined quizzes
+                const userGrouped = {};
+                allSubmissionsList.forEach(s => {
+                    if (!userGrouped[s.username]) userGrouped[s.username] = { username: s.username, user_avatar: s.user_avatar, totalPerc: 0, totalTime: 0, count: 0 };
+                    userGrouped[s.username].totalPerc += s.percentage;
+                    userGrouped[s.username].totalTime += (s.time_taken_seconds || 0);
+                    userGrouped[s.username].count++;
+                });
+
+                leaderboardData = Object.values(userGrouped).map(u => ({
+                    username: u.username,
+                    user_avatar: u.user_avatar,
+                    percentage: Math.round(u.totalPerc / u.count),
+                    scoreText: `${u.count} Quizzes Taken`,
+                    time_taken_seconds: Math.round(u.totalTime / u.count),
+                    timestamp: "Composite Avg"
+                }));
+                leaderboardData.sort((a, b) => b.percentage - a.percentage || a.time_taken_seconds - b.time_taken_seconds);
+            } else if (selectedFilter === "COMPOSITE_ALL") {
+                // Average across ALL published quizzes (un-taken quizzes count as 0%)
+                const totalPublishedCount = quizRecords.length || 1;
+                const userGrouped = {};
+                
+                users.forEach(u => {
+                    userGrouped[u.name] = { username: u.name, user_avatar: u.avatar_url, totalPerc: 0, totalTime: 0, count: 0 };
+                });
+
+                allSubmissionsList.forEach(s => {
+                    if (userGrouped[s.username]) {
+                        userGrouped[s.username].totalPerc += s.percentage;
+                        userGrouped[s.username].totalTime += (s.time_taken_seconds || 0);
+                        userGrouped[s.username].count++;
+                    }
+                });
+
+                leaderboardData = Object.values(userGrouped).map(u => ({
+                    username: u.username,
+                    user_avatar: u.user_avatar,
+                    percentage: Math.round(u.totalPerc / totalPublishedCount),
+                    scoreText: `${u.count}/${totalPublishedCount} Quizzes`,
+                    time_taken_seconds: u.count > 0 ? Math.round(u.totalTime / u.count) : 0,
+                    timestamp: "All Sessions Avg"
+                }));
+                leaderboardData.sort((a, b) => b.percentage - a.percentage || a.time_taken_seconds - b.time_taken_seconds);
+            }
+
+            if (leaderboardData.length === 0) {
+                table.innerHTML = `<tr><td colspan="6" class="px-6 py-8 text-center text-slate-400">No submissions found for selected view.</td></tr>`;
                 return;
             }
 
-            table.innerHTML = subList.map((s, idx) => {
+            table.innerHTML = leaderboardData.map((s, idx) => {
                 const medal = idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : `#${idx + 1}`;
+                const formatTime = formatSecondsToMMSS(s.time_taken_seconds || 0);
+                const avatarTag = s.user_avatar ? `<img src="${s.user_avatar}" class="w-6 h-6 rounded-full object-cover border inline-block mr-2">` : '<i data-lucide="user" class="w-4 h-4 text-slate-400 mr-2 inline-block"></i>';
+
                 return `
                     <tr class="hover:bg-slate-50 transition">
                         <td class="px-6 py-4 font-extrabold text-base">${medal}</td>
-                        <td class="px-6 py-4 font-bold text-slate-800">${escapeHTML(s.username)}</td>
-                        <td class="px-6 py-4 font-bold text-blue-600">${s.score} / ${s.total}</td>
+                        <td class="px-6 py-4 font-bold text-slate-800 flex items-center">
+                            ${avatarTag} ${escapeHTML(s.username)}
+                        </td>
+                        <td class="px-6 py-4 font-bold text-blue-600">${s.scoreText || `${s.score}/${s.total}`}</td>
                         <td class="px-6 py-4 font-bold text-emerald-600">${s.percentage}%</td>
+                        <td class="px-6 py-4 font-mono text-xs font-semibold text-slate-700">${formatTime}</td>
                         <td class="px-6 py-4 text-xs text-slate-400">${s.timestamp}</td>
                     </tr>
                 `;
             }).join('');
+            lucide.createIcons();
+        }
+
+        function formatSecondsToMMSS(seconds) {
+            const m = Math.floor(seconds / 60);
+            const s = seconds % 60;
+            return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
         }
 
         function renderQuestionDetailsPreview(q) {
@@ -978,6 +1200,12 @@
                                 ${String.fromCharCode(65 + i)}. ${escapeHTML(opt)} ${parseInt(q.correctAnswer) === i ? '✓ (Correct)' : ''}
                             </div>
                         `).join('')}
+                    </div>
+                `;
+            } else if (q.type === 'tf') {
+                return `
+                    <div class="text-xs bg-slate-50 p-2.5 rounded border border-slate-200 text-slate-700">
+                        <strong>Correct Answer:</strong> <code class="bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded font-mono font-bold">${q.correctAnswer.toUpperCase()}</code>
                     </div>
                 `;
             } else if (q.type === 'fill') {
@@ -1000,7 +1228,6 @@
             return '';
         }
 
-        // FEATURE 10: Randomized Matching Pairs order every time for each user
         function renderTakeQuiz() {
             const notPub = document.getElementById('quizNotPublishedScreen');
             const container = document.getElementById('quizContainer');
@@ -1015,7 +1242,6 @@
             notPub.classList.add('hidden');
             container.classList.remove('hidden');
 
-            // Timer Setup
             if (quizDurationMins > 0) {
                 document.getElementById('quizTimerBox').classList.remove('hidden');
                 startQuizTimer(quizDurationMins * 60);
@@ -1027,7 +1253,6 @@
 
             const qList = document.getElementById('quizQuestionsContainer');
             qList.innerHTML = questions.map((q, idx) => {
-                // Randomize matching pairs per render
                 let qToRender = JSON.parse(JSON.stringify(q));
                 if (qToRender.type === 'matching' && Array.isArray(qToRender.pairs)) {
                     qToRender.shuffledPairs = qToRender.pairs.slice().sort(() => Math.random() - 0.5);
@@ -1079,6 +1304,17 @@
                         `).join('')}
                     </div>
                 `;
+            } else if (q.type === 'tf') {
+                return `
+                    <div class="flex gap-4 mt-3">
+                        <label class="flex-1 flex items-center justify-center gap-2 p-3 rounded-lg border border-slate-200 hover:bg-emerald-50 cursor-pointer font-bold text-sm">
+                            <input type="radio" name="ans_${q.id}" value="true" required class="w-4 h-4 text-emerald-600"> True
+                        </label>
+                        <label class="flex-1 flex items-center justify-center gap-2 p-3 rounded-lg border border-slate-200 hover:bg-red-50 cursor-pointer font-bold text-sm">
+                            <input type="radio" name="ans_${q.id}" value="false" required class="w-4 h-4 text-red-600"> False
+                        </label>
+                    </div>
+                `;
             } else if (q.type === 'fill') {
                 return `<div class="mt-3"><input type="text" name="ans_${q.id}" required placeholder="Type your answer here..." class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 text-sm"></div>`;
             } else if (q.type === 'matching') {
@@ -1103,7 +1339,6 @@
             return '';
         }
 
-        // FEATURE 8 & 9: Batch Export to Excel (.xlsx) for MCQ and FILL BLANK
         function downloadBatchTemplate(type) {
             let data = [];
             let filename = "";
@@ -1112,7 +1347,6 @@
                 filename = "MCQ_Batch_Questions.xlsx";
                 data.push(["{Q_id}", "{Q_type}", "{Q_msg}", "{Option_A}", "{Option_B}", "{Option_C}", "{Option_D}", "{A_msg}", "{Soln_exp}", "{Actn}"]);
                 const myMcqs = questions.filter(q => q.author === currentUser.name && q.type === 'mcq');
-                
                 if (myMcqs.length > 0) {
                     myMcqs.forEach((q, i) => {
                         const correctLetter = String.fromCharCode(65 + parseInt(q.correctAnswer));
@@ -1142,7 +1376,6 @@
             showToast(`Exported ${type.toUpperCase()} template successfully!`, "success");
         }
 
-        // FEATURE 8 & 9: Batch File Upload (.xlsx, .xls, .csv, .numbers, .gsheet)
         async function handleBatchFileUpload(e) {
             const file = e.target.files[0];
             if (!file) return;
@@ -1155,12 +1388,10 @@
                     const firstSheet = workbook.SheetNames[0];
                     const rows = XLSX.utils.sheet_to_json(workbook.Sheets[firstSheet], { header: 1 });
 
-                    if (rows.length < 2) {
-                        return showToast("Uploaded file is empty or missing data rows.", "error");
-                    }
+                    if (rows.length < 2) return showToast("Uploaded file is empty or missing data rows.", "error");
 
                     const headers = rows[0].map(h => String(h).trim().toUpperCase());
-                    let addedCount = 0, updatedCount = 0, deletedCount = 0;
+                    let addedCount = 0;
 
                     for (let i = 1; i < rows.length; i++) {
                         const row = rows[i];
@@ -1168,8 +1399,6 @@
 
                         const qTypeIdx = headers.indexOf("{Q_TYPE}");
                         const qType = qTypeIdx !== -1 ? String(row[qTypeIdx]||'').trim().toUpperCase() : '';
-                        const actnIdx = headers.indexOf("{ACTN}");
-                        const actn = actnIdx !== -1 ? String(row[actnIdx]||'A').trim().toUpperCase() : 'A';
 
                         if (qType === 'MCQ') {
                             const prompt = row[headers.indexOf("{Q_MSG}")];
@@ -1190,13 +1419,12 @@
                                 options: [String(optA||''), String(optB||''), String(optC||''), String(optD||'')],
                                 correctAnswer: correctIdx,
                                 explanation: String(explanation),
-                                is_vault: false
+                                is_vault: false,
+                                quiz_session_id: currentQuizSession
                             };
 
-                            if (actn === 'A') {
-                                await _supabase.from('questions').insert(qData);
-                                addedCount++;
-                            }
+                            await _supabase.from('questions').insert(qData);
+                            addedCount++;
                         } else if (qType === 'FILL BLANK' || qType === 'FILL') {
                             const prompt = row[headers.indexOf("{Q_MSG}")];
                             const answer = row[headers.indexOf("{A_MSG}")];
@@ -1209,13 +1437,12 @@
                                 prompt: String(prompt||''),
                                 correctAnswer: String(answer||''),
                                 explanation: String(explanation),
-                                is_vault: false
+                                is_vault: false,
+                                quiz_session_id: currentQuizSession
                             };
 
-                            if (actn === 'A') {
-                                await _supabase.from('questions').insert(qData);
-                                addedCount++;
-                            }
+                            await _supabase.from('questions').insert(qData);
+                            addedCount++;
                         }
                     }
 
@@ -1238,47 +1465,66 @@
             document.getElementById(modalId).classList.add('hidden');
         }
 
-        // FEATURE 1: Publish with Countdown Timer
         function openPublishModal() {
             if (!isHostOrCoHost()) return;
             if (isPublished) {
-                // Toggle to Unpublish directly
-                unpublishQuiz();
+                unpublishQuiz(false);
             } else {
                 openModal('publishModal');
             }
         }
 
+        // FEATURE 1: Set Due Date & Due Time
         async function confirmPublishQuiz(e) {
             e.preventDefault();
             const duration = parseInt(document.getElementById('quizDurationInput').value) || 0;
+            const dueDateVal = document.getElementById('quizDueDateInput').value || null;
 
-            await _supabase.from('app_state').update({ is_published: true, duration_mins: duration }).eq('id', 1);
+            await _supabase.from('app_state').update({
+                is_published: true,
+                duration_mins: duration,
+                due_datetime: dueDateVal ? new Date(dueDateVal).toISOString() : null
+            }).eq('id', 1);
+
             await fetchCloudState();
             closeModal('publishModal');
             updateUI();
-            showToast("Quiz Published successfully!", "success");
+            showToast(`Quiz #${currentQuizSession} Published successfully!`, "success");
         }
 
-        // FEATURE 6: Unpublish automatically archives to Past Paper Vault and clears user questions
-        async function unpublishQuiz() {
-            if (!isHostOrCoHost()) return;
-            if (!confirm("Unpublish Quiz Bank? All active questions will be moved to Past Paper Vault and cleared from active repositories.")) return;
+        // FEATURE 1 & 6 & 11: Auto/Manual Unpublish and Analytics Recording
+        async function unpublishQuiz(isAutoClose = false) {
+            if (!isHostOrCoHost() && !isAutoClose) return;
+            if (!isAutoClose && !confirm("Unpublish Quiz Bank? Active questions will be archived to Past Paper Vault.")) return;
 
-            // 1. Move all active questions to Past Paper Vault (is_vault = true)
+            // 1. Move questions to vault with current quiz_session_id
             for (let q of questions) {
-                await _supabase.from('questions').update({ is_vault: true }).eq('id', q.id);
+                await _supabase.from('questions').update({ is_vault: true, quiz_session_id: currentQuizSession }).eq('id', q.id);
             }
 
-            // 2. Set platform to unpublished
-            await _supabase.from('app_state').update({ is_published: false, duration_mins: 0 }).eq('id', 1);
+            // 2. Record Historical Analytics
+            await _supabase.from('quiz_records').upsert({
+                quiz_session_id: currentQuizSession,
+                total_questions: questions.length,
+                published_at: new Date().toISOString(),
+                due_datetime: quizDueDate
+            });
+
+            // 3. Increment session counter & set draft
+            const nextSession = currentQuizSession + 1;
+            await _supabase.from('app_state').update({
+                is_published: false,
+                duration_mins: 0,
+                due_datetime: null,
+                current_quiz_session: nextSession
+            }).eq('id', 1);
 
             await fetchCloudState();
             updateUI();
-            showToast("Quiz Unpublished! Questions archived in Past Paper Vault.", "info");
+            showToast(isAutoClose ? "Quiz closed automatically (due date reached)." : "Quiz Unpublished! Questions archived.", "info");
         }
 
-        // FEATURE 2 & 3: Drag & Drop Users & Setting Roles
+        // FEATURE 11: Cluster for Published Quiz Records & Host Reset Function
         function renderHostControls() {
             if (!isHostOrCoHost()) return;
 
@@ -1287,40 +1533,78 @@
 
             const isHost = currentUser.role === 'host';
             document.getElementById('hostAddAccountBtn').style.display = isHost ? 'flex' : 'none';
+            document.getElementById('resetQuizRecordsBtn').style.display = isHost ? 'flex' : 'none';
 
             const statusTxt = document.getElementById('hostPublishStatusText');
-            const pubBtn = document.getElementById('publishAllBtn');
 
             if (isPublished) {
-                statusTxt.textContent = `Published & Live (${quizDurationMins ? quizDurationMins + 'm' : 'No Limit'})`;
+                statusTxt.textContent = `Published & Live (Quiz #${currentQuizSession})`;
                 statusTxt.className = "text-xl font-bold text-emerald-600 mt-1";
-                pubBtn.className = "px-5 py-3 rounded-xl font-bold text-sm shadow-lg transition flex items-center gap-2 bg-amber-600 hover:bg-amber-700 text-white";
-                pubBtn.innerHTML = `<i data-lucide="lock" class="w-5 h-5"></i> Unpublish Quiz Bank`;
             } else {
                 statusTxt.textContent = "Unpublished (Creation Phase)";
                 statusTxt.className = "text-xl font-bold text-amber-600 mt-1";
-                pubBtn.className = "px-5 py-3 rounded-xl font-bold text-sm shadow-lg transition flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white";
-                pubBtn.innerHTML = `<i data-lucide="upload-cloud" class="w-5 h-5"></i> Publish All Questions`;
             }
 
+            // Render Historical Quiz Records Cluster
+            const recordsTable = document.getElementById('quizRecordsTableBody');
+            if (quizRecords.length === 0) {
+                recordsTable.innerHTML = `<tr><td colspan="6" class="px-6 py-6 text-center text-slate-400">No published quiz records archived yet.</td></tr>`;
+            } else {
+                recordsTable.innerHTML = quizRecords.map(r => {
+                    const sessSubs = Object.values(submissions).flat().filter(s => s.quiz_session_id === r.quiz_session_id);
+                    const participantCount = sessSubs.length;
+                    
+                    let avgPerf = 0;
+                    let avgTimeSecs = 0;
+                    let championName = "N/A";
+                    let championAvatar = "";
+
+                    if (participantCount > 0) {
+                        const totalPerf = sessSubs.reduce((acc, curr) => acc + curr.percentage, 0);
+                        const totalTime = sessSubs.reduce((acc, curr) => acc + (curr.time_taken_seconds || 0), 0);
+                        avgPerf = Math.round(totalPerf / participantCount);
+                        avgTimeSecs = Math.round(totalTime / participantCount);
+
+                        sessSubs.sort((a, b) => b.percentage - a.percentage || a.time_taken_seconds - b.time_taken_seconds);
+                        championName = sessSubs[0].username;
+                        championAvatar = sessSubs[0].user_avatar || '';
+                    }
+
+                    const champAvatarTag = championAvatar ? `<img src="${championAvatar}" class="w-5 h-5 rounded-full object-cover border inline mr-1">` : '';
+
+                    return `
+                        <tr class="hover:bg-slate-50 transition">
+                            <td class="px-6 py-4 font-bold text-indigo-600">Quiz #${r.quiz_session_id}</td>
+                            <td class="px-6 py-4 font-semibold text-slate-700">${r.total_questions} questions</td>
+                            <td class="px-6 py-4 font-semibold text-slate-700">${participantCount} user(s)</td>
+                            <td class="px-6 py-4 font-bold text-emerald-600">${avgPerf}%</td>
+                            <td class="px-6 py-4 font-mono text-xs">${formatSecondsToMMSS(avgTimeSecs)}</td>
+                            <td class="px-6 py-4 font-bold text-slate-800 flex items-center">${champAvatarTag} ${escapeHTML(championName)}</td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+
+            // User Management Table
             const table = document.getElementById('userManagementTable');
             table.innerHTML = users.map((u, idx) => {
                 const count = questions.filter(q => q.author === u.name).length;
+                const userAvatarTag = u.avatar_url ? `<img src="${u.avatar_url}" class="w-6 h-6 rounded-full object-cover border">` : '<i data-lucide="user" class="w-4 h-4 text-slate-400"></i>';
+
                 return `
                     <tr class="hover:bg-slate-50 transition" ${isHost ? `draggable="true" ondragstart="handleDragStart(event, ${idx})" ondragover="handleDragOver(event)" ondrop="handleDrop(event, ${idx})"` : ''}>
                         <td class="px-4 py-4 text-slate-300 cursor-grab">${isHost ? '⋮⋮' : ''}</td>
                         <td class="px-6 py-4 font-semibold text-slate-800 flex items-center gap-2">
-                            <i data-lucide="user" class="w-4 h-4 text-slate-400"></i> ${escapeHTML(u.name)}
+                            ${userAvatarTag} ${escapeHTML(u.name)}
                         </td>
                         <td class="px-6 py-4">
-                            <!-- FEATURE 3: Set ROLE -->
                             ${isHost ? `
                                 <select onchange="updateUserRole('${escapeHTML(u.name)}', this.value)" class="px-2.5 py-1 text-xs font-bold rounded-lg border border-slate-300 bg-white">
                                     <option value="participant" ${u.role === 'participant' ? 'selected' : ''}>Participant</option>
                                     <option value="co-host" ${u.role === 'co-host' ? 'selected' : ''}>Co-host</option>
                                     <option value="host" ${u.role === 'host' ? 'selected' : ''}>Host</option>
                                 </select>
-                            ` : `<span class="px-2.5 py-1 text-xs font-bold rounded-full bg-slate-100 text-slate-700">${u.role}</span>`}
+                            ` : `<span class="px-2.5 py-1 text-xs font-bold rounded-full bg-slate-100 text-slate-700 uppercase">${u.role}</span>`}
                         </td>
                         <td class="px-6 py-4 text-sm font-medium text-slate-700">${count} questions</td>
                         <td class="px-6 py-4 text-right space-x-2">
@@ -1334,7 +1618,16 @@
             lucide.createIcons();
         }
 
-        // Drag & Drop Handler Functions
+        async function resetQuizRecords() {
+            if (currentUser.role !== 'host') return;
+            if (!confirm("Are you sure you want to clear ALL historical published quiz records?")) return;
+
+            await _supabase.from('quiz_records').delete().neq('quiz_session_id', 0);
+            await fetchCloudState();
+            renderHostControls();
+            showToast("Historical quiz records reset.", "info");
+        }
+
         function handleDragStart(e, index) { draggedUserIndex = index; }
         function handleDragOver(e) { e.preventDefault(); }
         async function handleDrop(e, targetIndex) {
@@ -1344,7 +1637,6 @@
             const movedUser = users.splice(draggedUserIndex, 1)[0];
             users.splice(targetIndex, 0, movedUser);
 
-            // Update sort_order in database
             for (let i = 0; i < users.length; i++) {
                 await _supabase.from('app_users').update({ sort_order: i }).eq('name', users[i].name);
             }
@@ -1359,7 +1651,6 @@
             showToast(`Role updated for ${username} to ${newRole}`, "success");
         }
 
-        // Other core handlers...
         async function handleSaveQuestion(e) {
             e.preventDefault();
             const id = document.getElementById('qId').value;
@@ -1374,7 +1665,8 @@
                 type,
                 prompt,
                 explanation,
-                is_vault: isVault
+                is_vault: isVault,
+                quiz_session_id: currentQuizSession
             };
 
             if (type === 'mcq') {
@@ -1382,6 +1674,10 @@
                 qData.options = Array.from(optInputs).map(i => i.value.trim());
                 const correct = document.querySelector('input[name="mcqCorrect"]:checked');
                 if (!correct) return showToast("Please select a correct option.", "error");
+                qData.correctAnswer = correct.value;
+            } else if (type === 'tf') {
+                const correct = document.querySelector('input[name="tfCorrect"]:checked');
+                if (!correct) return showToast("Please select True or False.", "error");
                 qData.correctAnswer = correct.value;
             } else if (type === 'fill') {
                 qData.correctAnswer = document.getElementById('fillCorrectAnswer').value.trim();
@@ -1461,6 +1757,19 @@
                         `).join('')}
                     </div>
                 `;
+            } else if (type === 'tf') {
+                const isTrue = existingQ && existingQ.type === 'tf' ? existingQ.correctAnswer === 'true' : true;
+                container.innerHTML = `
+                    <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2">Select Correct Statement Answer</label>
+                    <div class="flex gap-4">
+                        <label class="flex items-center gap-2 text-sm font-bold text-emerald-700">
+                            <input type="radio" name="tfCorrect" value="true" ${isTrue ? 'checked' : ''} class="w-4 h-4"> True
+                        </label>
+                        <label class="flex items-center gap-2 text-sm font-bold text-red-700">
+                            <input type="radio" name="tfCorrect" value="false" ${!isTrue ? 'checked' : ''} class="w-4 h-4"> False
+                        </label>
+                    </div>
+                `;
             } else if (type === 'fill') {
                 const answer = existingQ && existingQ.type === 'fill' ? existingQ.correctAnswer : '';
                 container.innerHTML = `
@@ -1502,9 +1811,13 @@
             container.appendChild(row);
         }
 
+        // FEATURE 3 & 5: Time Taken & Standardized Date Time Format
         async function handleQuizSubmit(e) {
             e.preventDefault();
             if (timerInterval) clearInterval(timerInterval);
+
+            const endTime = new Date();
+            const timeTakenSecs = quizStartTime ? Math.round((endTime - quizStartTime) / 1000) : 0;
 
             const formData = new FormData(e.target);
             let score = 0;
@@ -1515,6 +1828,9 @@
                 let userVal = null;
 
                 if (q.type === 'mcq') {
+                    userVal = formData.get(`ans_${q.id}`);
+                    if (userVal === q.correctAnswer) isCorrect = true;
+                } else if (q.type === 'tf') {
                     userVal = formData.get(`ans_${q.id}`);
                     if (userVal === q.correctAnswer) isCorrect = true;
                 } else if (q.type === 'fill') {
@@ -1538,13 +1854,19 @@
             const total = questions.length;
             const percentage = total > 0 ? Math.round((score / total) * 100) : 0;
 
+            // Formatted Date: YYYY/MM/DD, HH:MM:SS AM/PM
+            const formattedDateStr = formatStandardDateTime(endTime);
+
             const submissionData = {
                 username: currentUser.name,
+                quiz_session_id: currentQuizSession,
                 score,
                 total,
                 percentage,
                 answers,
-                timestamp: new Date().toLocaleString()
+                time_taken_seconds: timeTakenSecs,
+                user_avatar: currentUser.avatar_url || '',
+                timestamp: formattedDateStr
             };
 
             await _supabase.from('submissions').upsert(submissionData);
@@ -1554,10 +1876,25 @@
             switchTab('results');
         }
 
+        function formatStandardDateTime(d) {
+            const yyyy = d.getFullYear();
+            const mm = String(d.getMonth() + 1).padStart(2, '0');
+            const dd = String(d.getDate()).padStart(2, '0');
+            let hours = d.getHours();
+            const minutes = String(d.getMinutes()).padStart(2, '0');
+            const seconds = String(d.getSeconds()).padStart(2, '0');
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12;
+            hours = hours ? hours : 12; // hour '0' should be '12'
+            const formattedHours = String(hours).padStart(2, '0');
+            return `${yyyy}/${mm}/${dd}, ${formattedHours}:${minutes}:${seconds} ${ampm}`;
+        }
+
         function renderResults() {
             const noRes = document.getElementById('noResultsScreen');
             const resContent = document.getElementById('resultsContent');
-            const userSub = submissions[currentUser.name];
+            const userSubs = submissions[currentUser.name] || [];
+            const userSub = userSubs.find(s => s.quiz_session_id === currentQuizSession) || userSubs[userSubs.length - 1];
 
             if (!userSub || !isPublished) {
                 noRes.classList.remove('hidden');
@@ -1597,8 +1934,15 @@
                 const correctIdx = parseInt(q.correctAnswer);
                 return `
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-                        <div class="p-2.5 rounded border bg-slate-50"><span class="text-slate-500 block">Your Answer:</span><span class="font-semibold ${ansObj.isCorrect ? 'text-emerald-700' : 'text-red-600'}">${isNaN(userChoiceIdx) ? 'No Answer' : `${String.fromCharCode(65 + userChoiceIdx)}.${escapeHTML(q.options[userChoiceIdx])}`}</span></div>
+                        <div class="p-2.5 rounded border bg-slate-50"><span class="text-slate-500 block">Your Answer:</span><span class="font-semibold ${ansObj.isCorrect ? 'text-emerald-700' : 'text-red-600'}">${isNaN(userChoiceIdx) ? 'No Answer' : `${String.fromCharCode(65 + userChoiceIdx)}. ${escapeHTML(q.options[userChoiceIdx])}`}</span></div>
                         <div class="p-2.5 rounded border bg-emerald-50 border-emerald-200"><span class="text-emerald-800 block">Official Correct Answer:</span><span class="font-bold text-emerald-900">${String.fromCharCode(65 + correctIdx)}. ${escapeHTML(q.options[correctIdx])}</span></div>
+                    </div>
+                `;
+            } else if (q.type === 'tf') {
+                return `
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                        <div class="p-2.5 rounded border bg-slate-50"><span class="text-slate-500 block">Your Answer:</span><span class="font-semibold ${ansObj.isCorrect ? 'text-emerald-700' : 'text-red-600'}">${escapeHTML(String(ansObj.userVal).toUpperCase())}</span></div>
+                        <div class="p-2.5 rounded border bg-emerald-50 border-emerald-200"><span class="text-emerald-800 block">Official Correct Answer:</span><span class="font-bold text-emerald-900">${escapeHTML(String(q.correctAnswer).toUpperCase())}</span></div>
                     </div>
                 `;
             } else if (q.type === 'fill') {
@@ -1610,6 +1954,69 @@
                 `;
             }
             return '';
+        }
+
+        // FEATURE 8 & 9: Account Settings Fixes (Dynamic Role Sync & Profile Editing)
+        function openModal(modalId) {
+            if (modalId === 'settingsModal' && currentUser) {
+                document.getElementById('settingsCurrentUserName').textContent = currentUser.name;
+                document.getElementById('editUserNameInput').value = currentUser.name;
+                document.getElementById('newPasswordInput').value = currentUser.pass;
+                
+                // Synced Role Badge
+                const roleBadge = document.getElementById('settingsCurrentUserRole');
+                roleBadge.textContent = currentUser.role;
+
+                const avatarPrev = document.getElementById('settingsAvatarPreview');
+                if (currentUser.avatar_url) {
+                    avatarPrev.src = currentUser.avatar_url;
+                    avatarPrev.classList.remove('hidden');
+                } else {
+                    avatarPrev.classList.add('hidden');
+                }
+                tempAvatarBase64 = currentUser.avatar_url || null;
+            }
+            document.getElementById(modalId).classList.remove('hidden');
+        }
+
+        function handleAvatarFileSelect(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                tempAvatarBase64 = evt.target.result;
+                const avatarPrev = document.getElementById('settingsAvatarPreview');
+                avatarPrev.src = tempAvatarBase64;
+                avatarPrev.classList.remove('hidden');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        async function handleUserProfileUpdate(e) {
+            e.preventDefault();
+            const newName = document.getElementById('editUserNameInput').value.trim();
+            const newPass = document.getElementById('newPasswordInput').value.trim();
+
+            if (!currentUser) return;
+
+            const oldName = currentUser.name;
+
+            await _supabase.from('app_users').update({
+                name: newName,
+                pass: newPass,
+                avatar_url: tempAvatarBase64 || ''
+            }).eq('name', oldName);
+
+            currentUser.name = newName;
+            currentUser.pass = newPass;
+            currentUser.avatar_url = tempAvatarBase64 || '';
+
+            localStorage.setItem('quiz_current_user', JSON.stringify(currentUser));
+            await fetchCloudState();
+            closeModal('settingsModal');
+            updateUI();
+            showToast("Profile and account settings updated!", "success");
         }
 
         function openAdminPasswordReset(username) {
@@ -1649,18 +2056,6 @@
                 await _supabase.from('app_users').delete().eq('name', username);
                 await fetchCloudState();
                 showToast(`Account "${username}" removed.`, "info");
-            }
-        }
-
-        async function handlePasswordUpdate(e) {
-            e.preventDefault();
-            const newPass = document.getElementById('newPasswordInput').value;
-            if (currentUser) {
-                await _supabase.from('app_users').update({ pass: newPass }).eq('name', currentUser.name);
-                currentUser.pass = newPass;
-                localStorage.setItem('quiz_current_user', JSON.stringify(currentUser));
-                closeModal('settingsModal');
-                showToast("Password updated successfully!", "success");
             }
         }
 
