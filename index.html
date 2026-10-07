@@ -4,8 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bible QuizCraft - Multi-User Interactive Platform</title>
-    <!-- Favicon -->
-    <link rel="icon" type="image/png" href="bible.png">
+    <!-- Favicon with cache-busting -->
+    <link rel="icon" type="image/png" href="bible.png?v=2">
+    <link rel="shortcut icon" type="image/png" href="bible.png?v=2">
+    <link rel="apple-touch-icon" href="bible.png?v=2">
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Lucide Icons -->
@@ -14,6 +16,8 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <!-- SheetJS (xlsx) for Excel Batch Processing -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <!-- JS Confetti / Fireworks Canvas -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; }
@@ -42,14 +46,17 @@
                 </span>
 
                 <div id="userProfileHeader" class="hidden flex items-center gap-2 pl-3 border-l border-slate-700">
-                    <img id="headerUserAvatar" src="" class="w-8 h-8 rounded-full object-cover border border-amber-400 hidden" alt="Avatar">
+                    <!-- Profile avatar button replaces gear icon on mobile if uploaded -->
+                    <button id="headerProfileTriggerBtn" onclick="openModal('settingsModal')" class="flex items-center gap-2 p-1 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition" title="Account Settings">
+                        <img id="headerUserAvatar" src="" class="w-8 h-8 rounded-full object-cover border border-amber-400 hidden" alt="Avatar">
+                        <i id="headerSettingsDefaultIcon" data-lucide="settings" class="w-5 h-5"></i>
+                    </button>
+                    
                     <div class="text-right hidden md:block">
                         <div id="headerUserName" class="text-sm font-semibold text-slate-100">User</div>
                         <div id="headerUserRole" class="text-xs text-slate-400 capitalize">Host</div>
                     </div>
-                    <button onclick="openModal('settingsModal')" class="p-2 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition flex items-center justify-center" title="Account Settings">
-                        <i data-lucide="settings" class="w-5 h-5"></i>
-                    </button>
+                    
                     <button onclick="logout()" class="p-2 text-red-400 hover:text-red-300 hover:bg-slate-800 rounded-lg transition flex items-center justify-center" title="Sign Out">
                         <i data-lucide="log-out" class="w-5 h-5"></i>
                     </button>
@@ -89,7 +96,7 @@
     <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
 
         <!-- VIEW: LOGIN -->
-        <section id="view-login" class="max-w-md mx-auto my-12 bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden">
+        <section id="view-login" class="max-w-md mx-auto my-8 sm:my-12 bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden">
             <div class="bg-slate-900 p-8 text-center text-white relative">
                 <div class="w-16 h-16 bg-amber-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg shadow-amber-500/30">
                     <i data-lucide="book-open" class="w-8 h-8 text-white"></i>
@@ -118,6 +125,13 @@
                     <i data-lucide="log-in" class="w-5 h-5"></i> Sign In
                 </button>
             </form>
+
+            <div class="p-6 pt-0 border-t border-slate-100 text-center">
+                <p class="text-xs text-slate-400 mb-3">Or test your bible knowledge instantly</p>
+                <button type="button" onclick="startGuestMode()" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg shadow-md transition flex items-center justify-center gap-2">
+                    <i data-lucide="zap" class="w-4 h-4"></i> Guest Mode - Take the Challenge
+                </button>
+            </div>
         </section>
 
         <!-- VIEW: DASHBOARD -->
@@ -142,7 +156,6 @@
                 </div>
             </div>
 
-            <!-- Stats Grid -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center gap-4">
                     <div class="p-3 bg-blue-100 text-blue-600 rounded-xl"><i data-lucide="file-question" class="w-6 h-6"></i></div>
@@ -197,20 +210,23 @@
                         <option value="ORDERING">ORDERING</option>
                     </select>
 
-                    <button onclick="downloadBatchTemplate('mcq')" class="bg-slate-800 hover:bg-slate-900 text-white px-3 py-2 rounded-lg font-medium text-xs shadow transition flex items-center gap-1.5" title="Export MCQ Questions to Excel">
-                        <i data-lucide="download" class="w-3.5 h-3.5"></i> MCQ (.xlsx)
-                    </button>
-                    <button onclick="downloadBatchTemplate('fill')" class="bg-slate-800 hover:bg-slate-900 text-white px-3 py-2 rounded-lg font-medium text-xs shadow transition flex items-center gap-1.5" title="Export Fill Blank Questions to Excel">
-                        <i data-lucide="download" class="w-3.5 h-3.5"></i> Fill Blank (.xlsx)
-                    </button>
-                    <button onclick="downloadBatchTemplate('ordering')" class="bg-slate-800 hover:bg-slate-900 text-white px-3 py-2 rounded-lg font-medium text-xs shadow transition flex items-center gap-1.5" title="Export Ordering Questions to Excel">
-                        <i data-lucide="download" class="w-3.5 h-3.5"></i> Ordering (.xlsx)
-                    </button>
-                    <!-- Batch Upload Form with Dynamic Validations -->
-                    <label class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg font-medium text-xs shadow transition flex items-center gap-1.5 cursor-pointer">
-                        <i data-lucide="file-up" class="w-3.5 h-3.5"></i> Batch Upload
-                        <input type="file" id="batchFileInput" accept=".xlsx, .xls, .csv, .numbers, .gsheet" onchange="handleBatchFileUpload(event)" class="hidden">
-                    </label>
+                    <!-- Hidden on Mobile -->
+                    <div class="desktop-batch-tools flex items-center gap-2">
+                        <button onclick="downloadBatchTemplate('mcq')" class="bg-slate-800 hover:bg-slate-900 text-white px-3 py-2 rounded-lg font-medium text-xs shadow transition flex items-center gap-1.5" title="Export MCQ Questions to Excel">
+                            <i data-lucide="download" class="w-3.5 h-3.5"></i> MCQ (.xlsx)
+                        </button>
+                        <button onclick="downloadBatchTemplate('fill')" class="bg-slate-800 hover:bg-slate-900 text-white px-3 py-2 rounded-lg font-medium text-xs shadow transition flex items-center gap-1.5" title="Export Fill Blank Questions to Excel">
+                            <i data-lucide="download" class="w-3.5 h-3.5"></i> Fill Blank (.xlsx)
+                        </button>
+                        <button onclick="downloadBatchTemplate('ordering')" class="bg-slate-800 hover:bg-slate-900 text-white px-3 py-2 rounded-lg font-medium text-xs shadow transition flex items-center gap-1.5" title="Export Ordering Questions to Excel">
+                            <i data-lucide="download" class="w-3.5 h-3.5"></i> Ordering (.xlsx)
+                        </button>
+                        <label class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg font-medium text-xs shadow transition flex items-center gap-1.5 cursor-pointer">
+                            <i data-lucide="file-up" class="w-3.5 h-3.5"></i> Batch Upload
+                            <input type="file" id="batchFileInput" accept=".xlsx, .xls, .csv, .numbers, .gsheet" onchange="handleBatchFileUpload(event)" class="hidden">
+                        </label>
+                    </div>
+
                     <button onclick="openQuestionModal()" id="addQBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium text-xs shadow transition flex items-center gap-1.5">
                         <i data-lucide="plus" class="w-4 h-4"></i> Add Question
                     </button>
@@ -227,14 +243,19 @@
 
         <!-- VIEW: PAST PAPER VAULT -->
         <section id="view-past-paper-vault" class="space-y-6 hidden">
-            <div class="flex justify-between items-center">
+            <div class="flex justify-between items-center flex-wrap gap-3">
                 <div>
                     <h2 class="text-2xl font-bold text-slate-800">Past Paper Vault</h2>
-                    <p class="text-slate-500 text-sm">Historical question repository from past quiz sessions. Host can edit; Co-host and Participants are view-only.</p>
+                    <p class="text-slate-500 text-sm">Historical question repository from past quiz sessions. Host can edit or republish for guest challenge.</p>
                 </div>
-                <button id="clearVaultBtn" onclick="clearPastPaperVault()" class="hidden bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium text-xs shadow transition flex items-center gap-1.5">
-                    <i data-lucide="trash" class="w-4 h-4"></i> Empty History
-                </button>
+                <div class="flex items-center gap-2">
+                    <button id="republishGuestChallengeBtn" onclick="openRepublishGuestModal()" class="hidden bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-medium text-xs shadow transition flex items-center gap-1.5">
+                        <i data-lucide="zap" class="w-4 h-4"></i> Republish Guest Challenge
+                    </button>
+                    <button id="clearVaultBtn" onclick="clearPastPaperVault()" class="hidden bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium text-xs shadow transition flex items-center gap-1.5">
+                        <i data-lucide="trash" class="w-4 h-4"></i> Empty History
+                    </button>
+                </div>
             </div>
             <div id="pastPaperVaultList" class="space-y-4"></div>
         </section>
@@ -252,7 +273,7 @@
             <div id="quizContainer" class="hidden space-y-6 max-w-3xl mx-auto">
                 <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex flex-wrap justify-between items-center gap-4 sticky top-16 z-30">
                     <div>
-                        <h2 class="text-2xl font-bold text-slate-800">Live Bible Quiz Assessment</h2>
+                        <h2 class="text-2xl font-bold text-slate-800" id="quizTitleHeader">Live Bible Quiz Assessment</h2>
                         <p class="text-slate-500 text-sm">Answer all questions below and click submit to receive immediate scoring.</p>
                     </div>
                     <div class="flex items-center gap-3">
@@ -307,6 +328,29 @@
                     </div>
                 </div>
 
+                <!-- SHARE RESULTS FUNCTION -->
+                <div id="shareResultsBox" class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-5 shadow-sm space-y-3">
+                    <h4 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                        <i data-lucide="share-2" class="w-4 h-4 text-blue-600"></i> Share Your Achievements
+                    </h4>
+                    <p class="text-xs text-slate-600">Share your score with friends via Email, WhatsApp, Signal, or Instagram!</p>
+                    
+                    <div class="flex flex-wrap gap-2 pt-1">
+                        <button onclick="shareResultVia('whatsapp')" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-3 py-2 rounded-lg font-semibold transition flex items-center gap-1.5">
+                            <i data-lucide="message-circle" class="w-3.5 h-3.5"></i> WhatsApp
+                        </button>
+                        <button onclick="shareResultVia('signal')" class="bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-2 rounded-lg font-semibold transition flex items-center gap-1.5">
+                            <i data-lucide="send" class="w-3.5 h-3.5"></i> Signal
+                        </button>
+                        <button onclick="shareResultVia('instagram')" class="bg-pink-600 hover:bg-pink-700 text-white text-xs px-3 py-2 rounded-lg font-semibold transition flex items-center gap-1.5">
+                            <i data-lucide="instagram" class="w-3.5 h-3.5"></i> Instagram
+                        </button>
+                        <button onclick="openModal('emailShareModal')" class="bg-slate-800 hover:bg-slate-900 text-white text-xs px-3 py-2 rounded-lg font-semibold transition flex items-center gap-1.5">
+                            <i data-lucide="mail" class="w-3.5 h-3.5"></i> Email
+                        </button>
+                    </div>
+                </div>
+
                 <div class="flex items-center justify-between">
                     <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
                         <i data-lucide="file-check-2" class="w-5 h-5 text-blue-600"></i> Solution Breakdown
@@ -342,16 +386,15 @@
                     </select>
                 </div>
 
-                <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-                    <table class="w-full text-left text-sm text-slate-600">
+                <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-x-auto">
+                    <table class="w-full text-left text-sm text-slate-600 min-w-[320px]">
                         <thead class="bg-slate-50 text-xs uppercase text-slate-500 border-b border-slate-200">
                             <tr>
-                                <th class="px-6 py-3.5">Rank</th>
-                                <th class="px-6 py-3.5">Participant</th>
-                                <th class="px-6 py-3.5">SCORE</th>
-                                <th class="px-6 py-3.5">Accuracy</th>
-                                <th class="px-6 py-3.5">Time Spent</th>
-                                <th id="achievementsLastColHeader" class="px-6 py-3.5">SUBMITTED TIME</th>
+                                <th class="px-4 sm:px-6 py-3.5">Rank</th>
+                                <th class="px-4 sm:px-6 py-3.5">Participant</th>
+                                <th class="px-4 sm:px-6 py-3.5">Score (Accuracy)</th>
+                                <th class="px-6 py-3.5 desktop-leaderboard-col">Time Spent</th>
+                                <th id="achievementsLastColHeader" class="px-6 py-3.5 desktop-leaderboard-col">SUBMITTED TIME</th>
                             </tr>
                         </thead>
                         <tbody id="achievementsLeaderboardTable" class="divide-y divide-slate-100"></tbody>
@@ -397,8 +440,8 @@
                 </div>
             </div>
 
-            <!-- Published Quiz Records Cluster -->
-            <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+            <!-- Published Quiz Records Cluster (Hidden on mobile) -->
+            <div id="hostHistoricalRecordsBlock" class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
                 <div class="p-5 border-b border-slate-200 flex justify-between items-center bg-slate-50">
                     <div>
                         <h3 class="font-bold text-slate-800 flex items-center gap-2">
@@ -457,6 +500,71 @@
         </section>
 
     </main>
+
+    <!-- MODAL: EMAIL SHARE -->
+    <div id="emailShareModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-slate-100 overflow-hidden">
+            <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+                <h3 class="text-lg font-bold text-slate-800">Share Results via Email</h3>
+                <button onclick="closeModal('emailShareModal')" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-6 h-6"></i></button>
+            </div>
+            <form onsubmit="handleEmailShareSubmit(event)" class="p-6 space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2">Recipient Email Address</label>
+                    <input type="email" id="shareEmailAddress" required placeholder="friend@example.com" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-sm">
+                </div>
+                <div class="pt-2 flex justify-end gap-2">
+                    <button type="button" onclick="closeModal('emailShareModal')" class="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg text-sm">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 shadow">Send Email</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: REPUBLISH GUEST CHALLENGE -->
+    <div id="republishGuestModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto custom-scrollbar shadow-2xl border border-slate-100">
+            <div class="p-6 border-b border-slate-100 flex justify-between items-center sticky top-0 bg-white z-10">
+                <h3 class="text-lg font-bold text-slate-800">Republish Quiz for Guest Challenge</h3>
+                <button onclick="closeModal('republishGuestModal')" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-6 h-6"></i></button>
+            </div>
+            <form onsubmit="handleRepublishGuestSubmit(event)" class="p-6 space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2">Challenge Duration (Minutes)</label>
+                    <input type="number" id="guestDurationInput" required min="1" max="180" value="10" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-sm">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2">Maximum Questions to Display</label>
+                    <input type="number" id="guestMaxQuestionsInput" required min="1" max="100" value="5" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-sm">
+                    <p class="text-xs text-slate-400 mt-1">If set lower than total selection, questions will be randomly sampled.</p>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2">Select Questions from Vault</label>
+                    <div id="guestVaultSelectionList" class="space-y-2 max-h-48 overflow-y-auto p-3 bg-slate-50 rounded-lg border border-slate-200 text-xs"></div>
+                </div>
+
+                <div class="pt-2 flex justify-end gap-2">
+                    <button type="button" onclick="closeModal('republishGuestModal')" class="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg text-sm">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 shadow">Publish Guest Challenge</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: VIEW FEEDBACKS FOR HOST/CO-HOST -->
+    <div id="viewFeedbackModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-2xl max-w-lg w-full max-h-[80vh] overflow-y-auto custom-scrollbar shadow-2xl border border-slate-100">
+            <div class="p-6 border-b border-slate-100 flex justify-between items-center sticky top-0 bg-white">
+                <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                    <i data-lucide="message-square" class="w-5 h-5 text-indigo-600"></i> User Feedback Inbox
+                </h3>
+                <button onclick="closeModal('viewFeedbackModal')" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-6 h-6"></i></button>
+            </div>
+            <div id="feedbackListContainer" class="p-6 space-y-3"></div>
+        </div>
+    </div>
 
     <!-- MODAL: PUBLISH QUIZ WITH TIMER & DUE DATETIME -->
     <div id="publishModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
@@ -528,9 +636,9 @@
         </div>
     </div>
 
-    <!-- MODAL: ACCOUNT SETTINGS -->
+    <!-- MODAL: ACCOUNT SETTINGS & FEEDBACK -->
     <div id="settingsModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-slate-100 overflow-hidden">
+        <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-slate-100 overflow-hidden max-h-[90vh] overflow-y-auto custom-scrollbar">
             <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
                 <div class="flex items-center gap-2">
                     <i data-lucide="settings" class="w-5 h-5 text-slate-700"></i>
@@ -561,7 +669,7 @@
                     <div class="flex items-center gap-2">
                         <input type="file" id="avatarFileInput" accept="image/*" onchange="handleAvatarFileSelect(event)" class="text-xs text-slate-500 file:mr-2 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
                     </div>
-                    <p class="text-xs text-slate-400 mt-1">Upload a photo to represent you in the Quiz Leaderboard.</p>
+                    <p class="text-xs text-slate-400 mt-1">Uploaded avatar will sync automatically across all your devices.</p>
                 </div>
 
                 <div>
@@ -570,6 +678,23 @@
                         <input type="password" id="newPasswordInput" required minlength="4" placeholder="Enter new password" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 text-sm">
                         <button type="button" onclick="togglePasswordVisibility('newPasswordInput', 'newPasswordIcon')" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
                             <i id="newPasswordIcon" data-lucide="eye" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- FEEDBACK SECTION (DESKTOP ONLY / PARTICIPANTS ONLY) -->
+                <div id="settingsFeedbackSection" class="pt-4 border-t border-slate-100 space-y-3">
+                    <div id="participantFeedbackBlock" class="hidden space-y-2">
+                        <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider">Send Feedback to Host & Co-host</label>
+                        <textarea id="userFeedbackInput" rows="3" placeholder="Write your comments or suggestions..." class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 text-sm"></textarea>
+                        <button type="button" onclick="submitUserFeedback()" class="w-full py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-lg transition shadow">
+                            Send Comment
+                        </button>
+                    </div>
+
+                    <div id="hostFeedbackBlock" class="hidden">
+                        <button type="button" onclick="openViewFeedbackModal()" class="w-full py-2.5 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-lg transition shadow flex items-center justify-center gap-2">
+                            <i data-lucide="message-square" class="w-4 h-4"></i> View Feedback
                         </button>
                     </div>
                 </div>
@@ -667,6 +792,7 @@
         let pastQuestions = [];
         let submissions = {};
         let quizRecords = [];
+        let feedbackComments = [];
         let isPublished = false;
         let quizDurationMins = 0;
         let quizDueDate = null;
@@ -677,6 +803,21 @@
         let quizStartTime = null;
         let draggedUserIndex = null;
         let tempAvatarBase64 = null;
+        
+        // Guest Challenge State
+        let isGuestMode = false;
+        let guestChallengeConfig = {
+            active: false,
+            duration: 10,
+            maxQuestions: 5,
+            questionIds: []
+        };
+        let activeQuizQuestions = [];
+
+        // Mobile responsiveness helper check
+        function isMobileView() {
+            return window.innerWidth < 768;
+        }
 
         window.onload = async function() {
             await fetchCloudState();
@@ -684,18 +825,49 @@
             setupRealtimeSubscriptions();
             
             const savedCurrentUser = localStorage.getItem('quiz_current_user');
-            if (savedCurrentUser) currentUser = JSON.parse(savedCurrentUser);
+            if (savedCurrentUser) {
+                const stored = JSON.parse(savedCurrentUser);
+                // Problem 1 Fix: Always pair current session with remote database state
+                const freshUser = users.find(u => u.name === stored.name);
+                currentUser = freshUser || stored;
+            }
 
             populateLoginDropdown();
+            applyMobileRules();
             updateUI();
             lucide.createIcons();
 
             setInterval(checkAutoClosureDeadline, 10000);
+            window.addEventListener('resize', applyMobileRules);
         };
+
+        function applyMobileRules() {
+            const isMobile = isMobileView();
+            
+            // Requirement 8: Mobile specific layout rules
+            const desktopBatchTools = document.querySelectorAll('.desktop-batch-tools');
+            desktopBatchTools.forEach(el => el.style.display = isMobile ? 'none' : 'flex');
+
+            const hostHistBlock = document.getElementById('hostHistoricalRecordsBlock');
+            if (hostHistBlock) hostHistBlock.style.display = isMobile ? 'none' : 'block';
+
+            const feedbackSection = document.getElementById('settingsFeedbackSection');
+            if (feedbackSection) feedbackSection.style.display = isMobile ? 'none' : 'block';
+
+            const desktopCols = document.querySelectorAll('.desktop-leaderboard-col');
+            desktopCols.forEach(col => col.style.display = isMobile ? 'none' : 'table-cell');
+        }
 
         async function fetchCloudState() {
             const { data: userData } = await _supabase.from('app_users').select('*').order('sort_order', { ascending: true, nullsFirst: false });
-            if (userData) users = userData;
+            if (userData) {
+                users = userData;
+                // Sync profile picture in active session if logged in
+                if (currentUser && !isGuestMode) {
+                    const match = users.find(u => u.name === currentUser.name);
+                    if (match) currentUser = match;
+                }
+            }
 
             const { data: qData } = await _supabase.from('questions').select('*').eq('is_vault', false);
             if (qData) questions = qData;
@@ -709,6 +881,9 @@
                 quizDurationMins = stateData.duration_mins || 0;
                 quizDueDate = stateData.due_datetime || null;
                 currentQuizSession = stateData.current_quiz_session || 1;
+                if (stateData.guest_challenge_config) {
+                    guestChallengeConfig = stateData.guest_challenge_config;
+                }
             }
 
             const { data: subData } = await _supabase.from('submissions').select('*');
@@ -722,6 +897,9 @@
 
             const { data: recData } = await _supabase.from('quiz_records').select('*').order('quiz_session_id', { ascending: false });
             if (recData) quizRecords = recData;
+
+            const { data: fbData } = await _supabase.from('feedback').select('*').order('created_at', { ascending: false });
+            if (fbData) feedbackComments = fbData;
         }
 
         function checkAutoClosureDeadline() {
@@ -757,6 +935,7 @@
 
         async function handleLogin(e) {
             e.preventDefault();
+            isGuestMode = false;
             const username = document.getElementById('loginUserSelect').value;
             const passwordInput = document.getElementById('loginPassword').value;
 
@@ -775,8 +954,31 @@
             switchTab('dashboard');
         }
 
+        // Requirement 6: Guest Mode Challenge Init
+        function startGuestMode() {
+            isGuestMode = true;
+            currentUser = { name: "Guest User", role: "guest", avatar_url: "" };
+            
+            // Get questions for guest mode
+            if (guestChallengeConfig.active && guestChallengeConfig.questionIds.length > 0) {
+                let pool = pastQuestions.filter(q => guestChallengeConfig.questionIds.includes(q.id));
+                // Randomize
+                pool = pool.sort(() => Math.random() - 0.5);
+                const max = Math.min(guestChallengeConfig.maxQuestions, pool.length);
+                activeQuizQuestions = pool.slice(0, max);
+            } else {
+                // Fallback to random vault questions
+                activeQuizQuestions = pastQuestions.slice().sort(() => Math.random() - 0.5).slice(0, 5);
+            }
+
+            updateUI();
+            switchTab('take-quiz');
+            showToast("Entered Guest Mode - Take the Challenge!", "info");
+        }
+
         function logout() {
             currentUser = null;
+            isGuestMode = false;
             localStorage.removeItem('quiz_current_user');
             if (timerInterval) clearInterval(timerInterval);
 
@@ -833,7 +1035,7 @@
                 currentNavBtn.classList.remove('text-slate-300');
             }
 
-            if (tabId === 'take-quiz' && isPublished) {
+            if (tabId === 'take-quiz' && (isPublished || isGuestMode)) {
                 quizStartTime = new Date();
             }
 
@@ -851,24 +1053,35 @@
                 document.getElementById('view-login').classList.remove('hidden');
             } else {
                 userHeader.classList.remove('hidden');
-                nav.classList.remove('hidden');
+                
+                if (isGuestMode) {
+                    nav.classList.add('hidden');
+                } else {
+                    nav.classList.remove('hidden');
+                }
+
                 document.getElementById('view-login').classList.add('hidden');
 
                 document.getElementById('headerUserName').textContent = currentUser.name;
                 document.getElementById('headerUserRole').textContent = currentUser.role;
 
                 const avatarImg = document.getElementById('headerUserAvatar');
+                const defaultIcon = document.getElementById('headerSettingsDefaultIcon');
+
+                // Requirement 8: If avatar exists, show profile avatar icon instead of gear
                 if (currentUser.avatar_url) {
                     avatarImg.src = currentUser.avatar_url;
                     avatarImg.classList.remove('hidden');
+                    defaultIcon.classList.add('hidden');
                 } else {
                     avatarImg.classList.add('hidden');
+                    defaultIcon.classList.remove('hidden');
                 }
 
                 const hostNavBtn = document.getElementById('nav-host-controls');
                 const dashPublishBtn = document.getElementById('dashPublishBtn');
 
-                if (isHostOrCoHost()) {
+                if (isHostOrCoHost() && !isGuestMode) {
                     hostNavBtn.classList.remove('hidden');
                     dashPublishBtn.classList.remove('hidden');
                 } else {
@@ -1041,10 +1254,16 @@
         function renderPastPaperVault() {
             const list = document.getElementById('pastPaperVaultList');
             const clearBtn = document.getElementById('clearVaultBtn');
-            const canEdit = currentUser && currentUser.role === 'host';
+            const republishBtn = document.getElementById('republishGuestChallengeBtn');
+            const isHost = currentUser && currentUser.role === 'host';
 
-            if (canEdit) clearBtn.classList.remove('hidden');
-            else clearBtn.classList.add('hidden');
+            if (isHost) {
+                clearBtn.classList.remove('hidden');
+                republishBtn.classList.remove('hidden');
+            } else {
+                clearBtn.classList.add('hidden');
+                republishBtn.classList.add('hidden');
+            }
 
             if (pastQuestions.length === 0) {
                 list.innerHTML = `
@@ -1067,7 +1286,7 @@
                             <span class="text-xs font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded">Quiz #${q.quiz_session_id || 1}</span>
                             <span class="text-xs text-slate-400">| Original Author: ${escapeHTML(q.author)}</span>
                         </div>
-                        ${canEdit ? `
+                        ${isHost ? `
                             <div class="flex items-center gap-1">
                                 <button onclick="editQuestion('${q.id}', true)" class="p-1.5 text-slate-500 hover:text-blue-600 rounded hover:bg-slate-100" title="Host Edit"><i data-lucide="pencil" class="w-4 h-4"></i></button>
                                 <button onclick="deleteQuestion('${q.id}')" class="p-1.5 text-slate-500 hover:text-red-600 rounded hover:bg-slate-100" title="Delete"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
@@ -1081,6 +1300,47 @@
                 </div>
             `).join('');
             lucide.createIcons();
+        }
+
+        // Requirement 7: Republish Guest Challenge Modal
+        function openRepublishGuestModal() {
+            const listContainer = document.getElementById('guestVaultSelectionList');
+            if (pastQuestions.length === 0) {
+                return showToast("Past Paper Vault is empty!", "error");
+            }
+
+            listContainer.innerHTML = pastQuestions.map(q => `
+                <label class="flex items-center gap-2 p-1.5 hover:bg-slate-100 rounded cursor-pointer">
+                    <input type="checkbox" value="${q.id}" class="guest-q-checkbox w-4 h-4 text-indigo-600">
+                    <span class="truncate font-medium text-slate-700">${escapeHTML(q.prompt)}</span>
+                </label>
+            `).join('');
+
+            openModal('republishGuestModal');
+        }
+
+        async function handleRepublishGuestSubmit(e) {
+            e.preventDefault();
+            const duration = parseInt(document.getElementById('guestDurationInput').value) || 10;
+            const maxQ = parseInt(document.getElementById('guestMaxQuestionsInput').value) || 5;
+
+            const selectedCheckboxes = document.querySelectorAll('.guest-q-checkbox:checked');
+            const selectedIds = Array.from(selectedCheckboxes).map(cb => cb.value);
+
+            if (selectedIds.length === 0) {
+                return showToast("Please select at least one question for the Guest Challenge.", "error");
+            }
+
+            guestChallengeConfig = {
+                active: true,
+                duration: duration,
+                maxQuestions: maxQ,
+                questionIds: selectedIds
+            };
+
+            await _supabase.from('app_state').update({ guest_challenge_config: guestChallengeConfig }).eq('id', 1);
+            closeModal('republishGuestModal');
+            showToast("Republished Guest Challenge successfully!", "success");
         }
 
         async function clearPastPaperVault() {
@@ -1098,7 +1358,7 @@
             const content = document.getElementById('achievementsContent');
             const filterSelect = document.getElementById('achievementFilterSelect');
 
-            if (isPublished) {
+            if (isPublished && !isGuestMode) {
                 locked.classList.remove('hidden');
                 content.classList.add('hidden');
                 return;
@@ -1133,6 +1393,7 @@
             const filterSelect = document.getElementById('achievementFilterSelect');
             const lastColHeader = document.getElementById('achievementsLastColHeader');
             const selectedFilter = filterSelect.value || "COMPOSITE_JOINED";
+            const isMobile = isMobileView();
 
             const allSubmissionsList = Object.values(submissions).flat();
             let leaderboardData = [];
@@ -1154,7 +1415,7 @@
                     return {
                         username: s.username,
                         user_avatar: userAvatar,
-                        scoreText: `${N} / ${Q}`,
+                        scoreText: `${N} / ${Q} (${acc}%)`,
                         accPerc: acc,
                         accText: `${acc}%`,
                         time_taken_seconds: s.time_taken_seconds || 0,
@@ -1187,7 +1448,7 @@
                     return {
                         username: u.username,
                         user_avatar: u.user_avatar,
-                        scoreText: `${N} / ${Q}`,
+                        scoreText: `${N} / ${Q} (${acc}%)`,
                         accPerc: acc,
                         accText: `${acc}%`,
                         time_taken_seconds: u.totalTime,
@@ -1223,7 +1484,7 @@
                     return {
                         username: u.username,
                         user_avatar: u.user_avatar,
-                        scoreText: `${N} / ${Q}`,
+                        scoreText: `${N} / ${Q} (${acc}%)`,
                         accPerc: acc,
                         accText: `${acc}%`,
                         time_taken_seconds: u.totalTime,
@@ -1235,7 +1496,7 @@
             }
 
             if (leaderboardData.length === 0) {
-                table.innerHTML = `<tr><td colspan="6" class="px-6 py-8 text-center text-slate-400">No submissions found for selected filter.</td></tr>`;
+                table.innerHTML = `<tr><td colspan="5" class="px-6 py-8 text-center text-slate-400">No submissions found for selected filter.</td></tr>`;
                 return;
             }
 
@@ -1246,17 +1507,18 @@
 
                 return `
                     <tr class="hover:bg-slate-50 transition">
-                        <td class="px-6 py-4 font-extrabold text-base">${medal}</td>
-                        <td class="px-6 py-4 font-bold text-slate-800 flex items-center">
+                        <td class="px-4 sm:px-6 py-4 font-extrabold text-base">${medal}</td>
+                        <td class="px-4 sm:px-6 py-4 font-bold text-slate-800 flex items-center">
                             ${avatarTag} ${escapeHTML(s.username)}
                         </td>
-                        <td class="px-6 py-4 font-bold text-blue-600">${s.scoreText}</td>
-                        <td class="px-6 py-4 font-bold text-emerald-600">${s.accText}</td>
-                        <td class="px-6 py-4 font-mono text-xs font-semibold text-slate-700">${timeStr}</td>
-                        <td class="px-6 py-4 text-xs font-semibold text-slate-600">${s.lastColText}</td>
+                        <td class="px-4 sm:px-6 py-4 font-bold text-blue-600">${s.scoreText}</td>
+                        <td class="px-6 py-4 font-mono text-xs font-semibold text-slate-700 desktop-leaderboard-col">${timeStr}</td>
+                        <td class="px-6 py-4 text-xs font-semibold text-slate-600 desktop-leaderboard-col">${s.lastColText}</td>
                     </tr>
                 `;
             }).join('');
+            
+            applyMobileRules();
             lucide.createIcons();
         }
 
@@ -1328,7 +1590,7 @@
             const notPub = document.getElementById('quizNotPublishedScreen');
             const container = document.getElementById('quizContainer');
 
-            if (!isPublished) {
+            if (!isPublished && !isGuestMode) {
                 notPub.classList.remove('hidden');
                 container.classList.add('hidden');
                 if (timerInterval) clearInterval(timerInterval);
@@ -1338,17 +1600,22 @@
             notPub.classList.add('hidden');
             container.classList.remove('hidden');
 
-            if (quizDurationMins > 0) {
+            let pool = isGuestMode ? activeQuizQuestions : questions;
+            let duration = isGuestMode ? guestChallengeConfig.duration : quizDurationMins;
+
+            document.getElementById('quizTitleHeader').textContent = isGuestMode ? "Guest Mode Challenge" : "Live Bible Quiz Assessment";
+
+            if (duration > 0) {
                 document.getElementById('quizTimerBox').classList.remove('hidden');
-                startQuizTimer(quizDurationMins * 60);
+                startQuizTimer(duration * 60);
             } else {
                 document.getElementById('quizTimerBox').classList.add('hidden');
             }
 
-            document.getElementById('quizTotalQuestionsCount').textContent = questions.length;
+            document.getElementById('quizTotalQuestionsCount').textContent = pool.length;
 
             const qList = document.getElementById('quizQuestionsContainer');
-            qList.innerHTML = questions.map((q, idx) => {
+            qList.innerHTML = pool.map((q, idx) => {
                 let qToRender = JSON.parse(JSON.stringify(q));
                 if (qToRender.type === 'matching' && Array.isArray(qToRender.pairs)) {
                     qToRender.shuffledPairs = qToRender.pairs.slice().sort(() => Math.random() - 0.5);
@@ -1360,7 +1627,7 @@
                 return `
                     <div class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm space-y-4">
                         <div class="flex justify-between items-center">
-                            <span class="text-xs font-bold text-blue-600 uppercase tracking-wider">Question ${idx + 1} of ${questions.length}</span>
+                            <span class="text-xs font-bold text-blue-600 uppercase tracking-wider">Question ${idx + 1} of ${pool.length}</span>
                             <span class="text-xs text-slate-400 bg-slate-100 px-2.5 py-1 rounded">Author: ${escapeHTML(q.author)}</span>
                         </div>
 
@@ -1385,7 +1652,8 @@
                 if (secondsLeft <= 0) {
                     clearInterval(timerInterval);
                     showToast("Time is up! Auto-submitting quiz.", "error");
-                    document.getElementById('quizActiveForm').requestSubmit();
+                    // Requirement 6: Submit only answered questions if time up
+                    handleQuizSubmit(null, true);
                 }
                 secondsLeft--;
             }, 1000);
@@ -1397,7 +1665,7 @@
                     <div class="space-y-2 mt-3">
                         ${q.options.map((opt, i) => `
                             <label class="flex items-center gap-3 p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer transition">
-                                <input type="radio" name="ans_${q.id}" value="${i}" required class="w-4 h-4 text-blue-600 focus:ring-blue-500">
+                                <input type="radio" name="ans_${q.id}" value="${i}" class="w-4 h-4 text-blue-600 focus:ring-blue-500">
                                 <span class="text-sm font-medium text-slate-700">${String.fromCharCode(65 + i)}. ${escapeHTML(opt)}</span>
                             </label>
                         `).join('')}
@@ -1407,18 +1675,18 @@
                 return `
                     <div class="grid grid-cols-3 gap-3 mt-3">
                         <label class="flex items-center justify-center gap-2 p-3 rounded-lg border border-slate-200 hover:bg-emerald-50 cursor-pointer font-bold text-sm">
-                            <input type="radio" name="ans_${q.id}" value="true" required class="w-4 h-4 text-emerald-600"> True
+                            <input type="radio" name="ans_${q.id}" value="true" class="w-4 h-4 text-emerald-600"> True
                         </label>
                         <label class="flex items-center justify-center gap-2 p-3 rounded-lg border border-slate-200 hover:bg-red-50 cursor-pointer font-bold text-sm">
-                            <input type="radio" name="ans_${q.id}" value="false" required class="w-4 h-4 text-red-600"> False
+                            <input type="radio" name="ans_${q.id}" value="false" class="w-4 h-4 text-red-600"> False
                         </label>
                         <label class="flex items-center justify-center gap-2 p-3 rounded-lg border border-slate-200 hover:bg-amber-50 cursor-pointer font-bold text-sm">
-                            <input type="radio" name="ans_${q.id}" value="not_given" required class="w-4 h-4 text-amber-600"> Not Given
+                            <input type="radio" name="ans_${q.id}" value="not_given" class="w-4 h-4 text-amber-600"> Not Given
                         </label>
                     </div>
                 `;
             } else if (q.type === 'fill') {
-                return `<div class="mt-3"><input type="text" name="ans_${q.id}" required placeholder="Type your answer here..." class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 text-sm"></div>`;
+                return `<div class="mt-3"><input type="text" name="ans_${q.id}" placeholder="Type your answer here..." class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 text-sm"></div>`;
             } else if (q.type === 'matching') {
                 const pairsToUse = q.shuffledPairs || q.pairs;
                 const matchTargets = q.pairs.map(p => p.match).sort(() => Math.random() - 0.5);
@@ -1429,7 +1697,7 @@
                         ${pairsToUse.map((p, pairIdx) => `
                             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3 bg-slate-50 rounded-lg border border-slate-200">
                                 <span class="text-sm font-semibold text-slate-800">${escapeHTML(p.item)}</span>
-                                <select name="ans_${q.id}_${pairIdx}" required class="px-3 py-2 rounded border border-slate-300 text-sm bg-white focus:ring-2 focus:ring-blue-500">
+                                <select name="ans_${q.id}_${pairIdx}" class="px-3 py-2 rounded border border-slate-300 text-sm bg-white focus:ring-2 focus:ring-blue-500">
                                     <option value="">-- Choose Match --</option>
                                     ${matchTargets.map(target => `<option value="${escapeHTML(target)}">${escapeHTML(target)}</option>`).join('')}
                                 </select>
@@ -1448,7 +1716,7 @@
                                     <span class="text-sm font-semibold text-slate-800">${escapeHTML(item)}</span>
                                     <div class="flex items-center gap-2">
                                         <span class="text-xs text-slate-500 font-medium">Position:</span>
-                                        <select name="ans_${q.id}_pos_${itemIdx}" required data-item="${escapeHTML(item)}" class="ordering-select-${q.id} px-3 py-1.5 rounded border border-slate-300 text-sm font-bold bg-white focus:ring-2 focus:ring-blue-500">
+                                        <select name="ans_${q.id}_pos_${itemIdx}" data-item="${escapeHTML(item)}" class="ordering-select-${q.id} px-3 py-1.5 rounded border border-slate-300 text-sm font-bold bg-white focus:ring-2 focus:ring-blue-500">
                                             <option value="">-</option>
                                             ${itemsToOrder.map((_, pIdx) => `<option value="${pIdx + 1}">${pIdx + 1}</option>`).join('')}
                                         </select>
@@ -1512,7 +1780,7 @@
             showToast(`Exported ${type.toUpperCase()} template successfully!`, "success");
         }
 
-        // Requirements 1 & 2: Repository-Wide ID Collision Protection & Ordering Question Batch Support
+        // Updated Batch Processing Handler
         async function handleBatchFileUpload(e) {
             const fileInput = document.getElementById('batchFileInput');
             const file = e.target.files[0];
@@ -1547,13 +1815,12 @@
 
                     const validRows = [];
 
-                    // --- PASS 1: VALIDATION ---
                     for (let rowNum = 2; rowNum <= rows.length; rowNum++) {
                         const row = rows[rowNum - 1];
                         if (!row || row.length === 0) continue;
 
                         const rawActn = actnIdx !== -1 && row[actnIdx] !== undefined && row[actnIdx] !== null ? String(row[actnIdx]).trim().toUpperCase() : '';
-                        if (!rawActn) continue; // Skip rows where {Actn} is null/empty
+                        if (!rawActn) continue;
 
                         if (!['A', 'U', 'D'].includes(rawActn)) {
                             fileInput.value = '';
@@ -1566,10 +1833,15 @@
                             return showToast(`Upload Failed (Row ${rowNum}): {Q_id} cannot be empty.`, "error");
                         }
 
-                        let qType = qTypeIdx !== -1 ? String(row[rowTypeIdx = qTypeIdx] || '').trim().toUpperCase() : 'MCQ';
-                        if (qType === 'FILL BLANK') qType = 'FILL';
+                        // Normalized type resolution
+                        let rawType = qTypeIdx !== -1 ? String(row[qTypeIdx] || '').trim().toUpperCase() : 'MCQ';
+                        let qType = 'MCQ';
+                        if (rawType.includes('FILL')) qType = 'FILL';
+                        else if (rawType.includes('TRUE') || rawType === 'TF') qType = 'TF';
+                        else if (rawType.includes('MATCH')) qType = 'MATCHING';
+                        else if (rawType.includes('ORDER')) qType = 'ORDERING';
+                        else if (rawType === 'MCQ') qType = 'MCQ';
 
-                        // Validate {A_msg} for MCQ questions (Strictly "A", "B", "C", or "D")
                         if (qType === 'MCQ' && rawActn !== 'D') {
                             const aMsg = aMsgIdx !== -1 && row[aMsgIdx] !== undefined ? String(row[aMsgIdx]).trim().toUpperCase() : '';
                             if (!['A', 'B', 'C', 'D'].includes(aMsg)) {
@@ -1578,7 +1850,6 @@
                             }
                         }
 
-                        // Repository-wide Question Matching (Matches Question #i or exact ID across all question types)
                         const matchedQuestion = myUserQs.find((q, index) => {
                             const numStr = String(index + 1);
                             return q.id === rawQId || numStr === rawQId;
@@ -1587,7 +1858,7 @@
                         if (matchedQuestion) {
                             if (rawActn === 'A') {
                                 fileInput.value = '';
-                                return showToast(`Upload Failed (Row ${rowNum}): Question #${rawQId} already exists in your repository (${matchedQuestion.type.toUpperCase()} type). {Actn} cannot be "A" for existing questions; use "U" (Update) or "D" (Delete).`, "error");
+                                return showToast(`Upload Failed (Row ${rowNum}): Question #${rawQId} already exists in your repository. Use "U" or "D".`, "error");
                             }
                         } else {
                             if (rawActn === 'U' || rawActn === 'D') {
@@ -1614,13 +1885,16 @@
 
                     if (validRows.length === 0) {
                         fileInput.value = '';
-                        return showToast("No executable data rows found in uploaded file (all {Actn} values were blank or empty).", "info");
+                        return showToast("No executable data rows found in uploaded file.", "info");
                     }
 
-                    // --- PASS 2: EXECUTION ---
                     let added = 0, updated = 0, deleted = 0;
 
+                    const typeMap = { 'MCQ': 'mcq', 'TF': 'tf', 'FILL': 'fill', 'MATCHING': 'matching', 'ORDERING': 'ordering' };
+
                     for (const item of validRows) {
+                        const targetType = typeMap[item.qType] || 'mcq';
+
                         if (item.actn === 'D') {
                             if (item.matchedQuestion) {
                                 await _supabase.from('questions').delete().eq('id', item.matchedQuestion.id);
@@ -1628,8 +1902,6 @@
                             }
                         } else if (item.actn === 'U') {
                             if (item.matchedQuestion) {
-                                const targetType = item.qType === 'MCQ' ? 'mcq' : item.qType === 'ORDERING' ? 'ordering' : 'fill';
-                                
                                 let updatePayload = {
                                     type: targetType,
                                     prompt: item.prompt || item.matchedQuestion.prompt,
@@ -1657,8 +1929,6 @@
                                 updated++;
                             }
                         } else if (item.actn === 'A') {
-                            const targetType = item.qType === 'MCQ' ? 'mcq' : item.qType === 'ORDERING' ? 'ordering' : 'fill';
-
                             let newQ = {
                                 id: 'q-' + Date.now() + '-' + Math.random().toString(36).substring(2, 7),
                                 author: currentUser.name,
@@ -1701,11 +1971,78 @@
         }
 
         function openModal(modalId) {
+            if (modalId === 'settingsModal' && currentUser) {
+                document.getElementById('settingsCurrentUserName').textContent = currentUser.name;
+                document.getElementById('editUserNameInput').value = currentUser.name;
+                document.getElementById('newPasswordInput').value = currentUser.pass || 'guest';
+                
+                const roleBadge = document.getElementById('settingsCurrentUserRole');
+                roleBadge.textContent = currentUser.role;
+
+                const avatarPrev = document.getElementById('settingsAvatarPreview');
+                if (currentUser.avatar_url) {
+                    avatarPrev.src = currentUser.avatar_url;
+                    avatarPrev.classList.remove('hidden');
+                } else {
+                    avatarPrev.classList.add('hidden');
+                }
+                tempAvatarBase64 = currentUser.avatar_url || null;
+
+                // Requirement 5: Settings Feedback configuration
+                const partBlock = document.getElementById('participantFeedbackBlock');
+                const hostBlock = document.getElementById('hostFeedbackBlock');
+                if (isHostOrCoHost()) {
+                    partBlock.classList.add('hidden');
+                    hostBlock.classList.remove('hidden');
+                } else {
+                    partBlock.classList.remove('hidden');
+                    hostBlock.classList.add('hidden');
+                }
+            }
             document.getElementById(modalId).classList.remove('hidden');
         }
 
         function closeModal(modalId) {
             document.getElementById(modalId).classList.add('hidden');
+        }
+
+        // Requirement 5: Submit Feedback
+        async function submitUserFeedback() {
+            const input = document.getElementById('userFeedbackInput');
+            const comment = input.value.trim();
+            if (!comment) return showToast("Please enter a comment.", "error");
+
+            await _supabase.from('feedback').insert({
+                username: currentUser.name,
+                comment: comment,
+                created_at: new Date().toISOString()
+            });
+
+            input.value = '';
+            closeModal('settingsModal');
+            showToast("Feedback sent to Host and Co-host!", "success");
+        }
+
+        // Requirement 5: View Feedbacks for Host / Co-host
+        function openViewFeedbackModal() {
+            closeModal('settingsModal');
+            const container = document.getElementById('feedbackListContainer');
+
+            if (feedbackComments.length === 0) {
+                container.innerHTML = `<div class="text-center text-slate-400 text-sm py-6">No user feedback comments received yet.</div>`;
+            } else {
+                container.innerHTML = feedbackComments.map(fb => `
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-1">
+                        <div class="flex justify-between items-center text-xs">
+                            <span class="font-bold text-slate-800">${escapeHTML(fb.username)}</span>
+                            <span class="text-slate-400">${new Date(fb.created_at).toLocaleString()}</span>
+                        </div>
+                        <p class="text-sm text-slate-700">${escapeHTML(fb.comment)}</p>
+                    </div>
+                `).join('');
+            }
+
+            openModal('viewFeedbackModal');
         }
 
         function openPublishModal() {
@@ -1850,6 +2187,7 @@
                 `;
             }).join('');
 
+            applyMobileRules();
             lucide.createIcons();
         }
 
@@ -2085,18 +2423,49 @@
             container.appendChild(row);
         }
 
-        async function handleQuizSubmit(e) {
-            e.preventDefault();
+        async function handleQuizSubmit(e, isAutoTimeUp = false) {
+            if (e) e.preventDefault();
+            
+            let pool = isGuestMode ? activeQuizQuestions : questions;
+            const form = document.getElementById('quizActiveForm');
+            const formData = new FormData(form);
+
+            // Requirement 2: Completion Validation Check
+            if (!isAutoTimeUp) {
+                let unansweredCount = 0;
+
+                pool.forEach(q => {
+                    if (q.type === 'mcq' || q.type === 'tf') {
+                        if (!formData.get(`ans_${q.id}`)) unansweredCount++;
+                    } else if (q.type === 'fill') {
+                        const val = (formData.get(`ans_${q.id}`) || '').trim();
+                        if (!val) unansweredCount++;
+                    } else if (q.type === 'matching') {
+                        q.pairs.forEach((_, pIdx) => {
+                            if (!formData.get(`ans_${q.id}_${pIdx}`)) unansweredCount++;
+                        });
+                    } else if (q.type === 'ordering') {
+                        const selects = document.querySelectorAll(`.ordering-select-${q.id}`);
+                        selects.forEach(sel => {
+                            if (!sel.value) unansweredCount++;
+                        });
+                    }
+                });
+
+                if (unansweredCount > 0) {
+                    return showToast(`Not Yet Finished! Still remains ${unansweredCount} questions in the quiz.`, "error");
+                }
+            }
+
             if (timerInterval) clearInterval(timerInterval);
 
             const endTime = new Date();
             const timeTakenSecs = quizStartTime ? Math.round((endTime - quizStartTime) / 1000) : 0;
 
-            const formData = new FormData(e.target);
             let score = 0;
             const answers = {};
 
-            questions.forEach(q => {
+            pool.forEach(q => {
                 let isCorrect = false;
                 let userVal = null;
 
@@ -2139,14 +2508,13 @@
                 answers[q.id] = { userVal, isCorrect };
             });
 
-            const total = questions.length;
+            const total = pool.length;
             const percentage = total > 0 ? Math.round((score / total) * 100) : 0;
-
             const formattedDateStr = formatStandardDateTime(endTime);
 
             const submissionData = {
                 username: currentUser.name,
-                quiz_session_id: currentQuizSession,
+                quiz_session_id: isGuestMode ? 999999 : currentQuizSession,
                 score,
                 total,
                 percentage,
@@ -2156,11 +2524,75 @@
                 timestamp: formattedDateStr
             };
 
-            await _supabase.from('submissions').upsert(submissionData);
+            if (!isGuestMode) {
+                await _supabase.from('submissions').upsert(submissionData);
+            } else {
+                if (!submissions[currentUser.name]) submissions[currentUser.name] = [];
+                submissions[currentUser.name].push(submissionData);
+            }
+
             await fetchCloudState();
             updateUI();
+            
+            // Requirement 3: Firework special effects after submission
+            triggerFireworks();
+            
             showToast(`Quiz Submitted! Score: ${score}/${total} (${percentage}%)`, "success");
             switchTab('results');
+        }
+
+        // Requirement 3: Fireworks Cannon Trigger
+        function triggerFireworks() {
+            if (typeof confetti === 'function') {
+                const count = 200;
+                const defaults = { origin: { y: 0.7 } };
+
+                function fire(particleRatio, opts) {
+                    confetti(Object.assign({}, defaults, opts, {
+                        particleCount: Math.floor(count * particleRatio)
+                    }));
+                }
+
+                fire(0.25, { spread: 26, startVelocity: 55 });
+                fire(0.2, { spread: 60 });
+                fire(0.35, { spread: 100, decay: 0.91, scalar: 0.8 });
+                fire(0.1, { spread: 120, startVelocity: 25, decay: 0.92, scalar: 1.2 });
+                fire(0.1, { spread: 120, startVelocity: 45 });
+            }
+        }
+
+        // Requirement 4: Share Results via WhatsApp / Signal / Instagram / Email
+        function shareResultVia(platform) {
+            const userSubs = submissions[currentUser.name] || [];
+            const userSub = userSubs.find(s => s.quiz_session_id === (isGuestMode ? 999999 : currentQuizSession)) || userSubs[userSubs.length - 1];
+            if (!userSub) return;
+
+            const shareText = `I scored ${userSub.score}/${userSub.total} (${userSub.percentage}% Accuracy) on Bible QuizCraft! Test your Bible knowledge too!`;
+
+            if (platform === 'whatsapp') {
+                window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`, '_blank');
+            } else if (platform === 'signal') {
+                window.open(`https://signal.me/#p/?text=${encodeURIComponent(shareText)}`, '_blank');
+            } else if (platform === 'instagram') {
+                navigator.clipboard.writeText(shareText);
+                showToast("Results copied to clipboard! Paste into Instagram Story/DM.", "info");
+            }
+        }
+
+        function handleEmailShareSubmit(e) {
+            e.preventDefault();
+            const recipient = document.getElementById('shareEmailAddress').value.trim();
+            const userSubs = submissions[currentUser.name] || [];
+            const userSub = userSubs.find(s => s.quiz_session_id === (isGuestMode ? 999999 : currentQuizSession)) || userSubs[userSubs.length - 1];
+            
+            if (!userSub) return;
+
+            const subject = encodeURIComponent("My Bible QuizCraft Results!");
+            const body = encodeURIComponent(`Hi!\n\nI just completed a quiz on Bible QuizCraft:\nScore: ${userSub.score}/${userSub.total}\nAccuracy: ${userSub.percentage}%\nCompletion Time: ${formatSecondsToSmartTime(userSub.time_taken_seconds)}\n\nTest your Bible knowledge as well!`);
+
+            window.location.href = `mailto:${recipient}?subject=${subject}&body=${body}`;
+            closeModal('emailShareModal');
+            showToast("Opening email client...", "success");
         }
 
         function formatStandardDateTime(d) {
@@ -2181,9 +2613,10 @@
             const noRes = document.getElementById('noResultsScreen');
             const resContent = document.getElementById('resultsContent');
             const userSubs = submissions[currentUser.name] || [];
-            const userSub = userSubs.find(s => s.quiz_session_id === currentQuizSession) || userSubs[userSubs.length - 1];
+            const targetSess = isGuestMode ? 999999 : currentQuizSession;
+            const userSub = userSubs.find(s => s.quiz_session_id === targetSess) || userSubs[userSubs.length - 1];
 
-            if (!userSub || !isPublished) {
+            if (!userSub) {
                 noRes.classList.remove('hidden');
                 resContent.classList.add('hidden');
                 return;
@@ -2196,8 +2629,10 @@
             document.getElementById('resultPercentage').textContent = `${userSub.percentage}%`;
             document.getElementById('resultSubmittedTime').textContent = `Submitted on: ${userSub.timestamp}`;
 
+            let pool = isGuestMode ? activeQuizQuestions : questions;
+
             const breakdown = document.getElementById('solutionsBreakdownList');
-            breakdown.innerHTML = questions.map((q, idx) => {
+            breakdown.innerHTML = pool.map((q, idx) => {
                 const ansObj = userSub.answers[q.id] || { isCorrect: false, userVal: 'None' };
                 return `
                     <div class="bg-white rounded-xl border ${ansObj.isCorrect ? 'border-emerald-200 bg-emerald-50/20' : 'border-red-200 bg-red-50/20'} p-6 shadow-sm space-y-4">
@@ -2253,27 +2688,6 @@
             return '';
         }
 
-        function openModal(modalId) {
-            if (modalId === 'settingsModal' && currentUser) {
-                document.getElementById('settingsCurrentUserName').textContent = currentUser.name;
-                document.getElementById('editUserNameInput').value = currentUser.name;
-                document.getElementById('newPasswordInput').value = currentUser.pass;
-                
-                const roleBadge = document.getElementById('settingsCurrentUserRole');
-                roleBadge.textContent = currentUser.role;
-
-                const avatarPrev = document.getElementById('settingsAvatarPreview');
-                if (currentUser.avatar_url) {
-                    avatarPrev.src = currentUser.avatar_url;
-                    avatarPrev.classList.remove('hidden');
-                } else {
-                    avatarPrev.classList.add('hidden');
-                }
-                tempAvatarBase64 = currentUser.avatar_url || null;
-            }
-            document.getElementById(modalId).classList.remove('hidden');
-        }
-
         function handleAvatarFileSelect(e) {
             const file = e.target.files[0];
             if (!file) return;
@@ -2293,10 +2707,11 @@
             const newName = document.getElementById('editUserNameInput').value.trim();
             const newPass = document.getElementById('newPasswordInput').value.trim();
 
-            if (!currentUser) return;
+            if (!currentUser || isGuestMode) return;
 
             const oldName = currentUser.name;
 
+            // Problem 1 Solution: Sync profile picture & info directly in remote Supabase database table
             await _supabase.from('app_users').update({
                 name: newName,
                 pass: newPass,
@@ -2311,7 +2726,7 @@
             await fetchCloudState();
             closeModal('settingsModal');
             updateUI();
-            showToast("Profile and account settings updated!", "success");
+            showToast("Profile updated across all devices!", "success");
         }
 
         function openAdminPasswordReset(username) {
