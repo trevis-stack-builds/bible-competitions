@@ -108,7 +108,6 @@
                     <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2">Password</label>
                     <div class="relative">
                         <input type="password" id="loginPassword" required placeholder="Enter your password" class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-slate-50 text-slate-800 transition">
-                        <!-- Requirement 5: Dynamic eye / eye-off toggle icon -->
                         <button type="button" onclick="togglePasswordVisibility('loginPassword', 'loginPasswordIcon')" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
                             <i id="loginPasswordIcon" data-lucide="eye" class="w-5 h-5"></i>
                         </button>
@@ -203,9 +202,10 @@
                     <button onclick="downloadBatchTemplate('fill')" class="bg-slate-800 hover:bg-slate-900 text-white px-3 py-2 rounded-lg font-medium text-xs shadow transition flex items-center gap-1.5" title="Export Fill Blank Questions to Excel">
                         <i data-lucide="download" class="w-3.5 h-3.5"></i> Fill Blank (.xlsx)
                     </button>
+                    <!-- Batch Upload Form with Dynamic Validations -->
                     <label class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg font-medium text-xs shadow transition flex items-center gap-1.5 cursor-pointer">
                         <i data-lucide="file-up" class="w-3.5 h-3.5"></i> Batch Upload
-                        <input type="file" accept=".xlsx, .xls, .csv, .numbers, .gsheet" onchange="handleBatchFileUpload(event)" class="hidden">
+                        <input type="file" id="batchFileInput" accept=".xlsx, .xls, .csv, .numbers, .gsheet" onchange="handleBatchFileUpload(event)" class="hidden">
                     </label>
                     <button onclick="openQuestionModal()" id="addQBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium text-xs shadow transition flex items-center gap-1.5">
                         <i data-lucide="plus" class="w-4 h-4"></i> Add Question
@@ -344,11 +344,9 @@
                             <tr>
                                 <th class="px-6 py-3.5">Rank</th>
                                 <th class="px-6 py-3.5">Participant</th>
-                                <!-- Requirement 1: Changed SCORE (N/Q) to SCORE -->
                                 <th class="px-6 py-3.5">SCORE</th>
                                 <th class="px-6 py-3.5">Accuracy</th>
                                 <th class="px-6 py-3.5">Time Spent</th>
-                                <!-- Requirement 2: Dynamically toggled between SUBMITTED TIME and Quizzes Taken -->
                                 <th id="achievementsLastColHeader" class="px-6 py-3.5">SUBMITTED TIME</th>
                             </tr>
                         </thead>
@@ -404,7 +402,6 @@
                         </h3>
                         <p class="text-xs text-slate-500">Summary analytics across all published quiz sessions</p>
                     </div>
-                    <!-- Requirement 6: Reset Records resets both historical quiz records and Leaderboard submissions -->
                     <button id="resetQuizRecordsBtn" onclick="resetQuizRecords()" class="hidden bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1">
                         <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Reset Records
                     </button>
@@ -566,7 +563,6 @@
                     <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2">Update Password</label>
                     <div class="relative">
                         <input type="password" id="newPasswordInput" required minlength="4" placeholder="Enter new password" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 text-sm">
-                        <!-- Requirement 5: Dynamic eye / eye-off toggle icon -->
                         <button type="button" onclick="togglePasswordVisibility('newPasswordInput', 'newPasswordIcon')" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
                             <i id="newPasswordIcon" data-lucide="eye" class="w-4 h-4"></i>
                         </button>
@@ -599,7 +595,6 @@
                     <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2">New Password for User</label>
                     <div class="relative">
                         <input type="password" id="adminNewPassword" required minlength="4" placeholder="Enter new password" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 text-sm">
-                        <!-- Requirement 5: Dynamic eye / eye-off toggle icon -->
                         <button type="button" onclick="togglePasswordVisibility('adminNewPassword', 'adminPasswordIcon')" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
                             <i id="adminPasswordIcon" data-lucide="eye" class="w-4 h-4"></i>
                         </button>
@@ -641,7 +636,6 @@
                     <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2">Password</label>
                     <div class="relative">
                         <input type="password" id="newAccountPassword" required placeholder="Default password" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 text-sm">
-                        <!-- Requirement 5: Dynamic eye / eye-off toggle icon -->
                         <button type="button" onclick="togglePasswordVisibility('newAccountPassword', 'newAccPasswordIcon')" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
                             <i id="newAccPasswordIcon" data-lucide="eye" class="w-4 h-4"></i>
                         </button>
@@ -793,7 +787,6 @@
             updateUI();
         }
 
-        // Requirement 5: Dynamic Eye / Eye-Off Toggle
         function togglePasswordVisibility(inputId, iconId) {
             const input = document.getElementById(inputId);
             const icon = document.getElementById(iconId);
@@ -1095,7 +1088,6 @@
             showToast("Past Paper Vault emptied successfully.", "info");
         }
 
-        // Requirements 1, 2, 3, 4: Achievements Leaderboard Filter & Avatar Fixes
         function renderAchievements() {
             const locked = document.getElementById('achievementsLockedScreen');
             const content = document.getElementById('achievementsContent');
@@ -1141,7 +1133,6 @@
             let leaderboardData = [];
 
             if (selectedFilter.startsWith("SESSION_")) {
-                // Requirement 2: Column Header for Single Quiz
                 lastColHeader.textContent = "SUBMITTED TIME";
 
                 const sessId = parseInt(selectedFilter.replace("SESSION_", ""));
@@ -1160,16 +1151,15 @@
                         user_avatar: userAvatar,
                         scoreText: `${N} / ${Q}`,
                         accPerc: acc,
-                        accText: `${acc}%`, // Requirement 2: Clean % without (# Quiz)
+                        accText: `${acc}%`,
                         time_taken_seconds: s.time_taken_seconds || 0,
-                        lastColText: s.timestamp // Requirement 3: YYYY/MM/DD, HH:MM:SS AM/PM
+                        lastColText: s.timestamp
                     };
                 });
 
                 leaderboardData.sort((a, b) => b.accPerc - a.accPerc || a.time_taken_seconds - b.time_taken_seconds);
 
             } else if (selectedFilter === "COMPOSITE_JOINED") {
-                // Requirement 2: Column Header for Composite
                 lastColHeader.textContent = "Quizzes Taken";
 
                 const userGrouped = {};
@@ -1196,7 +1186,7 @@
                         accPerc: acc,
                         accText: `${acc}%`,
                         time_taken_seconds: u.totalTime,
-                        lastColText: qUnit // Requirement 2: # Quiz or # Quizzes
+                        lastColText: qUnit
                     };
                 });
 
@@ -1247,7 +1237,6 @@
             table.innerHTML = leaderboardData.map((s, idx) => {
                 const medal = idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : `#${idx + 1}`;
                 const timeStr = formatSecondsToSmartTime(s.time_taken_seconds || 0);
-                // Requirement 4: Avatar rendered reliably
                 const avatarTag = s.user_avatar ? `<img src="${s.user_avatar}" class="w-6 h-6 rounded-full object-cover border inline-block mr-2">` : '<i data-lucide="user" class="w-4 h-4 text-slate-400 mr-2 inline-block"></i>';
 
                 return `
@@ -1467,9 +1456,13 @@
             showToast(`Exported ${type.toUpperCase()} template successfully!`, "success");
         }
 
+        // Requirement 1: Comprehensive Batch File Data Validation & Processing
         async function handleBatchFileUpload(e) {
+            const fileInput = document.getElementById('batchFileInput');
             const file = e.target.files[0];
             if (!file) return;
+
+            const myUserQs = questions.filter(q => q.author === currentUser.name);
 
             const reader = new FileReader();
             reader.onload = async function(evt) {
@@ -1479,70 +1472,157 @@
                     const firstSheet = workbook.SheetNames[0];
                     const rows = XLSX.utils.sheet_to_json(workbook.Sheets[firstSheet], { header: 1 });
 
-                    if (rows.length < 2) return showToast("Uploaded file is empty or missing data rows.", "error");
+                    if (rows.length < 2) {
+                        fileInput.value = '';
+                        return showToast("Upload Failed: File is empty or missing data rows.", "error");
+                    }
 
-                    const headers = rows[0].map(h => String(h).trim().toUpperCase());
-                    let addedCount = 0;
+                    const headers = rows[0].map(h => String(h || '').trim().toUpperCase());
+                    const qIdIdx = headers.indexOf("{Q_ID}");
+                    const qTypeIdx = headers.indexOf("{Q_TYPE}");
+                    const qMsgIdx = headers.indexOf("{Q_MSG}");
+                    const aMsgIdx = headers.indexOf("{A_MSG}");
+                    const optAIdx = headers.indexOf("{OPTION_A}");
+                    const optBIdx = headers.indexOf("{OPTION_B}");
+                    const optCIdx = headers.indexOf("{OPTION_C}");
+                    const optDIdx = headers.indexOf("{OPTION_D}");
+                    const solnIdx = headers.indexOf("{SOLN_EXP}");
+                    const actnIdx = headers.indexOf("{ACTN}");
 
-                    for (let i = 1; i < rows.length; i++) {
-                        const row = rows[i];
+                    const validRows = [];
+
+                    // --- PASS 1: FULL VALIDATION ---
+                    for (let rowNum = 2; rowNum <= rows.length; rowNum++) {
+                        const row = rows[rowNum - 1];
                         if (!row || row.length === 0) continue;
 
-                        const qTypeIdx = headers.indexOf("{Q_TYPE}");
-                        const qType = qTypeIdx !== -1 ? String(row[qTypeIdx]||'').trim().toUpperCase() : '';
+                        const rawActn = actnIdx !== -1 && row[actnIdx] !== undefined && row[actnIdx] !== null ? String(row[actnIdx]).trim().toUpperCase() : '';
+                        if (!rawActn) continue; // Skip rows where {Actn} is null/empty
 
-                        if (qType === 'MCQ') {
-                            const prompt = row[headers.indexOf("{Q_MSG}")];
-                            const optA = row[headers.indexOf("{OPTION_A}")];
-                            const optB = row[headers.indexOf("{OPTION_B}")];
-                            const optC = row[headers.indexOf("{OPTION_C}")];
-                            const optD = row[headers.indexOf("{OPTION_D}")];
-                            const correctLetter = String(row[headers.indexOf("{A_MSG}")]||'A').trim().toUpperCase();
-                            const explanation = row[headers.indexOf("{SOLN_EXP}")]||'';
+                        if (!['A', 'U', 'D'].includes(rawActn)) {
+                            fileInput.value = '';
+                            return showToast(`Upload Failed (Row ${rowNum}): {Actn} must be "A" (Add), "U" (Update), or "D" (Delete). Provided: "${rawActn}"`, "error");
+                        }
 
-                            const correctIdx = correctLetter === 'B' ? '1' : correctLetter === 'C' ? '2' : correctLetter === 'D' ? '3' : '0';
+                        const rawQId = qIdIdx !== -1 && row[qIdIdx] !== undefined ? String(row[qIdIdx]).trim() : '';
+                        if (!rawQId) {
+                            fileInput.value = '';
+                            return showToast(`Upload Failed (Row ${rowNum}): {Q_id} cannot be empty.`, "error");
+                        }
 
-                            let qData = {
-                                id: 'q-' + Date.now() + '-' + i,
+                        const qType = qTypeIdx !== -1 ? String(row[qTypeIdx] || '').trim().toUpperCase() : 'MCQ';
+
+                        // Validate {A_msg} for MCQ questions (Strictly "A", "B", "C", or "D")
+                        if (qType === 'MCQ' && rawActn !== 'D') {
+                            const aMsg = aMsgIdx !== -1 && row[aMsgIdx] !== undefined ? String(row[aMsgIdx]).trim().toUpperCase() : '';
+                            if (!['A', 'B', 'C', 'D'].includes(aMsg)) {
+                                fileInput.value = '';
+                                return showToast(`Upload Failed (Row ${rowNum}): MCQ {A_msg} must strictly be "A", "B", "C", or "D". Provided: "${aMsg}"`, "error");
+                            }
+                        }
+
+                        // ID Collision Check against current user repository (Match Question #i or exact ID)
+                        const matchedQuestion = myUserQs.find((q, index) => {
+                            const numStr = String(index + 1);
+                            return q.id === rawQId || numStr === rawQId;
+                        });
+
+                        if (matchedQuestion) {
+                            if (rawActn === 'A') {
+                                fileInput.value = '';
+                                return showToast(`Upload Failed (Row ${rowNum}): Question #${rawQId} already exists in your repository. {Actn} cannot be "A" for existing questions; use "U" (Update) or "D" (Delete).`, "error");
+                            }
+                        } else {
+                            if (rawActn === 'U' || rawActn === 'D') {
+                                fileInput.value = '';
+                                return showToast(`Upload Failed (Row ${rowNum}): Question ID "${rawQId}" does not exist in your repository to ${rawActn === 'U' ? 'Update' : 'Delete'}.`, "error");
+                            }
+                        }
+
+                        validRows.push({
+                            rowNum,
+                            actn: rawActn,
+                            rawQId,
+                            qType,
+                            prompt: qMsgIdx !== -1 ? String(row[qMsgIdx] || '').trim() : '',
+                            aMsg: aMsgIdx !== -1 ? String(row[aMsgIdx] || '').trim() : '',
+                            optA: optAIdx !== -1 ? String(row[optAIdx] || '').trim() : '',
+                            optB: optBIdx !== -1 ? String(row[optBIdx] || '').trim() : '',
+                            optC: optCIdx !== -1 ? String(row[optCIdx] || '').trim() : '',
+                            optD: optDIdx !== -1 ? String(row[optDIdx] || '').trim() : '',
+                            soln: solnIdx !== -1 ? String(row[solnIdx] || '').trim() : '',
+                            matchedQuestion
+                        });
+                    }
+
+                    if (validRows.length === 0) {
+                        fileInput.value = '';
+                        return showToast("No executable data rows found in uploaded file (all {Actn} values were blank or empty).", "info");
+                    }
+
+                    // --- PASS 2: EXECUTION ---
+                    let added = 0, updated = 0, deleted = 0;
+
+                    for (const item of validRows) {
+                        if (item.actn === 'D') {
+                            if (item.matchedQuestion) {
+                                await _supabase.from('questions').delete().eq('id', item.matchedQuestion.id);
+                                deleted++;
+                            }
+                        } else if (item.actn === 'U') {
+                            if (item.matchedQuestion) {
+                                let updatePayload = {
+                                    prompt: item.prompt || item.matchedQuestion.prompt,
+                                    explanation: item.soln || item.matchedQuestion.explanation
+                                };
+
+                                if (item.qType === 'MCQ') {
+                                    const aLetter = item.aMsg.toUpperCase();
+                                    const cIdx = aLetter === 'B' ? '1' : aLetter === 'C' ? '2' : aLetter === 'D' ? '3' : '0';
+                                    updatePayload.options = [item.optA, item.optB, item.optC, item.optD];
+                                    updatePayload.correctAnswer = cIdx;
+                                } else if (item.qType === 'FILL BLANK' || item.qType === 'FILL') {
+                                    updatePayload.correctAnswer = item.aMsg;
+                                }
+
+                                await _supabase.from('questions').update(updatePayload).eq('id', item.matchedQuestion.id);
+                                updated++;
+                            }
+                        } else if (item.actn === 'A') {
+                            let newQ = {
+                                id: 'q-' + Date.now() + '-' + Math.random().toString(36).substring(2, 7),
                                 author: currentUser.name,
-                                type: 'mcq',
-                                prompt: String(prompt||''),
-                                options: [String(optA||''), String(optB||''), String(optC||''), String(optD||'')],
-                                correctAnswer: correctIdx,
-                                explanation: String(explanation),
+                                prompt: item.prompt,
+                                explanation: item.soln,
                                 is_vault: false,
                                 quiz_session_id: currentQuizSession
                             };
 
-                            await _supabase.from('questions').insert(qData);
-                            addedCount++;
-                        } else if (qType === 'FILL BLANK' || qType === 'FILL') {
-                            const prompt = row[headers.indexOf("{Q_MSG}")];
-                            const answer = row[headers.indexOf("{A_MSG}")];
-                            const explanation = row[headers.indexOf("{SOLN_EXP}")]||'';
+                            if (item.qType === 'MCQ') {
+                                const aLetter = item.aMsg.toUpperCase();
+                                const cIdx = aLetter === 'B' ? '1' : aLetter === 'C' ? '2' : aLetter === 'D' ? '3' : '0';
+                                newQ.type = 'mcq';
+                                newQ.options = [item.optA, item.optB, item.optC, item.optD];
+                                newQ.correctAnswer = cIdx;
+                            } else {
+                                newQ.type = 'fill';
+                                newQ.correctAnswer = item.aMsg;
+                            }
 
-                            let qData = {
-                                id: 'q-' + Date.now() + '-' + i,
-                                author: currentUser.name,
-                                type: 'fill',
-                                prompt: String(prompt||''),
-                                correctAnswer: String(answer||''),
-                                explanation: String(explanation),
-                                is_vault: false,
-                                quiz_session_id: currentQuizSession
-                            };
-
-                            await _supabase.from('questions').insert(qData);
-                            addedCount++;
+                            await _supabase.from('questions').insert(newQ);
+                            added++;
                         }
                     }
 
+                    fileInput.value = '';
                     await fetchCloudState();
                     updateUI();
-                    showToast(`Batch Import Complete! Added: ${addedCount}`, "success");
+                    showToast(`Batch Upload Successful! Added: ${added}, Updated: ${updated}, Deleted: ${deleted}`, "success");
+
                 } catch (err) {
                     console.error(err);
-                    showToast("Error parsing file. Please use valid .xlsx/.csv file.", "error");
+                    fileInput.value = '';
+                    showToast("Error reading file. Please ensure valid Excel (.xlsx) or CSV format.", "error");
                 }
             };
             reader.readAsArrayBuffer(file);
@@ -1701,7 +1781,6 @@
             lucide.createIcons();
         }
 
-        // Requirement 6: Reset Records resets BOTH quiz_records & Leaderboard submissions
         async function resetQuizRecords() {
             if (currentUser.role !== 'host') return;
             if (!confirm("Are you sure you want to clear ALL historical published quiz records AND user leaderboard submissions?")) return;
@@ -1963,7 +2042,6 @@
             switchTab('results');
         }
 
-        // Requirement 3: Formatted Date: YYYY/MM/DD, HH:MM:SS AM/PM
         function formatStandardDateTime(d) {
             const yyyy = d.getFullYear();
             const mm = String(d.getMonth() + 1).padStart(2, '0');
