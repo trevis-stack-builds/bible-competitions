@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bible QuizCraft - Multi-User Interactive Platform</title>
-    <!-- Favicon with cache-busting -->
+    <!-- Favicon with Cache-Busting Parameters -->
     <link rel="icon" type="image/png" href="bible.png?v=2">
     <link rel="shortcut icon" type="image/png" href="bible.png?v=2">
     <link rel="apple-touch-icon" href="bible.png?v=2">
@@ -36,17 +36,16 @@
                 </div>
                 <div>
                     <span class="font-bold text-lg tracking-wide bg-gradient-to-r from-amber-300 via-blue-300 to-indigo-200 bg-clip-text text-transparent">Bible QuizCraft</span>
-                    <span class="text-xs text-slate-400 block -mt-1">Interactive Bible Q&A Platform</span>
+                    <span class="text-xs text-slate-400 block -mt-1" data-i18n="appSubtitle">Interactive Bible Q&A Platform</span>
                 </div>
             </div>
 
             <div class="flex items-center gap-3">
                 <span id="publishingBadge" class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/30">
-                    <i data-lucide="clock" class="w-3.5 h-3.5"></i> Creation Phase
+                    <i data-lucide="clock" class="w-3.5 h-3.5"></i> <span data-i18n="badgeCreationPhase">Creation Phase</span>
                 </span>
 
                 <div id="userProfileHeader" class="hidden flex items-center gap-2 pl-3 border-l border-slate-700">
-                    <!-- Profile avatar button replaces gear icon on mobile if uploaded -->
                     <button id="headerProfileTriggerBtn" onclick="openModal('settingsModal')" class="flex items-center gap-2 p-1 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition" title="Account Settings">
                         <img id="headerUserAvatar" src="" class="w-8 h-8 rounded-full object-cover border border-amber-400 hidden" alt="Avatar">
                         <i id="headerSettingsDefaultIcon" data-lucide="settings" class="w-5 h-5"></i>
@@ -57,7 +56,7 @@
                         <div id="headerUserRole" class="text-xs text-slate-400 capitalize">Host</div>
                     </div>
                     
-                    <button onclick="logout()" class="p-2 text-red-400 hover:text-red-300 hover:bg-slate-800 rounded-lg transition flex items-center justify-center" title="Sign Out">
+                    <button id="headerLogoutBtn" onclick="logout()" class="p-2 text-red-400 hover:text-red-300 hover:bg-slate-800 rounded-lg transition flex items-center justify-center" title="Sign Out">
                         <i data-lucide="log-out" class="w-5 h-5"></i>
                     </button>
                 </div>
@@ -67,25 +66,25 @@
         <nav id="appNav" class="hidden bg-slate-800 border-t border-slate-700 px-4 sm:px-6">
             <div class="max-w-7xl mx-auto flex space-x-1 sm:space-x-3 overflow-x-auto custom-scrollbar text-sm py-2">
                 <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-btn flex items-center gap-2 px-3 py-2 rounded-md font-medium text-slate-300 hover:text-white hover:bg-slate-700 transition whitespace-nowrap">
-                    <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Dashboard
+                    <i data-lucide="layout-dashboard" class="w-4 h-4"></i> <span data-i18n="navDashboard">Dashboard</span>
                 </button>
                 <button onclick="switchTab('my-questions')" id="nav-my-questions" class="nav-btn flex items-center gap-2 px-3 py-2 rounded-md font-medium text-slate-300 hover:text-white hover:bg-slate-700 transition whitespace-nowrap">
-                    <i data-lucide="file-question" class="w-4 h-4"></i> My Questions (<span id="navMyQCount">0</span>)
+                    <i data-lucide="file-question" class="w-4 h-4"></i> <span data-i18n="navMyQuestions">My Questions</span> (<span id="navMyQCount">0</span>)
                 </button>
                 <button onclick="switchTab('past-paper-vault')" id="nav-past-paper-vault" class="nav-btn flex items-center gap-2 px-3 py-2 rounded-md font-medium text-slate-300 hover:text-white hover:bg-slate-700 transition whitespace-nowrap">
-                    <i data-lucide="archive" class="w-4 h-4"></i> Past Paper Vault
+                    <i data-lucide="archive" class="w-4 h-4"></i> <span data-i18n="navPastPaperVault">Past Paper Vault</span>
                 </button>
                 <button onclick="switchTab('take-quiz')" id="nav-take-quiz" class="nav-btn flex items-center gap-2 px-3 py-2 rounded-md font-medium text-slate-300 hover:text-white hover:bg-slate-700 transition whitespace-nowrap">
-                    <i data-lucide="play-circle" class="w-4 h-4"></i> Take Quiz
+                    <i data-lucide="play-circle" class="w-4 h-4"></i> <span data-i18n="navTakeQuiz">Take Quiz</span>
                 </button>
                 <button onclick="switchTab('results')" id="nav-results" class="nav-btn flex items-center gap-2 px-3 py-2 rounded-md font-medium text-slate-300 hover:text-white hover:bg-slate-700 transition whitespace-nowrap">
-                    <i data-lucide="award" class="w-4 h-4"></i> Results & Submissions
+                    <i data-lucide="award" class="w-4 h-4"></i> <span data-i18n="navResults">Results & Submissions</span>
                 </button>
                 <button onclick="switchTab('achievements')" id="nav-achievements" class="nav-btn flex items-center gap-2 px-3 py-2 rounded-md font-medium text-slate-300 hover:text-white hover:bg-slate-700 transition whitespace-nowrap">
-                    <i data-lucide="trophy" class="w-4 h-4"></i> Achievements
+                    <i data-lucide="trophy" class="w-4 h-4"></i> <span data-i18n="navAchievements">Achievements</span>
                 </button>
                 <button onclick="switchTab('host-controls')" id="nav-host-controls" class="nav-btn flex items-center gap-2 px-3 py-2 rounded-md font-medium text-amber-400 hover:text-amber-300 hover:bg-slate-700 transition whitespace-nowrap">
-                    <i data-lucide="shield-alert" class="w-4 h-4"></i> Control Center
+                    <i data-lucide="shield-alert" class="w-4 h-4"></i> <span data-i18n="navControlCenter">Control Center</span>
                 </button>
             </div>
         </nav>
@@ -102,17 +101,17 @@
                     <i data-lucide="book-open" class="w-8 h-8 text-white"></i>
                 </div>
                 <h2 class="text-2xl font-bold">Bible QuizCraft</h2>
-                <p class="text-slate-400 text-sm mt-1">Select account and log in to continue</p>
+                <p class="text-slate-400 text-sm mt-1" data-i18n="loginSubtitle">Select account and log in to continue</p>
             </div>
 
             <form id="loginForm" onsubmit="handleLogin(event)" class="p-6 space-y-5">
                 <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2">Select User Account</label>
+                    <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2" data-i18n="lblSelectAccount">Select User Account</label>
                     <select id="loginUserSelect" class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-slate-50 text-slate-800 transition font-medium"></select>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2">Password</label>
+                    <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2" data-i18n="lblPassword">Password</label>
                     <div class="relative">
                         <input type="password" id="loginPassword" required placeholder="Enter your password" class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-slate-50 text-slate-800 transition">
                         <button type="button" onclick="togglePasswordVisibility('loginPassword', 'loginPasswordIcon')" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
@@ -122,14 +121,14 @@
                 </div>
 
                 <button type="submit" class="w-full py-3.5 bg-amber-600 hover:bg-amber-700 text-white font-semibold rounded-lg shadow-lg shadow-amber-600/25 transition flex items-center justify-center gap-2">
-                    <i data-lucide="log-in" class="w-5 h-5"></i> Sign In
+                    <i data-lucide="log-in" class="w-5 h-5"></i> <span data-i18n="btnSignIn">Sign In</span>
                 </button>
             </form>
 
             <div class="p-6 pt-0 border-t border-slate-100 text-center">
-                <p class="text-xs text-slate-400 mb-3">Or test your bible knowledge instantly</p>
+                <p class="text-xs text-slate-400 mb-3" data-i18n="lblGuestHint">Or test your bible knowledge instantly</p>
                 <button type="button" onclick="startGuestMode()" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg shadow-md transition flex items-center justify-center gap-2">
-                    <i data-lucide="zap" class="w-4 h-4"></i> Guest Mode - Take the Challenge
+                    <i data-lucide="zap" class="w-4 h-4"></i> <span data-i18n="btnGuestMode">Guest Mode - Take the Challenge</span>
                 </button>
             </div>
         </section>
@@ -138,16 +137,16 @@
         <section id="view-dashboard" class="space-y-6 hidden">
             <div class="bg-gradient-to-r from-amber-700 via-amber-800 to-slate-900 rounded-2xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden">
                 <div class="relative z-10">
-                    <h1 class="text-2xl sm:text-3xl font-extrabold mb-2">Hello, <span id="dashUserName">User</span> 👋🏻</h1>
-                    <p class="text-amber-100 text-sm sm:text-base max-w-2xl">
+                    <h1 class="text-2xl sm:text-3xl font-extrabold mb-2"><span data-i18n="hello">Hello</span>, <span id="dashUserName">User</span> 👋🏻</h1>
+                    <p class="text-amber-100 text-sm sm:text-base max-w-2xl" data-i18n="dashWelcomeText">
                         Welcome to Bible QuizCraft. Upload your questions confidentially during the Creation Phase. Once Host/Co-host publishes the quiz bank, test your Bible knowledge!
                     </p>
                     <div class="mt-6 flex flex-wrap gap-3">
                         <button onclick="switchTab('my-questions')" class="bg-white text-amber-900 hover:bg-amber-50 px-4 py-2.5 rounded-lg font-semibold text-sm transition shadow flex items-center gap-2">
-                            <i data-lucide="plus-circle" class="w-4 h-4"></i> Manage My Questions
+                            <i data-lucide="plus-circle" class="w-4 h-4"></i> <span data-i18n="btnManageQuestions">Manage My Questions</span>
                         </button>
                         <button onclick="switchTab('take-quiz')" class="bg-amber-900/60 hover:bg-amber-900/80 border border-amber-400/30 text-white px-4 py-2.5 rounded-lg font-semibold text-sm transition flex items-center gap-2">
-                            <i data-lucide="play" class="w-4 h-4"></i> Take Live Quiz
+                            <i data-lucide="play" class="w-4 h-4"></i> <span data-i18n="btnTakeQuiz">Take Live Quiz</span>
                         </button>
                         <button id="dashPublishBtn" onclick="openPublishModal()" class="hidden px-4 py-2.5 rounded-lg font-semibold text-sm transition shadow flex items-center gap-2 text-white">
                             <i data-lucide="upload-cloud" class="w-4 h-4"></i> <span id="dashPublishBtnText">Publish Quiz Bank</span>
@@ -161,7 +160,7 @@
                     <div class="p-3 bg-blue-100 text-blue-600 rounded-xl"><i data-lucide="file-question" class="w-6 h-6"></i></div>
                     <div>
                         <div class="text-2xl font-bold text-slate-800" id="statMyCount">0</div>
-                        <div class="text-xs text-slate-500 font-medium">My Uploaded Questions</div>
+                        <div class="text-xs text-slate-500 font-medium" data-i18n="statMyUploaded">My Uploaded Questions</div>
                     </div>
                 </div>
 
@@ -169,7 +168,7 @@
                     <div class="p-3 bg-emerald-100 text-emerald-600 rounded-xl"><i data-lucide="database" class="w-6 h-6"></i></div>
                     <div>
                         <div class="text-2xl font-bold text-slate-800" id="statPublishedCount">0</div>
-                        <div class="text-xs text-slate-500 font-medium">Published Questions in Bank</div>
+                        <div class="text-xs text-slate-500 font-medium" data-i18n="statPublishedInBank">Published Questions in Bank</div>
                     </div>
                 </div>
 
@@ -177,7 +176,7 @@
                     <div class="p-3 bg-indigo-100 text-indigo-600 rounded-xl"><i data-lucide="check-circle" class="w-6 h-6"></i></div>
                     <div>
                         <div class="text-2xl font-bold text-slate-800" id="statMyScore">N/A</div>
-                        <div class="text-xs text-slate-500 font-medium">Last Quiz Score</div>
+                        <div class="text-xs text-slate-500 font-medium" data-i18n="statLastScore">Last Quiz Score</div>
                     </div>
                 </div>
 
@@ -185,7 +184,7 @@
                     <div class="p-3 bg-amber-100 text-amber-600 rounded-xl"><i data-lucide="radio" class="w-6 h-6"></i></div>
                     <div>
                         <div class="text-2xl font-bold text-slate-800" id="statQuizStatus">Draft</div>
-                        <div class="text-xs text-slate-500 font-medium">Platform Status</div>
+                        <div class="text-xs text-slate-500 font-medium" data-i18n="statPlatformStatus">Platform Status</div>
                     </div>
                 </div>
             </div>
@@ -197,8 +196,8 @@
         <section id="view-my-questions" class="space-y-6 hidden">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
-                    <h2 class="text-2xl font-bold text-slate-800">My Question Repository</h2>
-                    <p class="text-slate-500 text-sm">Questions you create remain confidential to your account until published.</p>
+                    <h2 class="text-2xl font-bold text-slate-800" data-i18n="titleMyRepo">My Question Repository</h2>
+                    <p class="text-slate-500 text-sm" data-i18n="subMyRepo">Questions you create remain confidential to your account until published.</p>
                 </div>
                 <div class="flex flex-wrap items-center gap-2">
                     <select id="myQTypeFilter" onchange="renderMyQuestions()" class="px-3 py-2 rounded-lg border border-slate-300 text-xs font-semibold bg-white shadow-sm focus:ring-2 focus:ring-blue-500">
@@ -210,7 +209,6 @@
                         <option value="ORDERING">ORDERING</option>
                     </select>
 
-                    <!-- Hidden on Mobile -->
                     <div class="desktop-batch-tools flex items-center gap-2">
                         <button onclick="downloadBatchTemplate('mcq')" class="bg-slate-800 hover:bg-slate-900 text-white px-3 py-2 rounded-lg font-medium text-xs shadow transition flex items-center gap-1.5" title="Export MCQ Questions to Excel">
                             <i data-lucide="download" class="w-3.5 h-3.5"></i> MCQ (.xlsx)
@@ -228,7 +226,7 @@
                     </div>
 
                     <button onclick="openQuestionModal()" id="addQBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium text-xs shadow transition flex items-center gap-1.5">
-                        <i data-lucide="plus" class="w-4 h-4"></i> Add Question
+                        <i data-lucide="plus" class="w-4 h-4"></i> <span data-i18n="btnAddQuestion">Add Question</span>
                     </button>
                 </div>
             </div>
@@ -245,15 +243,15 @@
         <section id="view-past-paper-vault" class="space-y-6 hidden">
             <div class="flex justify-between items-center flex-wrap gap-3">
                 <div>
-                    <h2 class="text-2xl font-bold text-slate-800">Past Paper Vault</h2>
-                    <p class="text-slate-500 text-sm">Historical question repository from past quiz sessions. Host can edit or republish for guest challenge.</p>
+                    <h2 class="text-2xl font-bold text-slate-800" data-i18n="titleVault">Past Paper Vault</h2>
+                    <p class="text-slate-500 text-sm" data-i18n="subVault">Historical question repository from past quiz sessions. Host can edit or republish for guest challenge.</p>
                 </div>
                 <div class="flex items-center gap-2">
                     <button id="republishGuestChallengeBtn" onclick="openRepublishGuestModal()" class="hidden bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-medium text-xs shadow transition flex items-center gap-1.5">
-                        <i data-lucide="zap" class="w-4 h-4"></i> Republish Guest Challenge
+                        <i data-lucide="zap" class="w-4 h-4"></i> <span data-i18n="btnRepublishGuest">Republish Guest Challenge</span>
                     </button>
                     <button id="clearVaultBtn" onclick="clearPastPaperVault()" class="hidden bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium text-xs shadow transition flex items-center gap-1.5">
-                        <i data-lucide="trash" class="w-4 h-4"></i> Empty History
+                        <i data-lucide="trash" class="w-4 h-4"></i> <span data-i18n="btnEmptyHistory">Empty History</span>
                     </button>
                 </div>
             </div>
@@ -266,22 +264,22 @@
                 <div class="w-16 h-16 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto mb-4">
                     <i data-lucide="clock" class="w-8 h-8"></i>
                 </div>
-                <h3 class="text-xl font-bold text-slate-800 mb-2">Quiz is Not Published Yet</h3>
-                <p class="text-slate-600 text-sm mb-6">Participants are currently uploading questions. The quiz will become available here once Host or Co-host publishes all questions.</p>
+                <h3 class="text-xl font-bold text-slate-800 mb-2" data-i18n="quizNotPublished">Quiz is Not Published Yet</h3>
+                <p class="text-slate-600 text-sm mb-6" data-i18n="quizNotPublishedSub">Participants are currently uploading questions. The quiz will become available here once Host or Co-host publishes all questions.</p>
             </div>
 
             <div id="quizContainer" class="hidden space-y-6 max-w-3xl mx-auto">
                 <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex flex-wrap justify-between items-center gap-4 sticky top-16 z-30">
                     <div>
                         <h2 class="text-2xl font-bold text-slate-800" id="quizTitleHeader">Live Bible Quiz Assessment</h2>
-                        <p class="text-slate-500 text-sm">Answer all questions below and click submit to receive immediate scoring.</p>
+                        <p class="text-slate-500 text-sm" data-i18n="quizAnswerInstructions">Answer all questions below and click submit to receive immediate scoring.</p>
                     </div>
                     <div class="flex items-center gap-3">
                         <div id="quizTimerBox" class="hidden bg-red-50 text-red-700 border border-red-200 px-4 py-2 rounded-lg font-bold text-sm flex items-center gap-2">
                             <i data-lucide="timer" class="w-4 h-4 animate-pulse"></i> Time Left: <span id="quizTimerDisplay">--:--</span>
                         </div>
                         <div class="bg-blue-50 text-blue-700 px-4 py-2 rounded-lg font-semibold text-sm flex items-center gap-2">
-                            <i data-lucide="list-checks" class="w-4 h-4"></i> <span id="quizTotalQuestionsCount">0</span> Questions
+                            <i data-lucide="list-checks" class="w-4 h-4"></i> <span id="quizTotalQuestionsCount">0</span> <span data-i18n="questions">Questions</span>
                         </div>
                     </div>
                 </div>
@@ -289,9 +287,9 @@
                 <form id="quizActiveForm" onsubmit="handleQuizSubmit(event)" class="space-y-6">
                     <div id="quizQuestionsContainer" class="space-y-6"></div>
                     <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
-                        <span class="text-sm text-slate-500">Ensure all answers are completed before submitting.</span>
+                        <span class="text-sm text-slate-500" data-i18n="quizEnsureComplete">Ensure all answers are completed before submitting.</span>
                         <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-6 py-3 rounded-lg shadow-lg transition flex items-center gap-2">
-                            <i data-lucide="check-circle-2" class="w-5 h-5"></i> Submit Quiz Answers
+                            <i data-lucide="check-circle-2" class="w-5 h-5"></i> <span data-i18n="btnSubmitQuiz">Submit Quiz Answers</span>
                         </button>
                     </div>
                 </form>
@@ -302,38 +300,37 @@
         <section id="view-results" class="space-y-6 hidden">
             <div id="noResultsScreen" class="bg-white rounded-2xl p-10 text-center border border-slate-200 shadow-sm max-w-md mx-auto">
                 <i data-lucide="award" class="w-12 h-12 text-slate-300 mx-auto mb-3"></i>
-                <h3 class="text-lg font-bold text-slate-800">No Submission Found</h3>
-                <p class="text-slate-500 text-sm mt-1">You haven't submitted answers for the published quiz yet.</p>
-                <button onclick="switchTab('take-quiz')" class="mt-4 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition">Go to Quiz</button>
+                <h3 class="text-lg font-bold text-slate-800" data-i18n="noSubFound">No Submission Found</h3>
+                <p class="text-slate-500 text-sm mt-1" data-i18n="noSubFoundSub">You haven't submitted answers for the published quiz yet.</p>
+                <button onclick="switchTab('take-quiz')" class="mt-4 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition" data-i18n="btnGoToQuiz">Go to Quiz</button>
             </div>
 
             <div id="resultsContent" class="hidden space-y-6 max-w-4xl mx-auto">
                 <div id="scoreBanner" class="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200 shadow-md flex flex-col sm:flex-row items-center justify-between gap-6">
                     <div class="space-y-2 text-center sm:text-left">
-                        <span class="px-3 py-1 bg-emerald-100 text-emerald-800 text-xs font-bold rounded-full uppercase tracking-wider">Quiz Completed</span>
-                        <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900">Your Quiz Results</h2>
+                        <span class="px-3 py-1 bg-emerald-100 text-emerald-800 text-xs font-bold rounded-full uppercase tracking-wider" data-i18n="tagQuizCompleted">Quiz Completed</span>
+                        <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900" data-i18n="titleQuizResults">Your Quiz Results</h2>
                         <p id="resultSubmittedTime" class="text-xs text-slate-400">Submitted on: -</p>
                     </div>
 
                     <div class="flex items-center gap-6 bg-slate-50 p-4 rounded-xl border border-slate-100">
                         <div class="text-center">
                             <div id="resultScoreFraction" class="text-3xl font-black text-blue-600">0 / 0</div>
-                            <div class="text-xs text-slate-500 font-medium">Correct Answers</div>
+                            <div class="text-xs text-slate-500 font-medium" data-i18n="statCorrectAns">Correct Answers</div>
                         </div>
                         <div class="h-10 w-px bg-slate-200"></div>
                         <div class="text-center">
                             <div id="resultPercentage" class="text-3xl font-black text-emerald-600">0%</div>
-                            <div class="text-xs text-slate-500 font-medium">Accuracy</div>
+                            <div class="text-xs text-slate-500 font-medium" data-i18n="statAccuracy">Accuracy</div>
                         </div>
                     </div>
                 </div>
 
-                <!-- SHARE RESULTS FUNCTION -->
                 <div id="shareResultsBox" class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-5 shadow-sm space-y-3">
                     <h4 class="font-bold text-slate-800 text-sm flex items-center gap-2">
-                        <i data-lucide="share-2" class="w-4 h-4 text-blue-600"></i> Share Your Achievements
+                        <i data-lucide="share-2" class="w-4 h-4 text-blue-600"></i> <span data-i18n="titleShareAchievements">Share Your Achievements</span>
                     </h4>
-                    <p class="text-xs text-slate-600">Share your score with friends via Email, WhatsApp, Signal, or Instagram!</p>
+                    <p class="text-xs text-slate-600" data-i18n="subShareAchievements">Share your score with friends via Email, WhatsApp, Signal, or Instagram!</p>
                     
                     <div class="flex flex-wrap gap-2 pt-1">
                         <button onclick="shareResultVia('whatsapp')" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-3 py-2 rounded-lg font-semibold transition flex items-center gap-1.5">
@@ -353,7 +350,7 @@
 
                 <div class="flex items-center justify-between">
                     <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
-                        <i data-lucide="file-check-2" class="w-5 h-5 text-blue-600"></i> Solution Breakdown
+                        <i data-lucide="file-check-2" class="w-5 h-5 text-blue-600"></i> <span data-i18n="titleSolutionBreakdown">Solution Breakdown</span>
                     </h3>
                 </div>
 
@@ -367,17 +364,17 @@
                 <div class="w-14 h-14 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto mb-3">
                     <i data-lucide="lock" class="w-7 h-7"></i>
                 </div>
-                <h3 class="text-xl font-bold text-slate-800">Leaderboard Hidden During Active Quiz</h3>
-                <p class="text-slate-500 text-sm mt-2">Final user rankings and achievements will be displayed here once Host/Co-host unpublishes the Quiz Bank.</p>
+                <h3 class="text-xl font-bold text-slate-800" data-i18n="leaderboardHidden">Leaderboard Hidden During Active Quiz</h3>
+                <p class="text-slate-500 text-sm mt-2" data-i18n="leaderboardHiddenSub">Final user rankings and achievements will be displayed here once Host/Co-host unpublishes the Quiz Bank.</p>
             </div>
 
             <div id="achievementsContent" class="hidden space-y-6 max-w-4xl mx-auto">
                 <div class="bg-gradient-to-r from-amber-600 via-amber-700 to-indigo-900 rounded-2xl p-6 text-white shadow-xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div>
                         <h2 class="text-2xl font-extrabold flex items-center gap-2">
-                            <i data-lucide="trophy" class="w-7 h-7 text-amber-300"></i> Quiz Leaderboard & Achievements
+                            <i data-lucide="trophy" class="w-7 h-7 text-amber-300"></i> <span data-i18n="titleLeaderboard">Quiz Leaderboard & Achievements</span>
                         </h2>
-                        <p class="text-amber-100 text-sm mt-1">Participant rankings based on accuracy and completion time.</p>
+                        <p class="text-amber-100 text-sm mt-1" data-i18n="subLeaderboard">Participant rankings based on accuracy and completion time.</p>
                     </div>
 
                     <select id="achievementFilterSelect" onchange="renderAchievementsTableOnly()" class="px-4 py-2 rounded-xl bg-slate-900 text-white font-semibold text-xs border border-amber-400/40 focus:ring-2 focus:ring-amber-400 shadow">
@@ -390,11 +387,11 @@
                     <table class="w-full text-left text-sm text-slate-600 min-w-[320px]">
                         <thead class="bg-slate-50 text-xs uppercase text-slate-500 border-b border-slate-200">
                             <tr>
-                                <th class="px-4 sm:px-6 py-3.5">Rank</th>
-                                <th class="px-4 sm:px-6 py-3.5">Participant</th>
-                                <th class="px-4 sm:px-6 py-3.5">Score (Accuracy)</th>
-                                <th class="px-6 py-3.5 desktop-leaderboard-col">Time Spent</th>
-                                <th id="achievementsLastColHeader" class="px-6 py-3.5 desktop-leaderboard-col">SUBMITTED TIME</th>
+                                <th class="px-4 sm:px-6 py-3.5" data-i18n="colRank">Rank</th>
+                                <th class="px-4 sm:px-6 py-3.5" data-i18n="colParticipant">Participant</th>
+                                <th class="px-4 sm:px-6 py-3.5" data-i18n="colScoreAccuracy">Score (Accuracy)</th>
+                                <th class="px-6 py-3.5 desktop-leaderboard-col" data-i18n="colTimeSpent">Time Spent</th>
+                                <th id="achievementsLastColHeader" class="px-6 py-3.5 desktop-leaderboard-col" data-i18n="colSubmittedTime">SUBMITTED TIME</th>
                             </tr>
                         </thead>
                         <tbody id="achievementsLeaderboardTable" class="divide-y divide-slate-100"></tbody>
@@ -409,10 +406,10 @@
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                     <div>
                         <div class="flex items-center gap-2 text-amber-400 font-semibold text-xs tracking-wider uppercase mb-1">
-                            <i data-lucide="shield" class="w-4 h-4"></i> Management Panel
+                            <i data-lucide="shield" class="w-4 h-4"></i> <span data-i18n="lblManagementPanel">Management Panel</span>
                         </div>
-                        <h2 class="text-2xl font-extrabold">Control Center</h2>
-                        <p class="text-slate-400 text-sm mt-1">Publish questions, set due date/timer, or manage user roles.</p>
+                        <h2 class="text-2xl font-extrabold" data-i18n="titleControlCenter">Control Center</h2>
+                        <p class="text-slate-400 text-sm mt-1" data-i18n="subControlCenter">Publish questions, set due date/timer, or manage user roles.</p>
                     </div>
 
                     <div class="flex flex-wrap gap-3">
@@ -425,32 +422,31 @@
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-                    <div class="text-xs text-slate-500 font-medium">Total Questions Uploaded</div>
+                    <div class="text-xs text-slate-500 font-medium" data-i18n="statTotalUploaded">Total Questions Uploaded</div>
                     <div id="hostTotalUploaded" class="text-3xl font-extrabold text-slate-800 mt-1">0</div>
                 </div>
 
                 <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-                    <div class="text-xs text-slate-500 font-medium">Publish Status</div>
+                    <div class="text-xs text-slate-500 font-medium" data-i18n="statPublishStatus">Publish Status</div>
                     <div id="hostPublishStatusText" class="text-xl font-bold text-amber-600 mt-1">Unpublished (Creation Phase)</div>
                 </div>
 
                 <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-                    <div class="text-xs text-slate-500 font-medium">Total Active Users</div>
+                    <div class="text-xs text-slate-500 font-medium" data-i18n="statActiveUsers">Total Active Users</div>
                     <div id="hostUserCount" class="text-3xl font-extrabold text-slate-800 mt-1">0</div>
                 </div>
             </div>
 
-            <!-- Published Quiz Records Cluster (Hidden on mobile) -->
             <div id="hostHistoricalRecordsBlock" class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
                 <div class="p-5 border-b border-slate-200 flex justify-between items-center bg-slate-50">
                     <div>
                         <h3 class="font-bold text-slate-800 flex items-center gap-2">
-                            <i data-lucide="history" class="w-4 h-4 text-amber-600"></i> Historical Published Quiz Records
+                            <i data-lucide="history" class="w-4 h-4 text-amber-600"></i> <span data-i18n="titleHistRecords">Historical Published Quiz Records</span>
                         </h3>
-                        <p class="text-xs text-slate-500">Summary analytics across all published quiz sessions</p>
+                        <p class="text-xs text-slate-500" data-i18n="subHistRecords">Summary analytics across all published quiz sessions</p>
                     </div>
                     <button id="resetQuizRecordsBtn" onclick="resetQuizRecords()" class="hidden bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1">
-                        <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Reset Records
+                        <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> <span data-i18n="btnResetRecords">Reset Records</span>
                     </button>
                 </div>
                 <div class="overflow-x-auto">
@@ -470,15 +466,14 @@
                 </div>
             </div>
 
-            <!-- User Account Management -->
             <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
                 <div class="p-5 border-b border-slate-200 flex justify-between items-center">
                     <div>
-                        <h3 class="font-bold text-slate-800">User Account Management</h3>
-                        <p class="text-xs text-slate-500">Host can drag to reorder users, change roles, or add accounts.</p>
+                        <h3 class="font-bold text-slate-800" data-i18n="titleUserMgmt">User Account Management</h3>
+                        <p class="text-xs text-slate-500" data-i18n="subUserMgmt">Host can drag to reorder users, change roles, or add accounts.</p>
                     </div>
                     <button id="hostAddAccountBtn" onclick="openModal('addUserModal')" class="bg-slate-900 hover:bg-slate-800 text-white px-3.5 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5">
-                        <i data-lucide="user-plus" class="w-4 h-4"></i> Add Account
+                        <i data-lucide="user-plus" class="w-4 h-4"></i> <span data-i18n="btnAddAccount">Add Account</span>
                     </button>
                 </div>
 
@@ -486,11 +481,11 @@
                     <table class="w-full text-left text-sm text-slate-600">
                         <thead class="bg-slate-50 text-xs uppercase text-slate-500 border-b border-slate-200">
                             <tr>
-                                <th class="px-4 py-3 w-8"></th>
-                                <th class="px-6 py-3">Account Name</th>
-                                <th class="px-6 py-3">Role</th>
-                                <th class="px-6 py-3">Uploaded Questions</th>
-                                <th class="px-6 py-3 text-right">Actions</th>
+                                <th class="px-4 py-3 w-8 desktop-user-mgmt-col"></th>
+                                <th class="px-6 py-3" data-i18n="colAccountName">Account Name</th>
+                                <th class="px-6 py-3" data-i18n="colRole">Role</th>
+                                <th class="px-6 py-3 desktop-user-mgmt-col" data-i18n="colUploadedQs">Uploaded Questions</th>
+                                <th class="px-6 py-3 text-right" data-i18n="colActions">Actions</th>
                             </tr>
                         </thead>
                         <tbody id="userManagementTable" class="divide-y divide-slate-100"></tbody>
@@ -505,17 +500,17 @@
     <div id="emailShareModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-slate-100 overflow-hidden">
             <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
-                <h3 class="text-lg font-bold text-slate-800">Share Results via Email</h3>
+                <h3 class="text-lg font-bold text-slate-800" data-i18n="titleShareEmail">Share Results via Email</h3>
                 <button onclick="closeModal('emailShareModal')" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-6 h-6"></i></button>
             </div>
             <form onsubmit="handleEmailShareSubmit(event)" class="p-6 space-y-4">
                 <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2">Recipient Email Address</label>
+                    <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2" data-i18n="lblRecipientEmail">Recipient Email Address</label>
                     <input type="email" id="shareEmailAddress" required placeholder="friend@example.com" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-sm">
                 </div>
                 <div class="pt-2 flex justify-end gap-2">
-                    <button type="button" onclick="closeModal('emailShareModal')" class="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg text-sm">Cancel</button>
-                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 shadow">Send Email</button>
+                    <button type="button" onclick="closeModal('emailShareModal')" class="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg text-sm" data-i18n="btnCancel">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 shadow" data-i18n="btnSendEmail">Send Email</button>
                 </div>
             </form>
         </div>
@@ -525,29 +520,29 @@
     <div id="republishGuestModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto custom-scrollbar shadow-2xl border border-slate-100">
             <div class="p-6 border-b border-slate-100 flex justify-between items-center sticky top-0 bg-white z-10">
-                <h3 class="text-lg font-bold text-slate-800">Republish Quiz for Guest Challenge</h3>
+                <h3 class="text-lg font-bold text-slate-800" data-i18n="titleRepublishGuest">Republish Quiz for Guest Challenge</h3>
                 <button onclick="closeModal('republishGuestModal')" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-6 h-6"></i></button>
             </div>
             <form onsubmit="handleRepublishGuestSubmit(event)" class="p-6 space-y-4">
                 <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2">Challenge Duration (Minutes)</label>
+                    <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2" data-i18n="lblChallengeDuration">Challenge Duration (Minutes)</label>
                     <input type="number" id="guestDurationInput" required min="1" max="180" value="10" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-sm">
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2">Maximum Questions to Display</label>
+                    <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2" data-i18n="lblMaxQuestions">Maximum Questions to Display</label>
                     <input type="number" id="guestMaxQuestionsInput" required min="1" max="100" value="5" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-sm">
-                    <p class="text-xs text-slate-400 mt-1">If set lower than total selection, questions will be randomly sampled.</p>
+                    <p class="text-xs text-slate-400 mt-1" data-i18n="subMaxQuestions">If set lower than total selection, questions will be randomly sampled.</p>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2">Select Questions from Vault</label>
+                    <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2" data-i18n="lblSelectFromVault">Select Questions from Vault</label>
                     <div id="guestVaultSelectionList" class="space-y-2 max-h-48 overflow-y-auto p-3 bg-slate-50 rounded-lg border border-slate-200 text-xs"></div>
                 </div>
 
                 <div class="pt-2 flex justify-end gap-2">
-                    <button type="button" onclick="closeModal('republishGuestModal')" class="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg text-sm">Cancel</button>
-                    <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 shadow">Publish Guest Challenge</button>
+                    <button type="button" onclick="closeModal('republishGuestModal')" class="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg text-sm" data-i18n="btnCancel">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 shadow" data-i18n="btnPubGuestChallenge">Publish Guest Challenge</button>
                 </div>
             </form>
         </div>
@@ -558,7 +553,7 @@
         <div class="bg-white rounded-2xl max-w-lg w-full max-h-[80vh] overflow-y-auto custom-scrollbar shadow-2xl border border-slate-100">
             <div class="p-6 border-b border-slate-100 flex justify-between items-center sticky top-0 bg-white">
                 <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
-                    <i data-lucide="message-square" class="w-5 h-5 text-indigo-600"></i> User Feedback Inbox
+                    <i data-lucide="message-square" class="w-5 h-5 text-indigo-600"></i> <span data-i18n="titleFeedbackInbox">User Feedback Inbox</span>
                 </h3>
                 <button onclick="closeModal('viewFeedbackModal')" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-6 h-6"></i></button>
             </div>
@@ -570,24 +565,24 @@
     <div id="publishModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-slate-100 overflow-hidden">
             <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
-                <h3 class="text-lg font-bold text-slate-800">Publish Quiz Bank</h3>
+                <h3 class="text-lg font-bold text-slate-800" data-i18n="titlePublishBank">Publish Quiz Bank</h3>
                 <button onclick="closeModal('publishModal')" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-6 h-6"></i></button>
             </div>
             <form onsubmit="confirmPublishQuiz(event)" class="p-6 space-y-4">
                 <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2">Countdown Duration (Minutes) - Optional</label>
+                    <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2" data-i18n="lblCountdownDuration">Countdown Duration (Minutes) - Optional</label>
                     <input type="number" id="quizDurationInput" min="1" max="180" placeholder="e.g. 15 (Leave blank for no timer limit)" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-sm">
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2">Automatic Closure Due Date & Time - Optional</label>
+                    <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2" data-i18n="lblClosureDueDate">Automatic Closure Due Date & Time - Optional</label>
                     <input type="datetime-local" id="quizDueDateInput" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-sm">
-                    <p class="text-xs text-slate-400 mt-1">The quiz will automatically close and unpublish when this deadline passes.</p>
+                    <p class="text-xs text-slate-400 mt-1" data-i18n="subClosureDueDate">The quiz will automatically close and unpublish when this deadline passes.</p>
                 </div>
 
                 <div class="pt-4 flex justify-end gap-2">
-                    <button type="button" onclick="closeModal('publishModal')" class="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg text-sm">Cancel</button>
-                    <button type="submit" class="px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm font-medium hover:bg-emerald-700 shadow">Publish Now</button>
+                    <button type="button" onclick="closeModal('publishModal')" class="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg text-sm" data-i18n="btnCancel">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm font-medium hover:bg-emerald-700 shadow" data-i18n="btnPublishNow">Publish Now</button>
                 </div>
             </form>
         </div>
@@ -606,7 +601,7 @@
                 <input type="hidden" id="qIsVault" value="false">
 
                 <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2">Question Type</label>
+                    <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2" data-i18n="lblQType">Question Type</label>
                     <select id="qType" onchange="renderQuestionTypeInputs()" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 text-sm font-medium">
                         <option value="mcq">Multiple Choice Question (MCQ)</option>
                         <option value="tf">True / False / Not Given Question</option>
@@ -617,20 +612,20 @@
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2">Question Text / Prompt</label>
+                    <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2" data-i18n="lblQPrompt">Question Text / Prompt</label>
                     <textarea id="qPrompt" required rows="3" placeholder="Enter your question prompt here..." class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 text-sm"></textarea>
                 </div>
 
                 <div id="typeSpecificInputs" class="space-y-4 p-4 bg-slate-50 rounded-xl border border-slate-200"></div>
 
                 <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2">Solution Explanation (Optional)</label>
+                    <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2" data-i18n="lblQExplanation">Solution Explanation (Optional)</label>
                     <input type="text" id="qExplanation" placeholder="Explain why this answer is correct..." class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 text-sm">
                 </div>
 
                 <div class="flex justify-end gap-3 pt-4 border-t border-slate-100">
-                    <button type="button" onclick="closeModal('questionModal')" class="px-4 py-2.5 border border-slate-300 text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-50">Cancel</button>
-                    <button type="submit" class="px-5 py-2.5 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 shadow">Save Question</button>
+                    <button type="button" onclick="closeModal('questionModal')" class="px-4 py-2.5 border border-slate-300 text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-50" data-i18n="btnCancel">Cancel</button>
+                    <button type="submit" class="px-5 py-2.5 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 shadow" data-i18n="btnSaveQuestion">Save Question</button>
                 </div>
             </form>
         </div>
@@ -642,38 +637,53 @@
             <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
                 <div class="flex items-center gap-2">
                     <i data-lucide="settings" class="w-5 h-5 text-slate-700"></i>
-                    <h3 class="text-lg font-bold text-slate-800">Account Settings</h3>
+                    <h3 class="text-lg font-bold text-slate-800" data-i18n="titleAccountSettings">Account Settings</h3>
                 </div>
-                <button onclick="closeModal('settingsModal')" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-6 h-6"></i></button>
+                <!-- Language Switch EN / 繁 Button -->
+                <div class="flex items-center gap-3">
+                    <button type="button" onclick="toggleLanguage()" class="px-2.5 py-1 text-xs font-bold rounded-lg border border-amber-500 text-amber-700 hover:bg-amber-50 transition shadow-sm flex items-center gap-1">
+                        <i data-lucide="languages" class="w-3.5 h-3.5"></i> <span id="langToggleBtnText">繁</span>
+                    </button>
+                    <button onclick="closeModal('settingsModal')" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-6 h-6"></i></button>
+                </div>
             </div>
 
             <form onsubmit="handleUserProfileUpdate(event)" class="p-6 space-y-4">
-                <div class="bg-blue-50 p-3 rounded-lg border border-blue-100 flex items-center justify-between">
-                    <div class="flex items-center gap-3">
-                        <img id="settingsAvatarPreview" src="" class="w-10 h-10 rounded-full object-cover border border-blue-200 hidden" alt="Preview">
-                        <div>
-                            <span class="text-xs text-slate-500 block">Logged In Account</span>
-                            <span id="settingsCurrentUserName" class="text-base font-bold text-blue-900">User</span>
+                <div class="bg-blue-50 p-4 rounded-xl border border-blue-100 flex flex-col items-center text-center gap-3">
+                    <!-- ENLARGED / ZOOM OUT PROFILE ICON -->
+                    <div class="relative group cursor-pointer" onclick="document.getElementById('avatarFileInput').click()">
+                        <img id="settingsAvatarPreview" src="" class="w-24 h-24 rounded-full object-cover border-4 border-white shadow-md hidden" alt="Avatar Preview">
+                        <div id="settingsAvatarFallbackIcon" class="w-24 h-24 rounded-full bg-slate-200 border-4 border-white shadow-md flex items-center justify-center text-slate-500">
+                            <i data-lucide="user" class="w-12 h-12"></i>
+                        </div>
+                        <div class="absolute inset-0 bg-black/30 rounded-full flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition text-xs font-semibold">
+                            <i data-lucide="camera" class="w-5 h-5"></i>
                         </div>
                     </div>
-                    <span id="settingsCurrentUserRole" class="px-2.5 py-1 bg-blue-200 text-blue-800 text-xs font-bold rounded-full uppercase">Participant</span>
+                    <div>
+                        <span class="text-xs text-slate-500 block" data-i18n="lblLoggedInAccount">Logged In Account</span>
+                        <span id="settingsCurrentUserName" class="text-lg font-bold text-blue-900">User</span>
+                        <div class="mt-1">
+                            <span id="settingsCurrentUserRole" class="px-2.5 py-0.5 bg-blue-200 text-blue-800 text-xs font-bold rounded-full uppercase">Participant</span>
+                        </div>
+                    </div>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2">Edit Account Name</label>
+                    <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2" data-i18n="lblEditAccountName">Edit Account Name</label>
                     <input type="text" id="editUserNameInput" required class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 text-sm font-medium">
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2">Upload Personal Icon / Avatar</label>
+                    <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2" data-i18n="lblUploadAvatar">Upload Personal Icon / Avatar</label>
                     <div class="flex items-center gap-2">
                         <input type="file" id="avatarFileInput" accept="image/*" onchange="handleAvatarFileSelect(event)" class="text-xs text-slate-500 file:mr-2 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
                     </div>
-                    <p class="text-xs text-slate-400 mt-1">Uploaded avatar will sync automatically across all your devices.</p>
+                    <p class="text-xs text-slate-400 mt-1" data-i18n="subUploadAvatar">Uploaded avatar will sync automatically across all your devices.</p>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2">Update Password</label>
+                    <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2" data-i18n="lblUpdatePassword">Update Password</label>
                     <div class="relative">
                         <input type="password" id="newPasswordInput" required minlength="4" placeholder="Enter new password" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 text-sm">
                         <button type="button" onclick="togglePasswordVisibility('newPasswordInput', 'newPasswordIcon')" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
@@ -682,25 +692,31 @@
                     </div>
                 </div>
 
-                <!-- FEEDBACK SECTION (DESKTOP ONLY / PARTICIPANTS ONLY) -->
                 <div id="settingsFeedbackSection" class="pt-4 border-t border-slate-100 space-y-3">
                     <div id="participantFeedbackBlock" class="hidden space-y-2">
-                        <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider">Send Feedback to Host & Co-host</label>
+                        <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider" data-i18n="lblSendFeedback">Send Feedback to Host & Co-host</label>
                         <textarea id="userFeedbackInput" rows="3" placeholder="Write your comments or suggestions..." class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 text-sm"></textarea>
-                        <button type="button" onclick="submitUserFeedback()" class="w-full py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-lg transition shadow">
+                        <button type="button" onclick="submitUserFeedback()" class="w-full py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-lg transition shadow" data-i18n="btnSendComment">
                             Send Comment
                         </button>
                     </div>
 
                     <div id="hostFeedbackBlock" class="hidden">
                         <button type="button" onclick="openViewFeedbackModal()" class="w-full py-2.5 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-lg transition shadow flex items-center justify-center gap-2">
-                            <i data-lucide="message-square" class="w-4 h-4"></i> View Feedback
+                            <i data-lucide="message-square" class="w-4 h-4"></i> <span data-i18n="btnViewFeedback">View Feedback</span>
                         </button>
                     </div>
                 </div>
 
+                <!-- MOBILE LOGOUT BUTTON INSIDE ACCOUNT SETTINGS -->
+                <div id="mobileModalLogoutBlock" class="hidden pt-2">
+                    <button type="button" onclick="logout(); closeModal('settingsModal');" class="w-full py-2.5 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 text-xs font-bold rounded-lg transition flex items-center justify-center gap-2">
+                        <i data-lucide="log-out" class="w-4 h-4"></i> <span data-i18n="btnSignOut">Sign Out</span>
+                    </button>
+                </div>
+
                 <div class="pt-4 border-t border-slate-100 flex justify-end">
-                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 shadow">Save Changes</button>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 shadow" data-i18n="btnSaveChanges">Save Changes</button>
                 </div>
             </form>
         </div>
@@ -710,19 +726,19 @@
     <div id="resetUserPasswordModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-slate-100 overflow-hidden">
             <div class="p-6 border-b border-slate-100 flex justify-between items-center">
-                <h3 class="text-lg font-bold text-slate-800">Reset User Password</h3>
+                <h3 class="text-lg font-bold text-slate-800" data-i18n="titleResetPassword">Reset User Password</h3>
                 <button onclick="closeModal('resetUserPasswordModal')" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-6 h-6"></i></button>
             </div>
 
             <form onsubmit="handleAdminPasswordReset(event)" class="p-6 space-y-4">
                 <input type="hidden" id="adminResetTargetUser">
                 <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-1">Target Account</label>
+                    <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-1" data-i18n="lblTargetAccount">Target Account</label>
                     <div id="adminResetUserName" class="text-base font-bold text-slate-800">-</div>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2">New Password for User</label>
+                    <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2" data-i18n="lblNewPassword">New Password for User</label>
                     <div class="relative">
                         <input type="password" id="adminNewPassword" required minlength="4" placeholder="Enter new password" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 text-sm">
                         <button type="button" onclick="togglePasswordVisibility('adminNewPassword', 'adminPasswordIcon')" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
@@ -732,8 +748,8 @@
                 </div>
 
                 <div class="pt-4 flex justify-end gap-2">
-                    <button type="button" onclick="closeModal('resetUserPasswordModal')" class="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg text-sm">Cancel</button>
-                    <button type="submit" class="px-4 py-2 bg-amber-600 text-white rounded-lg text-sm font-medium hover:bg-amber-700 shadow">Save Password</button>
+                    <button type="button" onclick="closeModal('resetUserPasswordModal')" class="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg text-sm" data-i18n="btnCancel">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-amber-600 text-white rounded-lg text-sm font-medium hover:bg-amber-700 shadow" data-i18n="btnSavePassword">Save Password</button>
                 </div>
             </form>
         </div>
@@ -743,18 +759,18 @@
     <div id="addUserModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-slate-100 overflow-hidden">
             <div class="p-6 border-b border-slate-100 flex justify-between items-center">
-                <h3 class="text-lg font-bold text-slate-800">Add New User Account</h3>
+                <h3 class="text-lg font-bold text-slate-800" data-i18n="titleAddAccount">Add New User Account</h3>
                 <button onclick="closeModal('addUserModal')" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-6 h-6"></i></button>
             </div>
 
             <form onsubmit="handleAddUserAccount(event)" class="p-6 space-y-4">
                 <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2">Account Name</label>
+                    <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2" data-i18n="lblAccountName">Account Name</label>
                     <input type="text" id="newAccountName" required placeholder="e.g. Sarah" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 text-sm">
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2">Role</label>
+                    <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2" data-i18n="colRole">Role</label>
                     <select id="newAccountRole" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-sm">
                         <option value="participant">Participant</option>
                         <option value="co-host">Co-host</option>
@@ -763,7 +779,7 @@
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2">Password</label>
+                    <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2" data-i18n="lblPassword">Password</label>
                     <div class="relative">
                         <input type="password" id="newAccountPassword" required placeholder="Default password" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 text-sm">
                         <button type="button" onclick="togglePasswordVisibility('newAccountPassword', 'newAccPasswordIcon')" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
@@ -773,8 +789,8 @@
                 </div>
 
                 <div class="pt-4 flex justify-end gap-2">
-                    <button type="button" onclick="closeModal('addUserModal')" class="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg text-sm">Cancel</button>
-                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 shadow">Create Account</button>
+                    <button type="button" onclick="closeModal('addUserModal')" class="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg text-sm" data-i18n="btnCancel">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 shadow" data-i18n="btnCreateAccount">Create Account</button>
                 </div>
             </form>
         </div>
@@ -785,6 +801,248 @@
         const SUPABASE_URL = 'https://jevyqvtgljhfwqltrbgu.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpldnlxdnRnbGpoZndxbHRyYmd1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTExMjc1MzAsImV4cCI6MjEwNjcwMzUzMH0.O6IifPUuHuBdqdwEXTUypsJZN-GHaBh4iGLOFseKyZ8';
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // Language Translations Object (EN / 繁)
+        let currentLang = localStorage.getItem('quiz_app_lang') || 'EN';
+
+        const i18n = {
+            EN: {
+                appSubtitle: "Interactive Bible Q&A Platform",
+                badgeCreationPhase: "Creation Phase",
+                navDashboard: "Dashboard",
+                navMyQuestions: "My Questions",
+                navPastPaperVault: "Past Paper Vault",
+                navTakeQuiz: "Take Quiz",
+                navResults: "Results & Submissions",
+                navAchievements: "Achievements",
+                navControlCenter: "Control Center",
+                loginSubtitle: "Select account and log in to continue",
+                lblSelectAccount: "Select User Account",
+                lblPassword: "Password",
+                btnSignIn: "Sign In",
+                lblGuestHint: "Or test your bible knowledge instantly",
+                btnGuestMode: "Guest Mode - Take the Challenge",
+                hello: "Hello",
+                dashWelcomeText: "Welcome to Bible QuizCraft. Upload your questions confidentially during the Creation Phase. Once Host/Co-host publishes the quiz bank, test your Bible knowledge!",
+                btnManageQuestions: "Manage My Questions",
+                btnTakeQuiz: "Take Live Quiz",
+                statMyUploaded: "My Uploaded Questions",
+                statPublishedInBank: "Published Questions in Bank",
+                statLastScore: "Last Quiz Score",
+                statPlatformStatus: "Platform Status",
+                titleMyRepo: "My Question Repository",
+                subMyRepo: "Questions you create remain confidential to your account until published.",
+                btnAddQuestion: "Add Question",
+                titleVault: "Past Paper Vault",
+                subVault: "Historical question repository from past quiz sessions. Host can edit or republish for guest challenge.",
+                btnRepublishGuest: "Republish Guest Challenge",
+                btnEmptyHistory: "Empty History",
+                quizNotPublished: "Quiz is Not Published Yet",
+                quizNotPublishedSub: "Participants are currently uploading questions. The quiz will become available here once Host or Co-host publishes all questions.",
+                quizAnswerInstructions: "Answer all questions below and click submit to receive immediate scoring.",
+                questions: "Questions",
+                quizEnsureComplete: "Ensure all answers are completed before submitting.",
+                btnSubmitQuiz: "Submit Quiz Answers",
+                noSubFound: "No Submission Found",
+                noSubFoundSub: "You haven't submitted answers for the published quiz yet.",
+                btnGoToQuiz: "Go to Quiz",
+                tagQuizCompleted: "Quiz Completed",
+                titleQuizResults: "Your Quiz Results",
+                statCorrectAns: "Correct Answers",
+                statAccuracy: "Accuracy",
+                titleShareAchievements: "Share Your Achievements",
+                subShareAchievements: "Share your score with friends via Email, WhatsApp, Signal, or Instagram!",
+                titleSolutionBreakdown: "Solution Breakdown",
+                leaderboardHidden: "Leaderboard Hidden During Active Quiz",
+                leaderboardHiddenSub: "Final user rankings and achievements will be displayed here once Host/Co-host unpublishes the Quiz Bank.",
+                titleLeaderboard: "Quiz Leaderboard & Achievements",
+                subLeaderboard: "Participant rankings based on accuracy and completion time.",
+                colRank: "Rank",
+                colParticipant: "Participant",
+                colScoreAccuracy: "Score (Accuracy)",
+                colTimeSpent: "Time Spent",
+                colSubmittedTime: "SUBMITTED TIME",
+                lblManagementPanel: "Management Panel",
+                titleControlCenter: "Control Center",
+                subControlCenter: "Publish questions, set due date/timer, or manage user roles.",
+                statTotalUploaded: "Total Questions Uploaded",
+                statPublishStatus: "Publish Status",
+                statActiveUsers: "Total Active Users",
+                titleHistRecords: "Historical Published Quiz Records",
+                subHistRecords: "Summary analytics across all published quiz sessions",
+                btnResetRecords: "Reset Records",
+                titleUserMgmt: "User Account Management",
+                subUserMgmt: "Host can drag to reorder users, change roles, or add accounts.",
+                btnAddAccount: "Add Account",
+                colAccountName: "Account Name",
+                colRole: "Role",
+                colUploadedQs: "Uploaded Questions",
+                colActions: "Actions",
+                titleShareEmail: "Share Results via Email",
+                lblRecipientEmail: "Recipient Email Address",
+                btnCancel: "Cancel",
+                btnSendEmail: "Send Email",
+                titleRepublishGuest: "Republish Quiz for Guest Challenge",
+                lblChallengeDuration: "Challenge Duration (Minutes)",
+                lblMaxQuestions: "Maximum Questions to Display",
+                subMaxQuestions: "If set lower than total selection, questions will be randomly sampled.",
+                lblSelectFromVault: "Select Questions from Vault",
+                btnPubGuestChallenge: "Publish Guest Challenge",
+                titleFeedbackInbox: "User Feedback Inbox",
+                titlePublishBank: "Publish Quiz Bank",
+                lblCountdownDuration: "Countdown Duration (Minutes) - Optional",
+                lblClosureDueDate: "Automatic Closure Due Date & Time - Optional",
+                subClosureDueDate: "The quiz will automatically close and unpublish when this deadline passes.",
+                btnPublishNow: "Publish Now",
+                lblQType: "Question Type",
+                lblQPrompt: "Question Text / Prompt",
+                lblQExplanation: "Solution Explanation (Optional)",
+                btnSaveQuestion: "Save Question",
+                titleAccountSettings: "Account Settings",
+                lblLoggedInAccount: "Logged In Account",
+                lblEditAccountName: "Edit Account Name",
+                lblUploadAvatar: "Upload Personal Icon / Avatar",
+                subUploadAvatar: "Uploaded avatar will sync automatically across all your devices.",
+                lblUpdatePassword: "Update Password",
+                lblSendFeedback: "Send Feedback to Host & Co-host",
+                btnSendComment: "Send Comment",
+                btnViewFeedback: "View Feedback",
+                btnSignOut: "Sign Out",
+                btnSaveChanges: "Save Changes",
+                titleResetPassword: "Reset User Password",
+                lblTargetAccount: "Target Account",
+                lblNewPassword: "New Password for User",
+                btnSavePassword: "Save Password",
+                titleAddAccount: "Add New User Account",
+                btnCreateAccount: "Create Account"
+            },
+            繁: {
+                appSubtitle: "互動式聖經問答平台",
+                badgeCreationPhase: "題目籌備階段",
+                navDashboard: "儀表板",
+                navMyQuestions: "我的題目",
+                navPastPaperVault: "歷屆試題庫",
+                navTakeQuiz: "進行測驗",
+                navResults: "測驗結果與紀錄",
+                navAchievements: "排行榜與成就",
+                navControlCenter: "控制中心",
+                loginSubtitle: "請選擇帳號並登入以繼續",
+                lblSelectAccount: "選擇使用者帳號",
+                lblPassword: "密碼",
+                btnSignIn: "登入帳號",
+                lblGuestHint: "或立即測試您的聖經知識",
+                btnGuestMode: "訪客模式 - 挑戰答題",
+                hello: "您好",
+                dashWelcomeText: "歡迎來到 Bible QuizCraft！在題目籌備階段，您上傳的題目將保持保密。待主持人發布測驗後即可開始測試聖經知識！",
+                btnManageQuestions: "管理我的題目",
+                btnTakeQuiz: "進行即時測驗",
+                statMyUploaded: "我上傳的題目數",
+                statPublishedInBank: "題庫已發布題目數",
+                statLastScore: "最近一次測驗分數",
+                statPlatformStatus: "平台當前狀態",
+                titleMyRepo: "我的題目儲存庫",
+                subMyRepo: "您建立的題目在發布前將嚴格保持個人保密。",
+                btnAddQuestion: "新增題目",
+                titleVault: "歷屆試題庫",
+                subVault: "過往測驗的歷史題目庫。主持人可進行編輯或重新發布供訪客挑戰。",
+                btnRepublishGuest: "重新發布訪客挑戰",
+                btnEmptyHistory: "清空歷史紀錄",
+                quizNotPublished: "測驗尚未發布",
+                quizNotPublishedSub: "參與者目前正在上傳題目。待主持人或副主持人發布後，測驗將在此處開放。",
+                quizAnswerInstructions: "請回答以下所有題目，完成後點擊提交即可獲取即時評分。",
+                questions: "題",
+                quizEnsureComplete: "提交前請確保所有題目均已作答完畢。",
+                btnSubmitQuiz: "提交測驗答案",
+                noSubFound: "未找到提交紀錄",
+                noSubFoundSub: "您尚未提交此期發布測驗的答案。",
+                btnGoToQuiz: "前往測驗",
+                tagQuizCompleted: "測驗已完成",
+                titleQuizResults: "您的測驗成績",
+                statCorrectAns: "答對題數",
+                statAccuracy: "正確率",
+                titleShareAchievements: "分享您的測驗成就",
+                subShareAchievements: "透過 電子郵件、WhatsApp、Signal 或 Instagram 與朋友分享成績！",
+                titleSolutionBreakdown: "題目解析與答案",
+                leaderboardHidden: "測驗進行中排行榜暫時隱藏",
+                leaderboardHiddenSub: "待主持人/副主持人結束並取消發布測驗後，最終排名將在此顯示。",
+                titleLeaderboard: "測驗排行榜與成就",
+                subLeaderboard: "根據正確率及完成時間進行的參與者排名。",
+                colRank: "名次",
+                colParticipant: "參與者",
+                colScoreAccuracy: "得分 (正確率)",
+                colTimeSpent: "所用時間",
+                colSubmittedTime: "提交時間",
+                lblManagementPanel: "管理面板",
+                titleControlCenter: "控制中心",
+                subControlCenter: "發布題目、設定截止時間/計時器或管理使用者權限。",
+                statTotalUploaded: "總上傳題目數",
+                statPublishStatus: "發布狀態",
+                statActiveUsers: "活躍使用者總數",
+                titleHistRecords: "歷屆已發布測驗紀錄",
+                subHistRecords: "跨期測驗的綜合數據分析",
+                btnResetRecords: "重置紀錄",
+                titleUserMgmt: "使用者帳號管理",
+                subUserMgmt: "主持人可拖曳調整順序、變更身份權限或新增帳號。",
+                btnAddAccount: "新增帳號",
+                colAccountName: "帳號名稱",
+                colRole: "身份角色",
+                colUploadedQs: "已上傳題目數",
+                colActions: "操作選項",
+                titleShareEmail: "透過電子郵件分享成績",
+                lblRecipientEmail: "收件人電子郵件地址",
+                btnCancel: "取消",
+                btnSendEmail: "發送郵件",
+                titleRepublishGuest: "發布訪客挑戰測驗",
+                lblChallengeDuration: "挑戰限時 (分鐘)",
+                lblMaxQuestions: "最多顯示題目數量",
+                subMaxQuestions: "若設定數量少於勾選總數，系統將隨機抽樣題目。",
+                lblSelectFromVault: "從歷史試題庫勾選題目",
+                btnPubGuestChallenge: "發布訪客挑戰",
+                titleFeedbackInbox: "使用者意見回饋收件匣",
+                titlePublishBank: "發布測驗題庫",
+                lblCountdownDuration: "倒數計時限時 (分鐘) - 可選",
+                lblClosureDueDate: "自動截止關閉時間 - 可選",
+                subClosureDueDate: "當到達此截止時間，測驗將自動結束並取消發布。",
+                btnPublishNow: "立即發布",
+                lblQType: "題目類型",
+                lblQPrompt: "題目內容 / 敘述",
+                lblQExplanation: "解答說明 (可選)",
+                btnSaveQuestion: "儲存題目",
+                titleAccountSettings: "帳號設定",
+                lblLoggedInAccount: "當前登入帳號",
+                lblEditAccountName: "編輯帳號名稱",
+                lblUploadAvatar: "上傳個人頭像",
+                subUploadAvatar: "上傳的頭像是將自動同步至您的所有裝置。",
+                lblUpdatePassword: "更新密碼",
+                lblSendFeedback: "傳送意見回饋給主持人/副主持人",
+                btnSendComment: "發送留言",
+                btnViewFeedback: "檢視意見回饋",
+                btnSignOut: "登出帳號",
+                btnSaveChanges: "儲存變更",
+                titleResetPassword: "重置使用者密碼",
+                lblTargetAccount: "目標帳號",
+                lblNewPassword: "新密碼",
+                btnSavePassword: "儲存密碼",
+                titleAddAccount: "新增使用者帳號",
+                btnCreateAccount: "建立帳號"
+            }
+        };
+
+        function toggleLanguage() {
+            currentLang = currentLang === 'EN' ? '繁' : 'EN';
+            localStorage.setItem('quiz_app_lang', currentLang);
+            applyLanguage();
+        }
+
+        function applyLanguage() {
+            const langData = i18n[currentLang] || i18n.EN;
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (langData[key]) el.textContent = langData[key];
+            });
+            const toggleBtnText = document.getElementById('langToggleBtnText');
+            if (toggleBtnText) toggleBtnText.textContent = currentLang === 'EN' ? '繁' : 'EN';
+        }
 
         // Application State
         let users = [];
@@ -804,7 +1062,6 @@
         let draggedUserIndex = null;
         let tempAvatarBase64 = null;
         
-        // Guest Challenge State
         let isGuestMode = false;
         let guestChallengeConfig = {
             active: false,
@@ -814,7 +1071,6 @@
         };
         let activeQuizQuestions = [];
 
-        // Mobile responsiveness helper check
         function isMobileView() {
             return window.innerWidth < 768;
         }
@@ -827,13 +1083,13 @@
             const savedCurrentUser = localStorage.getItem('quiz_current_user');
             if (savedCurrentUser) {
                 const stored = JSON.parse(savedCurrentUser);
-                // Problem 1 Fix: Always pair current session with remote database state
                 const freshUser = users.find(u => u.name === stored.name);
                 currentUser = freshUser || stored;
             }
 
             populateLoginDropdown();
             applyMobileRules();
+            applyLanguage();
             updateUI();
             lucide.createIcons();
 
@@ -844,25 +1100,42 @@
         function applyMobileRules() {
             const isMobile = isMobileView();
             
-            // Requirement 8: Mobile specific layout rules
             const desktopBatchTools = document.querySelectorAll('.desktop-batch-tools');
             desktopBatchTools.forEach(el => el.style.display = isMobile ? 'none' : 'flex');
 
             const hostHistBlock = document.getElementById('hostHistoricalRecordsBlock');
             if (hostHistBlock) hostHistBlock.style.display = isMobile ? 'none' : 'block';
 
-            const feedbackSection = document.getElementById('settingsFeedbackSection');
-            if (feedbackSection) feedbackSection.style.display = isMobile ? 'none' : 'block';
-
             const desktopCols = document.querySelectorAll('.desktop-leaderboard-col');
             desktopCols.forEach(col => col.style.display = isMobile ? 'none' : 'table-cell');
+
+            // Requirement 1: Mobile UI Simplifications
+            const headerLogoutBtn = document.getElementById('headerLogoutBtn');
+            const mobileModalLogoutBlock = document.getElementById('mobileModalLogoutBlock');
+            if (headerLogoutBtn && mobileModalLogoutBlock) {
+                if (isMobile) {
+                    headerLogoutBtn.classList.add('hidden');
+                    mobileModalLogoutBlock.classList.remove('hidden');
+                } else {
+                    headerLogoutBtn.classList.remove('hidden');
+                    mobileModalLogoutBlock.classList.add('hidden');
+                }
+            }
+
+            const desktopMgmtCols = document.querySelectorAll('.desktop-user-mgmt-col');
+            desktopMgmtCols.forEach(col => col.style.display = isMobile ? 'none' : 'table-cell');
+
+            const hostAddAccBtn = document.getElementById('hostAddAccountBtn');
+            if (hostAddAccBtn) {
+                if (isMobile) hostAddAccBtn.classList.add('hidden');
+                else if (currentUser && currentUser.role === 'host') hostAddAccBtn.classList.remove('hidden');
+            }
         }
 
         async function fetchCloudState() {
             const { data: userData } = await _supabase.from('app_users').select('*').order('sort_order', { ascending: true, nullsFirst: false });
             if (userData) {
                 users = userData;
-                // Sync profile picture in active session if logged in
                 if (currentUser && !isGuestMode) {
                     const match = users.find(u => u.name === currentUser.name);
                     if (match) currentUser = match;
@@ -898,6 +1171,7 @@
             const { data: recData } = await _supabase.from('quiz_records').select('*').order('quiz_session_id', { ascending: false });
             if (recData) quizRecords = recData;
 
+            // Fetch Feedback Comments
             const { data: fbData } = await _supabase.from('feedback').select('*').order('created_at', { ascending: false });
             if (fbData) feedbackComments = fbData;
         }
@@ -954,20 +1228,16 @@
             switchTab('dashboard');
         }
 
-        // Requirement 6: Guest Mode Challenge Init
         function startGuestMode() {
             isGuestMode = true;
             currentUser = { name: "Guest User", role: "guest", avatar_url: "" };
             
-            // Get questions for guest mode
             if (guestChallengeConfig.active && guestChallengeConfig.questionIds.length > 0) {
                 let pool = pastQuestions.filter(q => guestChallengeConfig.questionIds.includes(q.id));
-                // Randomize
                 pool = pool.sort(() => Math.random() - 0.5);
                 const max = Math.min(guestChallengeConfig.maxQuestions, pool.length);
                 activeQuizQuestions = pool.slice(0, max);
             } else {
-                // Fallback to random vault questions
                 activeQuizQuestions = pastQuestions.slice().sort(() => Math.random() - 0.5).slice(0, 5);
             }
 
@@ -1040,6 +1310,7 @@
             }
 
             renderCurrentView();
+            applyLanguage();
             lucide.createIcons();
         }
 
@@ -1068,7 +1339,6 @@
                 const avatarImg = document.getElementById('headerUserAvatar');
                 const defaultIcon = document.getElementById('headerSettingsDefaultIcon');
 
-                // Requirement 8: If avatar exists, show profile avatar icon instead of gear
                 if (currentUser.avatar_url) {
                     avatarImg.src = currentUser.avatar_url;
                     avatarImg.classList.remove('hidden');
@@ -1096,6 +1366,7 @@
 
                 switchTab(activeTab);
             }
+            applyMobileRules();
             lucide.createIcons();
         }
 
@@ -1108,11 +1379,11 @@
 
             if (isPublished) {
                 dashPublishBtn.className = "bg-amber-600 hover:bg-amber-700 text-white px-4 py-2.5 rounded-lg font-semibold text-sm transition shadow flex items-center gap-2";
-                dashPublishText.textContent = "Unpublish Quiz Bank";
+                dashPublishText.textContent = currentLang === '繁' ? "取消發布題庫" : "Unpublish Quiz Bank";
 
                 if (ctrlPublishBtn) {
                     ctrlPublishBtn.className = "px-5 py-3 rounded-xl font-bold text-sm shadow-lg transition flex items-center gap-2 bg-amber-600 hover:bg-amber-700 text-white";
-                    ctrlPublishText.textContent = "Unpublish Quiz Bank";
+                    ctrlPublishText.textContent = currentLang === '繁' ? "取消發布題庫" : "Unpublish Quiz Bank";
                 }
 
                 let dueText = quizDueDate ? ` | Due: ${new Date(quizDueDate).toLocaleString()}` : '';
@@ -1120,15 +1391,15 @@
                 badge.innerHTML = `<i data-lucide="check-circle" class="w-3.5 h-3.5"></i> Quiz #${currentQuizSession} Live${dueText}`;
             } else {
                 dashPublishBtn.className = "bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-lg font-semibold text-sm transition shadow flex items-center gap-2";
-                dashPublishText.textContent = "Publish Quiz Bank";
+                dashPublishText.textContent = currentLang === '繁' ? "發布測驗題庫" : "Publish Quiz Bank";
 
                 if (ctrlPublishBtn) {
                     ctrlPublishBtn.className = "px-5 py-3 rounded-xl font-bold text-sm shadow-lg transition flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white";
-                    ctrlPublishText.textContent = "Publish All Questions";
+                    ctrlPublishText.textContent = currentLang === '繁' ? "發布所有題目" : "Publish All Questions";
                 }
 
                 badge.className = "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/30";
-                badge.innerHTML = `<i data-lucide="clock" class="w-3.5 h-3.5"></i> Creation Phase`;
+                badge.innerHTML = `<i data-lucide="clock" class="w-3.5 h-3.5"></i> <span data-i18n="badgeCreationPhase">Creation Phase</span>`;
             }
             lucide.createIcons();
         }
@@ -1302,7 +1573,6 @@
             lucide.createIcons();
         }
 
-        // Requirement 7: Republish Guest Challenge Modal
         function openRepublishGuestModal() {
             const listContainer = document.getElementById('guestVaultSelectionList');
             if (pastQuestions.length === 0) {
@@ -1393,13 +1663,12 @@
             const filterSelect = document.getElementById('achievementFilterSelect');
             const lastColHeader = document.getElementById('achievementsLastColHeader');
             const selectedFilter = filterSelect.value || "COMPOSITE_JOINED";
-            const isMobile = isMobileView();
 
             const allSubmissionsList = Object.values(submissions).flat();
             let leaderboardData = [];
 
             if (selectedFilter.startsWith("SESSION_")) {
-                lastColHeader.textContent = "SUBMITTED TIME";
+                lastColHeader.textContent = currentLang === '繁' ? "提交時間" : "SUBMITTED TIME";
 
                 const sessId = parseInt(selectedFilter.replace("SESSION_", ""));
                 const sessRecord = quizRecords.find(r => r.quiz_session_id === sessId);
@@ -1426,7 +1695,7 @@
                 leaderboardData.sort((a, b) => b.accPerc - a.accPerc || a.time_taken_seconds - b.time_taken_seconds);
 
             } else if (selectedFilter === "COMPOSITE_JOINED") {
-                lastColHeader.textContent = "Quizzes Taken";
+                lastColHeader.textContent = currentLang === '繁' ? "參加測驗數" : "Quizzes Taken";
 
                 const userGrouped = {};
                 allSubmissionsList.forEach(s => {
@@ -1459,7 +1728,7 @@
                 leaderboardData.sort((a, b) => b.accPerc - a.accPerc || a.time_taken_seconds - b.time_taken_seconds);
 
             } else if (selectedFilter === "COMPOSITE_ALL") {
-                lastColHeader.textContent = "Quizzes Taken";
+                lastColHeader.textContent = currentLang === '繁' ? "參加測驗數" : "Quizzes Taken";
 
                 const grandTotalQAcrossAllPublished = quizRecords.reduce((sum, r) => sum + r.total_questions, 0);
 
@@ -1652,7 +1921,6 @@
                 if (secondsLeft <= 0) {
                     clearInterval(timerInterval);
                     showToast("Time is up! Auto-submitting quiz.", "error");
-                    // Requirement 6: Submit only answered questions if time up
                     handleQuizSubmit(null, true);
                 }
                 secondsLeft--;
@@ -1780,7 +2048,6 @@
             showToast(`Exported ${type.toUpperCase()} template successfully!`, "success");
         }
 
-        // Updated Batch Processing Handler
         async function handleBatchFileUpload(e) {
             const fileInput = document.getElementById('batchFileInput');
             const file = e.target.files[0];
@@ -1833,7 +2100,6 @@
                             return showToast(`Upload Failed (Row ${rowNum}): {Q_id} cannot be empty.`, "error");
                         }
 
-                        // Normalized type resolution
                         let rawType = qTypeIdx !== -1 ? String(row[qTypeIdx] || '').trim().toUpperCase() : 'MCQ';
                         let qType = 'MCQ';
                         if (rawType.includes('FILL')) qType = 'FILL';
@@ -1979,16 +2245,20 @@
                 const roleBadge = document.getElementById('settingsCurrentUserRole');
                 roleBadge.textContent = currentUser.role;
 
+                // Requirement 2: Enlarged / Zoom out icon display logic
                 const avatarPrev = document.getElementById('settingsAvatarPreview');
+                const fallbackIcon = document.getElementById('settingsAvatarFallbackIcon');
+                
                 if (currentUser.avatar_url) {
                     avatarPrev.src = currentUser.avatar_url;
                     avatarPrev.classList.remove('hidden');
+                    fallbackIcon.classList.add('hidden');
                 } else {
                     avatarPrev.classList.add('hidden');
+                    fallbackIcon.classList.remove('hidden');
                 }
                 tempAvatarBase64 = currentUser.avatar_url || null;
 
-                // Requirement 5: Settings Feedback configuration
                 const partBlock = document.getElementById('participantFeedbackBlock');
                 const hostBlock = document.getElementById('hostFeedbackBlock');
                 if (isHostOrCoHost()) {
@@ -2000,13 +2270,13 @@
                 }
             }
             document.getElementById(modalId).classList.remove('hidden');
+            applyLanguage();
         }
 
         function closeModal(modalId) {
             document.getElementById(modalId).classList.add('hidden');
         }
 
-        // Requirement 5: Submit Feedback
         async function submitUserFeedback() {
             const input = document.getElementById('userFeedbackInput');
             const comment = input.value.trim();
@@ -2021,28 +2291,49 @@
             input.value = '';
             closeModal('settingsModal');
             showToast("Feedback sent to Host and Co-host!", "success");
+            await fetchCloudState();
         }
 
-        // Requirement 5: View Feedbacks for Host / Co-host
-        function openViewFeedbackModal() {
+        // Requirement 3 & 4: Fix Host/Co-host View Feedback & Delete Comment functionality
+        async function openViewFeedbackModal() {
             closeModal('settingsModal');
+            await fetchCloudState();
+            renderFeedbackCommentsList();
+            openModal('viewFeedbackModal');
+        }
+
+        function renderFeedbackCommentsList() {
             const container = document.getElementById('feedbackListContainer');
 
-            if (feedbackComments.length === 0) {
+            if (!feedbackComments || feedbackComments.length === 0) {
                 container.innerHTML = `<div class="text-center text-slate-400 text-sm py-6">No user feedback comments received yet.</div>`;
             } else {
                 container.innerHTML = feedbackComments.map(fb => `
-                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-1">
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2">
                         <div class="flex justify-between items-center text-xs">
-                            <span class="font-bold text-slate-800">${escapeHTML(fb.username)}</span>
-                            <span class="text-slate-400">${new Date(fb.created_at).toLocaleString()}</span>
+                            <span class="font-bold text-slate-800 flex items-center gap-1.5">
+                                <i data-lucide="user" class="w-3.5 h-3.5 text-slate-400"></i> ${escapeHTML(fb.username)}
+                            </span>
+                            <div class="flex items-center gap-2">
+                                <span class="text-slate-400">${new Date(fb.created_at).toLocaleString()}</span>
+                                <button onclick="deleteFeedbackComment('${fb.id}')" class="text-red-500 hover:text-red-700 p-1 rounded hover:bg-red-50 transition" title="Delete Feedback">
+                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                </button>
+                            </div>
                         </div>
                         <p class="text-sm text-slate-700">${escapeHTML(fb.comment)}</p>
                     </div>
                 `).join('');
             }
+            lucide.createIcons();
+        }
 
-            openModal('viewFeedbackModal');
+        async function deleteFeedbackComment(id) {
+            if (!confirm("Are you sure you want to delete this comment?")) return;
+            await _supabase.from('feedback').delete().eq('id', id);
+            await fetchCloudState();
+            renderFeedbackCommentsList();
+            showToast("Feedback comment deleted.", "info");
         }
 
         function openPublishModal() {
@@ -2106,7 +2397,10 @@
             document.getElementById('hostUserCount').textContent = users.length;
 
             const isHost = currentUser.role === 'host';
-            document.getElementById('hostAddAccountBtn').style.display = isHost ? 'flex' : 'none';
+            const isMobile = isMobileView();
+            
+            // Mobile simplified view rules
+            document.getElementById('hostAddAccountBtn').style.display = (isHost && !isMobile) ? 'flex' : 'none';
             document.getElementById('resetQuizRecordsBtn').style.display = isHost ? 'flex' : 'none';
 
             const statusTxt = document.getElementById('hostPublishStatusText');
@@ -2165,7 +2459,7 @@
 
                 return `
                     <tr class="hover:bg-slate-50 transition" ${isHost ? `draggable="true" ondragstart="handleDragStart(event, ${idx})" ondragover="handleDragOver(event)" ondrop="handleDrop(event, ${idx})"` : ''}>
-                        <td class="px-4 py-4 text-slate-300 cursor-grab">${isHost ? '⋮⋮' : ''}</td>
+                        <td class="px-4 py-4 text-slate-300 cursor-grab desktop-user-mgmt-col">${isHost ? '⋮⋮' : ''}</td>
                         <td class="px-6 py-4 font-semibold text-slate-800 flex items-center gap-2">
                             ${userAvatarTag} ${escapeHTML(u.name)}
                         </td>
@@ -2178,7 +2472,7 @@
                                 </select>
                             ` : `<span class="px-2.5 py-1 text-xs font-bold rounded-full bg-slate-100 text-slate-700 uppercase">${u.role}</span>`}
                         </td>
-                        <td class="px-6 py-4 text-sm font-medium text-slate-700">${count} questions</td>
+                        <td class="px-6 py-4 text-sm font-medium text-slate-700 desktop-user-mgmt-col">${count} questions</td>
                         <td class="px-6 py-4 text-right space-x-2">
                             <button onclick="openAdminPasswordReset('${escapeHTML(u.name)}')" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded font-medium">Reset Pass</button>
                             ${isHost && u.role !== 'host' ? `<button onclick="deleteUserAccount('${escapeHTML(u.name)}')" class="text-xs bg-red-50 hover:bg-red-100 text-red-600 px-3 py-1.5 rounded font-medium">Delete</button>` : ''}
@@ -2430,7 +2724,6 @@
             const form = document.getElementById('quizActiveForm');
             const formData = new FormData(form);
 
-            // Requirement 2: Completion Validation Check
             if (!isAutoTimeUp) {
                 let unansweredCount = 0;
 
@@ -2534,14 +2827,12 @@
             await fetchCloudState();
             updateUI();
             
-            // Requirement 3: Firework special effects after submission
             triggerFireworks();
             
             showToast(`Quiz Submitted! Score: ${score}/${total} (${percentage}%)`, "success");
             switchTab('results');
         }
 
-        // Requirement 3: Fireworks Cannon Trigger
         function triggerFireworks() {
             if (typeof confetti === 'function') {
                 const count = 200;
@@ -2561,7 +2852,6 @@
             }
         }
 
-        // Requirement 4: Share Results via WhatsApp / Signal / Instagram / Email
         function shareResultVia(platform) {
             const userSubs = submissions[currentUser.name] || [];
             const userSub = userSubs.find(s => s.quiz_session_id === (isGuestMode ? 999999 : currentQuizSession)) || userSubs[userSubs.length - 1];
@@ -2696,8 +2986,11 @@
             reader.onload = function(evt) {
                 tempAvatarBase64 = evt.target.result;
                 const avatarPrev = document.getElementById('settingsAvatarPreview');
+                const fallbackIcon = document.getElementById('settingsAvatarFallbackIcon');
+                
                 avatarPrev.src = tempAvatarBase64;
                 avatarPrev.classList.remove('hidden');
+                fallbackIcon.classList.add('hidden');
             };
             reader.readAsDataURL(file);
         }
@@ -2711,7 +3004,6 @@
 
             const oldName = currentUser.name;
 
-            // Problem 1 Solution: Sync profile picture & info directly in remote Supabase database table
             await _supabase.from('app_users').update({
                 name: newName,
                 pass: newPass,
