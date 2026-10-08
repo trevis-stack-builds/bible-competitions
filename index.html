@@ -4,10 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bible QuizCraft - Multi-User Interactive Platform</title>
-    <!-- Favicon with Cache-Busting Parameters -->
-    <link rel="icon" type="image/png" href="bible.png?v=2">
-    <link rel="shortcut icon" type="image/png" href="bible.png?v=2">
-    <link rel="apple-touch-icon" href="bible.png?v=2">
+    <!-- Favicon with Safari PNG & Apple Touch Icon Support -->
+    <link rel="icon" type="image/png" sizes="32x32" href="bible.png?v=3">
+    <link rel="icon" type="image/png" sizes="16x16" href="bible.png?v=3">
+    <link rel="shortcut icon" type="image/png" href="bible.png?v=3">
+    <link rel="apple-touch-icon" sizes="180x180" href="bible.png?v=3">
+    <link rel="mask-icon" href="bible.png?v=3" color="#d97706">
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Lucide Icons -->
@@ -41,10 +43,22 @@
             </div>
 
             <div class="flex items-center gap-3">
+                <!-- Status Badge (Hidden on Login & Guest Mode) -->
                 <span id="publishingBadge" class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/30">
                     <i data-lucide="clock" class="w-3.5 h-3.5"></i> <span data-i18n="badgeCreationPhase">Creation Phase</span>
                 </span>
 
+                <!-- Requirement 6: Guest Mode Header (No status labels) -->
+                <div id="guestProfileHeader" class="hidden flex items-center gap-2 pl-3 border-l border-slate-700">
+                    <button type="button" onclick="toggleLanguage()" class="px-2.5 py-1 text-xs font-bold rounded-lg border border-amber-500 text-amber-300 hover:bg-slate-800 transition shadow-sm flex items-center gap-1">
+                        <i data-lucide="languages" class="w-3.5 h-3.5"></i> <span class="langToggleBtnText">繁</span>
+                    </button>
+                    <button onclick="logout()" class="p-2 text-red-400 hover:text-red-300 hover:bg-slate-800 rounded-lg transition flex items-center justify-center" title="Sign Out">
+                        <i data-lucide="log-out" class="w-5 h-5"></i>
+                    </button>
+                </div>
+
+                <!-- Regular User Header -->
                 <div id="userProfileHeader" class="hidden flex items-center gap-2 pl-3 border-l border-slate-700">
                     <button id="headerProfileTriggerBtn" onclick="openModal('settingsModal')" class="flex items-center gap-2 p-1 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition" title="Account Settings">
                         <img id="headerUserAvatar" src="" class="w-8 h-8 rounded-full object-cover border border-amber-400 hidden" alt="Avatar">
@@ -94,20 +108,20 @@
 
     <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
 
-        <!-- VIEW: LOGIN -->
+        <!-- VIEW: LOGIN (Requirement 5 & 6: Manual Case-Sensitive Input, No Status Labels) -->
         <section id="view-login" class="max-w-md mx-auto my-8 sm:my-12 bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden">
             <div class="bg-slate-900 p-8 text-center text-white relative">
                 <div class="w-16 h-16 bg-amber-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg shadow-amber-500/30">
                     <i data-lucide="book-open" class="w-8 h-8 text-white"></i>
                 </div>
                 <h2 class="text-2xl font-bold">Bible QuizCraft</h2>
-                <p class="text-slate-400 text-sm mt-1" data-i18n="loginSubtitle">Select account and log in to continue</p>
+                <p class="text-slate-400 text-sm mt-1" data-i18n="loginSubtitle">Enter account name and log in to continue</p>
             </div>
 
             <form id="loginForm" onsubmit="handleLogin(event)" class="p-6 space-y-5">
                 <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2" data-i18n="lblSelectAccount">Select User Account</label>
-                    <select id="loginUserSelect" class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-slate-50 text-slate-800 transition font-medium"></select>
+                    <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2" data-i18n="lblAccountNameInput">User Account Name</label>
+                    <input type="text" id="loginUserNameInput" required placeholder="Enter exact account name (Case-Sensitive)" class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-slate-50 text-slate-800 transition font-medium">
                 </div>
 
                 <div>
@@ -133,7 +147,7 @@
             </div>
         </section>
 
-        <!-- VIEW: DASHBOARD -->
+        <!-- VIEW: DASHBOARD (Requirement 8 & 9: Chatroom & Pinned Announcements) -->
         <section id="view-dashboard" class="space-y-6 hidden">
             <div class="bg-gradient-to-r from-amber-700 via-amber-800 to-slate-900 rounded-2xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden">
                 <div class="relative z-10">
@@ -190,6 +204,36 @@
             </div>
 
             <div id="dashStatusCard" class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm"></div>
+
+            <!-- CHATROOM INTEGRATION -->
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-md overflow-hidden flex flex-col h-[520px]">
+                <div class="bg-slate-900 text-white px-6 py-4 flex items-center justify-between border-b border-slate-800">
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="message-square" class="w-5 h-5 text-amber-400"></i>
+                        <h3 class="font-bold text-base" data-i18n="titleCommunityChatroom">Community Chatroom</h3>
+                    </div>
+                    <span class="text-xs text-slate-400 font-medium" data-i18n="subCommunityChatroom">Live discussion & announcements</span>
+                </div>
+
+                <!-- Pinned Announcements Container (Max 2) -->
+                <div id="pinnedAnnouncementsContainer" class="bg-amber-50/80 border-b border-amber-200 p-3 hidden space-y-2 max-h-36 overflow-y-auto custom-scrollbar"></div>
+
+                <!-- Chat Scrollable History Container -->
+                <div id="chatHistoryContainer" class="flex-1 p-4 overflow-y-auto space-y-3 custom-scrollbar bg-slate-50"></div>
+
+                <!-- Chat Input Form -->
+                <form onsubmit="handleSendChatMessage(event)" class="p-3 bg-white border-t border-slate-200 flex items-center gap-2">
+                    <div id="announcementToggleBtnContainer" class="hidden">
+                        <button type="button" id="chatAnnouncementToggle" onclick="toggleAnnouncementMode()" class="px-2.5 py-2 rounded-lg text-xs font-bold border border-amber-300 bg-amber-50 text-amber-700 hover:bg-amber-100 transition flex items-center gap-1 shrink-0" title="Toggle Host Announcement Mode">
+                            <i data-lucide="pin" class="w-3.5 h-3.5"></i> <span id="announcementToggleLabel">Normal</span>
+                        </button>
+                    </div>
+                    <input type="text" id="chatMessageInput" required placeholder="Type a message..." class="flex-1 px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-slate-50">
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white p-2.5 rounded-xl transition shadow flex items-center justify-center shrink-0">
+                        <i data-lucide="send" class="w-4 h-4"></i>
+                    </button>
+                </form>
+            </div>
         </section>
 
         <!-- VIEW: MY QUESTIONS -->
@@ -201,7 +245,7 @@
                 </div>
                 <div class="flex flex-wrap items-center gap-2">
                     <select id="myQTypeFilter" onchange="renderMyQuestions()" class="px-3 py-2 rounded-lg border border-slate-300 text-xs font-semibold bg-white shadow-sm focus:ring-2 focus:ring-blue-500">
-                        <option value="ALL">All Question Types</option>
+                        <option value="ALL" data-i18n="optAllTypes">All Question Types</option>
                         <option value="MCQ">MCQ</option>
                         <option value="TF">TRUE / FALSE / NOT GIVEN</option>
                         <option value="FILL">FILL BLANK</option>
@@ -231,9 +275,10 @@
                 </div>
             </div>
 
+            <!-- Locked Notice for Pending or Published Phase (Requirement 3) -->
             <div id="questionsLockedNotice" class="hidden bg-amber-50 border border-amber-200 text-amber-800 px-4 py-3 rounded-lg flex items-center gap-3">
                 <i data-lucide="lock" class="w-5 h-5 text-amber-600 shrink-0"></i>
-                <div class="text-sm"><strong>Quiz Phase Locked:</strong> The host/co-host has published all questions. Editing and adding new questions is currently disabled.</div>
+                <div class="text-sm" id="questionsLockedNoticeText"><strong>Quiz Phase Locked:</strong> Editing and adding new questions is currently disabled.</div>
             </div>
 
             <div id="myQuestionsList" class="space-y-4"></div>
@@ -264,8 +309,8 @@
                 <div class="w-16 h-16 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto mb-4">
                     <i data-lucide="clock" class="w-8 h-8"></i>
                 </div>
-                <h3 class="text-xl font-bold text-slate-800 mb-2" data-i18n="quizNotPublished">Quiz is Not Published Yet</h3>
-                <p class="text-slate-600 text-sm mb-6" data-i18n="quizNotPublishedSub">Participants are currently uploading questions. The quiz will become available here once Host or Co-host publishes all questions.</p>
+                <h3 class="text-xl font-bold text-slate-800 mb-2" id="quizNotPublishedTitle" data-i18n="quizNotPublished">Quiz is Not Published Yet</h3>
+                <p class="text-slate-600 text-sm mb-6" id="quizNotPublishedSub" data-i18n="quizNotPublishedSub">Participants are currently uploading questions. The quiz will become available here once Host or Co-host publishes all questions.</p>
             </div>
 
             <div id="quizContainer" class="hidden space-y-6 max-w-3xl mx-auto">
@@ -296,7 +341,7 @@
             </div>
         </section>
 
-        <!-- VIEW: RESULTS -->
+        <!-- VIEW: RESULTS (Requirement 7: Guest Post-Submission UI Updates) -->
         <section id="view-results" class="space-y-6 hidden">
             <div id="noResultsScreen" class="bg-white rounded-2xl p-10 text-center border border-slate-200 shadow-sm max-w-md mx-auto">
                 <i data-lucide="award" class="w-12 h-12 text-slate-300 mx-auto mb-3"></i>
@@ -309,7 +354,7 @@
                 <div id="scoreBanner" class="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200 shadow-md flex flex-col sm:flex-row items-center justify-between gap-6">
                     <div class="space-y-2 text-center sm:text-left">
                         <span class="px-3 py-1 bg-emerald-100 text-emerald-800 text-xs font-bold rounded-full uppercase tracking-wider" data-i18n="tagQuizCompleted">Quiz Completed</span>
-                        <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900" data-i18n="titleQuizResults">Your Quiz Results</h2>
+                        <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900" id="resultsTitleHeader" data-i18n="titleQuizResults">Your Quiz Results</h2>
                         <p id="resultSubmittedTime" class="text-xs text-slate-400">Submitted on: -</p>
                     </div>
 
@@ -324,6 +369,12 @@
                             <div class="text-xs text-slate-500 font-medium" data-i18n="statAccuracy">Accuracy</div>
                         </div>
                     </div>
+                </div>
+
+                <div id="guestRetakeBox" class="hidden bg-indigo-50 border border-indigo-200 rounded-xl p-5 text-center shadow-sm">
+                    <button onclick="retakeGuestChallenge()" class="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-md transition inline-flex items-center gap-2 text-sm">
+                        <i data-lucide="rotate-ccw" class="w-4 h-4"></i> <span data-i18n="btnTakeChallengeAgain">Take Challenge Again</span>
+                    </button>
                 </div>
 
                 <div id="shareResultsBox" class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-5 shadow-sm space-y-3">
@@ -445,6 +496,7 @@
                         </h3>
                         <p class="text-xs text-slate-500" data-i18n="subHistRecords">Summary analytics across all published quiz sessions</p>
                     </div>
+                    <!-- Requirement 4: Reset Records now also resets Quiz Number -->
                     <button id="resetQuizRecordsBtn" onclick="resetQuizRecords()" class="hidden bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1">
                         <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> <span data-i18n="btnResetRecords">Reset Records</span>
                     </button>
@@ -453,12 +505,12 @@
                     <table class="w-full text-left text-sm text-slate-600">
                         <thead class="bg-slate-100 text-xs uppercase text-slate-500 border-b border-slate-200">
                             <tr>
-                                <th class="px-6 py-3">Session</th>
-                                <th class="px-6 py-3">Total Questions</th>
-                                <th class="px-6 py-3">Participants</th>
-                                <th class="px-6 py-3">Avg Performance</th>
-                                <th class="px-6 py-3">Avg Time Spent</th>
-                                <th class="px-6 py-3">Champion</th>
+                                <th class="px-6 py-3" data-i18n="colSession">Session</th>
+                                <th class="px-6 py-3" data-i18n="colTotalQs">Total Questions</th>
+                                <th class="px-6 py-3" data-i18n="colParticipantsCount">Participants</th>
+                                <th class="px-6 py-3" data-i18n="colAvgPerf">Avg Performance</th>
+                                <th class="px-6 py-3" data-i18n="colAvgTimeSpent">Avg Time Spent</th>
+                                <th class="px-6 py-3" data-i18n="colChampion">Champion</th>
                             </tr>
                         </thead>
                         <tbody id="quizRecordsTableBody" class="divide-y divide-slate-100"></tbody>
@@ -561,7 +613,7 @@
         </div>
     </div>
 
-    <!-- MODAL: PUBLISH QUIZ WITH TIMER & DUE DATETIME -->
+    <!-- MODAL: PUBLISH QUIZ WITH TIMER, SCHEDULED PUBLICATION & CLOSURE (Requirement 2: Separate Date/Time Inputs) -->
     <div id="publishModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-slate-100 overflow-hidden">
             <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
@@ -574,15 +626,29 @@
                     <input type="number" id="quizDurationInput" min="1" max="180" placeholder="e.g. 15 (Leave blank for no timer limit)" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-sm">
                 </div>
 
+                <!-- Scheduled Publication (Two separate inputs) -->
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2" data-i18n="lblScheduledPublish">Automatic Publication Schedule - Optional</label>
+                    <div class="grid grid-cols-2 gap-2">
+                        <input type="date" id="quizPublishDateInput" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm">
+                        <input type="time" id="quizPublishTimeInput" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm">
+                    </div>
+                    <p class="text-xs text-slate-400 mt-1" data-i18n="subScheduledPublish">Quiz will automatically go live at this exact time. Enters "Pending" phase 15 minutes prior.</p>
+                </div>
+
+                <!-- Automatic Closure (Two separate inputs) -->
                 <div>
                     <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2" data-i18n="lblClosureDueDate">Automatic Closure Due Date & Time - Optional</label>
-                    <input type="datetime-local" id="quizDueDateInput" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-sm">
+                    <div class="grid grid-cols-2 gap-2">
+                        <input type="date" id="quizDueDateDateInput" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm">
+                        <input type="time" id="quizDueDateTimeInput" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm">
+                    </div>
                     <p class="text-xs text-slate-400 mt-1" data-i18n="subClosureDueDate">The quiz will automatically close and unpublish when this deadline passes.</p>
                 </div>
 
                 <div class="pt-4 flex justify-end gap-2">
                     <button type="button" onclick="closeModal('publishModal')" class="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg text-sm" data-i18n="btnCancel">Cancel</button>
-                    <button type="submit" class="px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm font-medium hover:bg-emerald-700 shadow" data-i18n="btnPublishNow">Publish Now</button>
+                    <button type="submit" class="px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm font-medium hover:bg-emerald-700 shadow" data-i18n="btnPublishNow">Save & Publish</button>
                 </div>
             </form>
         </div>
@@ -631,7 +697,7 @@
         </div>
     </div>
 
-    <!-- MODAL: ACCOUNT SETTINGS & FEEDBACK -->
+    <!-- MODAL: ACCOUNT SETTINGS & FEEDBACK (Requirement 10: Left Avatar Layout & Click Zoom) -->
     <div id="settingsModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-slate-100 overflow-hidden max-h-[90vh] overflow-y-auto custom-scrollbar">
             <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
@@ -639,33 +705,34 @@
                     <i data-lucide="settings" class="w-5 h-5 text-slate-700"></i>
                     <h3 class="text-lg font-bold text-slate-800" data-i18n="titleAccountSettings">Account Settings</h3>
                 </div>
-                <!-- Language Switch EN / 繁 Button -->
                 <div class="flex items-center gap-3">
                     <button type="button" onclick="toggleLanguage()" class="px-2.5 py-1 text-xs font-bold rounded-lg border border-amber-500 text-amber-700 hover:bg-amber-50 transition shadow-sm flex items-center gap-1">
-                        <i data-lucide="languages" class="w-3.5 h-3.5"></i> <span id="langToggleBtnText">繁</span>
+                        <i data-lucide="languages" class="w-3.5 h-3.5"></i> <span class="langToggleBtnText">繁</span>
                     </button>
                     <button onclick="closeModal('settingsModal')" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-6 h-6"></i></button>
                 </div>
             </div>
 
             <form onsubmit="handleUserProfileUpdate(event)" class="p-6 space-y-4">
-                <div class="bg-blue-50 p-4 rounded-xl border border-blue-100 flex flex-col items-center text-center gap-3">
-                    <!-- ENLARGED / ZOOM OUT PROFILE ICON -->
-                    <div class="relative group cursor-pointer" onclick="document.getElementById('avatarFileInput').click()">
-                        <img id="settingsAvatarPreview" src="" class="w-24 h-24 rounded-full object-cover border-4 border-white shadow-md hidden" alt="Avatar Preview">
-                        <div id="settingsAvatarFallbackIcon" class="w-24 h-24 rounded-full bg-slate-200 border-4 border-white shadow-md flex items-center justify-center text-slate-500">
-                            <i data-lucide="user" class="w-12 h-12"></i>
+                <!-- Reverted Header Layout: Small Left PFP + Text Stack -->
+                <div class="bg-blue-50/70 p-4 rounded-xl border border-blue-100 flex items-center justify-between gap-3">
+                    <div class="flex items-center gap-3">
+                        <div class="relative cursor-pointer group" onclick="zoomProfilePicture()">
+                            <img id="settingsAvatarPreview" src="" class="w-12 h-12 rounded-full object-cover border-2 border-amber-400 shadow-sm hidden" alt="Avatar">
+                            <div id="settingsAvatarFallbackIcon" class="w-12 h-12 rounded-full bg-slate-200 border-2 border-slate-300 flex items-center justify-center text-slate-500">
+                                <i data-lucide="user" class="w-6 h-6"></i>
+                            </div>
+                            <div class="absolute inset-0 bg-black/20 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition text-white">
+                                <i data-lucide="zoom-in" class="w-4 h-4"></i>
+                            </div>
                         </div>
-                        <div class="absolute inset-0 bg-black/30 rounded-full flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition text-xs font-semibold">
-                            <i data-lucide="camera" class="w-5 h-5"></i>
+                        <div>
+                            <span class="text-[10px] uppercase tracking-wider text-slate-500 font-bold block" data-i18n="lblLoggedInAccount">Logged In Account</span>
+                            <span id="settingsCurrentUserName" class="text-base font-bold text-blue-900 leading-tight block">User</span>
                         </div>
                     </div>
                     <div>
-                        <span class="text-xs text-slate-500 block" data-i18n="lblLoggedInAccount">Logged In Account</span>
-                        <span id="settingsCurrentUserName" class="text-lg font-bold text-blue-900">User</span>
-                        <div class="mt-1">
-                            <span id="settingsCurrentUserRole" class="px-2.5 py-0.5 bg-blue-200 text-blue-800 text-xs font-bold rounded-full uppercase">Participant</span>
-                        </div>
+                        <span id="settingsCurrentUserRole" class="px-2.5 py-1 bg-blue-200 text-blue-800 text-xs font-extrabold rounded-full uppercase">Participant</span>
                     </div>
                 </div>
 
@@ -708,9 +775,15 @@
                     </div>
                 </div>
 
-                <!-- MOBILE LOGOUT BUTTON INSIDE ACCOUNT SETTINGS -->
+                <!-- Requirement 1: Delete Account Option -->
+                <div id="deleteAccountSection" class="pt-4 border-t border-slate-100">
+                    <button type="button" onclick="deleteSelfAccount()" class="w-full py-2 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 text-xs font-bold rounded-lg transition flex items-center justify-center gap-1.5">
+                        <i data-lucide="user-x" class="w-4 h-4"></i> <span data-i18n="btnDeleteAccount">Delete Account</span>
+                    </button>
+                </div>
+
                 <div id="mobileModalLogoutBlock" class="hidden pt-2">
-                    <button type="button" onclick="logout(); closeModal('settingsModal');" class="w-full py-2.5 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 text-xs font-bold rounded-lg transition flex items-center justify-center gap-2">
+                    <button type="button" onclick="logout(); closeModal('settingsModal');" class="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 text-xs font-bold rounded-lg transition flex items-center justify-center gap-2">
                         <i data-lucide="log-out" class="w-4 h-4"></i> <span data-i18n="btnSignOut">Sign Out</span>
                     </button>
                 </div>
@@ -719,6 +792,15 @@
                     <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 shadow" data-i18n="btnSaveChanges">Save Changes</button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- MODAL: PROFILE PICTURE ZOOM / ENLARGEMENT (Requirement 10) -->
+    <div id="pfpZoomModal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden" onclick="closeModal('pfpZoomModal')">
+        <div class="relative max-w-sm w-full flex flex-col items-center" onclick="event.stopPropagation()">
+            <button onclick="closeModal('pfpZoomModal')" class="absolute -top-10 right-0 text-white hover:text-slate-300"><i data-lucide="x" class="w-8 h-8"></i></button>
+            <img id="zoomedAvatarImg" src="" class="w-64 h-64 sm:w-80 sm:h-80 rounded-2xl object-cover border-4 border-white shadow-2xl">
+            <span id="zoomedAvatarName" class="mt-4 text-lg font-bold text-white tracking-wide"></span>
         </div>
     </div>
 
@@ -802,13 +884,14 @@
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpldnlxdnRnbGpoZndxbHRyYmd1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTExMjc1MzAsImV4cCI6MjEwNjcwMzUzMH0.O6IifPUuHuBdqdwEXTUypsJZN-GHaBh4iGLOFseKyZ8';
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // Language Translations Object (EN / 繁)
         let currentLang = localStorage.getItem('quiz_app_lang') || 'EN';
 
+        // Translation Dictionary
         const i18n = {
             EN: {
                 appSubtitle: "Interactive Bible Q&A Platform",
                 badgeCreationPhase: "Creation Phase",
+                badgePendingPhase: "Pending Phase (Locked)",
                 navDashboard: "Dashboard",
                 navMyQuestions: "My Questions",
                 navPastPaperVault: "Past Paper Vault",
@@ -816,8 +899,8 @@
                 navResults: "Results & Submissions",
                 navAchievements: "Achievements",
                 navControlCenter: "Control Center",
-                loginSubtitle: "Select account and log in to continue",
-                lblSelectAccount: "Select User Account",
+                loginSubtitle: "Enter account name and log in to continue",
+                lblAccountNameInput: "User Account Name",
                 lblPassword: "Password",
                 btnSignIn: "Sign In",
                 lblGuestHint: "Or test your bible knowledge instantly",
@@ -826,6 +909,14 @@
                 dashWelcomeText: "Welcome to Bible QuizCraft. Upload your questions confidentially during the Creation Phase. Once Host/Co-host publishes the quiz bank, test your Bible knowledge!",
                 btnManageQuestions: "Manage My Questions",
                 btnTakeQuiz: "Take Live Quiz",
+                btnPublishQuizBank: "Publish Quiz Bank",
+                btnUnpublishQuizBank: "Unpublish Quiz Bank",
+                btnPublishAllQuestions: "Publish All Questions",
+                dashBankIsLive: "Quiz Bank #{session} is Live",
+                dashCreationPhaseActive: "Creation Phase Active",
+                dashCreationPhaseSub: "You can upload and edit your questions. Other users cannot view your uploaded questions until published.",
+                dashPendingPhaseActive: "Pending Phase Active",
+                dashPendingPhaseSub: "Quiz is scheduled for publication shortly. Question creation and editing are now locked.",
                 statMyUploaded: "My Uploaded Questions",
                 statPublishedInBank: "Published Questions in Bank",
                 statLastScore: "Last Quiz Score",
@@ -833,12 +924,16 @@
                 titleMyRepo: "My Question Repository",
                 subMyRepo: "Questions you create remain confidential to your account until published.",
                 btnAddQuestion: "Add Question",
+                optAllTypes: "All Question Types",
                 titleVault: "Past Paper Vault",
                 subVault: "Historical question repository from past quiz sessions. Host can edit or republish for guest challenge.",
                 btnRepublishGuest: "Republish Guest Challenge",
                 btnEmptyHistory: "Empty History",
+                lblOriginalAuthor: "Original Author",
                 quizNotPublished: "Quiz is Not Published Yet",
                 quizNotPublishedSub: "Participants are currently uploading questions. The quiz will become available here once Host or Co-host publishes all questions.",
+                quizInPendingTitle: "Quiz In Pending Phase",
+                quizInPendingSub: "The quiz is scheduled to go live shortly! Prepare yourself.",
                 quizAnswerInstructions: "Answer all questions below and click submit to receive immediate scoring.",
                 questions: "Questions",
                 quizEnsureComplete: "Ensure all answers are completed before submitting.",
@@ -848,6 +943,7 @@
                 btnGoToQuiz: "Go to Quiz",
                 tagQuizCompleted: "Quiz Completed",
                 titleQuizResults: "Your Quiz Results",
+                titleGuestResults: "Your Result",
                 statCorrectAns: "Correct Answers",
                 statAccuracy: "Accuracy",
                 titleShareAchievements: "Share Your Achievements",
@@ -857,11 +953,14 @@
                 leaderboardHiddenSub: "Final user rankings and achievements will be displayed here once Host/Co-host unpublishes the Quiz Bank.",
                 titleLeaderboard: "Quiz Leaderboard & Achievements",
                 subLeaderboard: "Participant rankings based on accuracy and completion time.",
+                optCompositeJoined: "Composite (Joined Quizzes Only)",
+                optCompositeAll: "Composite (All Published Quizzes)",
                 colRank: "Rank",
                 colParticipant: "Participant",
                 colScoreAccuracy: "Score (Accuracy)",
                 colTimeSpent: "Time Spent",
                 colSubmittedTime: "SUBMITTED TIME",
+                colQuizzesTaken: "Quizzes Taken",
                 lblManagementPanel: "Management Panel",
                 titleControlCenter: "Control Center",
                 subControlCenter: "Publish questions, set due date/timer, or manage user roles.",
@@ -870,6 +969,12 @@
                 statActiveUsers: "Total Active Users",
                 titleHistRecords: "Historical Published Quiz Records",
                 subHistRecords: "Summary analytics across all published quiz sessions",
+                colSession: "Session",
+                colTotalQs: "Total Questions",
+                colParticipantsCount: "Participants",
+                colAvgPerf: "Avg Performance",
+                colAvgTimeSpent: "Avg Time Spent",
+                colChampion: "Champion",
                 btnResetRecords: "Reset Records",
                 titleUserMgmt: "User Account Management",
                 subUserMgmt: "Host can drag to reorder users, change roles, or add accounts.",
@@ -891,9 +996,11 @@
                 titleFeedbackInbox: "User Feedback Inbox",
                 titlePublishBank: "Publish Quiz Bank",
                 lblCountdownDuration: "Countdown Duration (Minutes) - Optional",
+                lblScheduledPublish: "Automatic Publication Schedule - Optional",
+                subScheduledPublish: "Quiz will automatically go live at this exact time. Enters 'Pending' phase 15 minutes prior.",
                 lblClosureDueDate: "Automatic Closure Due Date & Time - Optional",
                 subClosureDueDate: "The quiz will automatically close and unpublish when this deadline passes.",
-                btnPublishNow: "Publish Now",
+                btnPublishNow: "Save & Publish",
                 lblQType: "Question Type",
                 lblQPrompt: "Question Text / Prompt",
                 lblQExplanation: "Solution Explanation (Optional)",
@@ -907,6 +1014,7 @@
                 lblSendFeedback: "Send Feedback to Host & Co-host",
                 btnSendComment: "Send Comment",
                 btnViewFeedback: "View Feedback",
+                btnDeleteAccount: "Delete Account",
                 btnSignOut: "Sign Out",
                 btnSaveChanges: "Save Changes",
                 titleResetPassword: "Reset User Password",
@@ -914,11 +1022,15 @@
                 lblNewPassword: "New Password for User",
                 btnSavePassword: "Save Password",
                 titleAddAccount: "Add New User Account",
-                btnCreateAccount: "Create Account"
+                btnCreateAccount: "Create Account",
+                titleCommunityChatroom: "Community Chatroom",
+                subCommunityChatroom: "Live discussion & announcements",
+                btnTakeChallengeAgain: "Take Challenge Again"
             },
             繁: {
                 appSubtitle: "互動式聖經問答平台",
                 badgeCreationPhase: "題目籌備階段",
+                badgePendingPhase: "準備發布階段（已鎖定）",
                 navDashboard: "儀表板",
                 navMyQuestions: "我的題目",
                 navPastPaperVault: "歷屆試題庫",
@@ -926,8 +1038,8 @@
                 navResults: "測驗結果與紀錄",
                 navAchievements: "排行榜與成就",
                 navControlCenter: "控制中心",
-                loginSubtitle: "請選擇帳號並登入以繼續",
-                lblSelectAccount: "選擇使用者帳號",
+                loginSubtitle: "請輸入帳號名稱並登入以繼續",
+                lblAccountNameInput: "使用者帳號名稱",
                 lblPassword: "密碼",
                 btnSignIn: "登入帳號",
                 lblGuestHint: "或立即測試您的聖經知識",
@@ -936,6 +1048,14 @@
                 dashWelcomeText: "歡迎來到 Bible QuizCraft！在題目籌備階段，您上傳的題目將保持保密。待主持人發布測驗後即可開始測試聖經知識！",
                 btnManageQuestions: "管理我的題目",
                 btnTakeQuiz: "進行即時測驗",
+                btnPublishQuizBank: "發布測驗題庫",
+                btnUnpublishQuizBank: "取消發布題庫",
+                btnPublishAllQuestions: "發布所有題目",
+                dashBankIsLive: "第 #{session} 期測驗題庫已發布",
+                dashCreationPhaseActive: "題目籌備階段（進行中）",
+                dashCreationPhaseSub: "您可以上傳及編輯您的題目。在發布前，其他使用者無法檢視您上傳的題目。",
+                dashPendingPhaseActive: "準備發布階段（已鎖定）",
+                dashPendingPhaseSub: "測驗即將發布，目前題目新增與修改已全面鎖定。",
                 statMyUploaded: "我上傳的題目數",
                 statPublishedInBank: "題庫已發布題目數",
                 statLastScore: "最近一次測驗分數",
@@ -943,12 +1063,16 @@
                 titleMyRepo: "我的題目儲存庫",
                 subMyRepo: "您建立的題目在發布前將嚴格保持個人保密。",
                 btnAddQuestion: "新增題目",
+                optAllTypes: "所有題目類型",
                 titleVault: "歷屆試題庫",
                 subVault: "過往測驗的歷史題目庫。主持人可進行編輯或重新發布供訪客挑戰。",
                 btnRepublishGuest: "重新發布訪客挑戰",
                 btnEmptyHistory: "清空歷史紀錄",
+                lblOriginalAuthor: "原創作者",
                 quizNotPublished: "測驗尚未發布",
                 quizNotPublishedSub: "參與者目前正在上傳題目。待主持人或副主持人發布後，測驗將在此處開放。",
+                quizInPendingTitle: "測驗處於準備發布階段",
+                quizInPendingSub: "測驗即將開始！請做好預備。",
                 quizAnswerInstructions: "請回答以下所有題目，完成後點擊提交即可獲取即時評分。",
                 questions: "題",
                 quizEnsureComplete: "提交前請確保所有題目均已作答完畢。",
@@ -958,6 +1082,7 @@
                 btnGoToQuiz: "前往測驗",
                 tagQuizCompleted: "測驗已完成",
                 titleQuizResults: "您的測驗成績",
+                titleGuestResults: "您的測驗結果",
                 statCorrectAns: "答對題數",
                 statAccuracy: "正確率",
                 titleShareAchievements: "分享您的測驗成就",
@@ -967,11 +1092,14 @@
                 leaderboardHiddenSub: "待主持人/副主持人結束並取消發布測驗後，最終排名將在此顯示。",
                 titleLeaderboard: "測驗排行榜與成就",
                 subLeaderboard: "根據正確率及完成時間進行的參與者排名。",
+                optCompositeJoined: "綜合排名（僅限已參加的測驗）",
+                optCompositeAll: "綜合排名（所有已發布測驗）",
                 colRank: "名次",
                 colParticipant: "參與者",
                 colScoreAccuracy: "得分 (正確率)",
                 colTimeSpent: "所用時間",
                 colSubmittedTime: "提交時間",
+                colQuizzesTaken: "參加測驗數",
                 lblManagementPanel: "管理面板",
                 titleControlCenter: "控制中心",
                 subControlCenter: "發布題目、設定截止時間/計時器或管理使用者權限。",
@@ -980,6 +1108,12 @@
                 statActiveUsers: "活躍使用者總數",
                 titleHistRecords: "歷屆已發布測驗紀錄",
                 subHistRecords: "跨期測驗的綜合數據分析",
+                colSession: "期數",
+                colTotalQs: "總題目數",
+                colParticipantsCount: "參與人數",
+                colAvgPerf: "平均正確率",
+                colAvgTimeSpent: "平均所用時間",
+                colChampion: "最高分得主",
                 btnResetRecords: "重置紀錄",
                 titleUserMgmt: "使用者帳號管理",
                 subUserMgmt: "主持人可拖曳調整順序、變更身份權限或新增帳號。",
@@ -1001,9 +1135,11 @@
                 titleFeedbackInbox: "使用者意見回饋收件匣",
                 titlePublishBank: "發布測驗題庫",
                 lblCountdownDuration: "倒數計時限時 (分鐘) - 可選",
+                lblScheduledPublish: "預定自動發布時間 - 可選",
+                subScheduledPublish: "測驗將在此時間自動開放。發布前15分鐘自動進入「準備發布」鎖定狀態。",
                 lblClosureDueDate: "自動截止關閉時間 - 可選",
                 subClosureDueDate: "當到達此截止時間，測驗將自動結束並取消發布。",
-                btnPublishNow: "立即發布",
+                btnPublishNow: "儲存並設定發布",
                 lblQType: "題目類型",
                 lblQPrompt: "題目內容 / 敘述",
                 lblQExplanation: "解答說明 (可選)",
@@ -1017,6 +1153,7 @@
                 lblSendFeedback: "傳送意見回饋給主持人/副主持人",
                 btnSendComment: "發送留言",
                 btnViewFeedback: "檢視意見回饋",
+                btnDeleteAccount: "刪除帳號",
                 btnSignOut: "登出帳號",
                 btnSaveChanges: "儲存變更",
                 titleResetPassword: "重置使用者密碼",
@@ -1024,7 +1161,10 @@
                 lblNewPassword: "新密碼",
                 btnSavePassword: "儲存密碼",
                 titleAddAccount: "新增使用者帳號",
-                btnCreateAccount: "建立帳號"
+                btnCreateAccount: "建立帳號",
+                titleCommunityChatroom: "社群聊天室",
+                subCommunityChatroom: "即時交流與重要公告",
+                btnTakeChallengeAgain: "再次挑戰答題"
             }
         };
 
@@ -1032,6 +1172,7 @@
             currentLang = currentLang === 'EN' ? '繁' : 'EN';
             localStorage.setItem('quiz_app_lang', currentLang);
             applyLanguage();
+            renderCurrentView();
         }
 
         function applyLanguage() {
@@ -1040,8 +1181,10 @@
                 const key = el.getAttribute('data-i18n');
                 if (langData[key]) el.textContent = langData[key];
             });
-            const toggleBtnText = document.getElementById('langToggleBtnText');
-            if (toggleBtnText) toggleBtnText.textContent = currentLang === 'EN' ? '繁' : 'EN';
+            document.querySelectorAll('.langToggleBtnText').forEach(el => {
+                el.textContent = currentLang === 'EN' ? '繁' : 'EN';
+            });
+            syncPublishButtonsUI();
         }
 
         // Application State
@@ -1051,7 +1194,10 @@
         let submissions = {};
         let quizRecords = [];
         let feedbackComments = [];
+        let chatMessages = [];
         let isPublished = false;
+        let isPending = false;
+        let scheduledPublishTime = null;
         let quizDurationMins = 0;
         let quizDueDate = null;
         let currentQuizSession = 1;
@@ -1061,6 +1207,7 @@
         let quizStartTime = null;
         let draggedUserIndex = null;
         let tempAvatarBase64 = null;
+        let isAnnouncementMode = false;
         
         let isGuestMode = false;
         let guestChallengeConfig = {
@@ -1077,7 +1224,7 @@
 
         window.onload = async function() {
             await fetchCloudState();
-            checkAutoClosureDeadline();
+            checkScheduledPublishAndClosure();
             setupRealtimeSubscriptions();
             
             const savedCurrentUser = localStorage.getItem('quiz_current_user');
@@ -1087,13 +1234,12 @@
                 currentUser = freshUser || stored;
             }
 
-            populateLoginDropdown();
             applyMobileRules();
             applyLanguage();
             updateUI();
             lucide.createIcons();
 
-            setInterval(checkAutoClosureDeadline, 10000);
+            setInterval(checkScheduledPublishAndClosure, 5000);
             window.addEventListener('resize', applyMobileRules);
         };
 
@@ -1109,7 +1255,6 @@
             const desktopCols = document.querySelectorAll('.desktop-leaderboard-col');
             desktopCols.forEach(col => col.style.display = isMobile ? 'none' : 'table-cell');
 
-            // Requirement 1: Mobile UI Simplifications
             const headerLogoutBtn = document.getElementById('headerLogoutBtn');
             const mobileModalLogoutBlock = document.getElementById('mobileModalLogoutBlock');
             if (headerLogoutBtn && mobileModalLogoutBlock) {
@@ -1120,6 +1265,12 @@
                     headerLogoutBtn.classList.remove('hidden');
                     mobileModalLogoutBlock.classList.add('hidden');
                 }
+            }
+
+            const feedbackSec = document.getElementById('settingsFeedbackSection');
+            if (feedbackSec) {
+                if (isMobile) feedbackSec.classList.add('hidden');
+                else feedbackSec.classList.remove('hidden');
             }
 
             const desktopMgmtCols = document.querySelectorAll('.desktop-user-mgmt-col');
@@ -1150,7 +1301,9 @@
 
             const { data: stateData } = await _supabase.from('app_state').select('*').eq('id', 1).single();
             if (stateData) {
-                isPublished = stateData.is_published;
+                isPublished = stateData.is_published || false;
+                isPending = stateData.is_pending || false;
+                scheduledPublishTime = stateData.scheduled_publish_time || null;
                 quizDurationMins = stateData.duration_mins || 0;
                 quizDueDate = stateData.due_datetime || null;
                 currentQuizSession = stateData.current_quiz_session || 1;
@@ -1171,14 +1324,47 @@
             const { data: recData } = await _supabase.from('quiz_records').select('*').order('quiz_session_id', { ascending: false });
             if (recData) quizRecords = recData;
 
-            // Fetch Feedback Comments
             const { data: fbData } = await _supabase.from('feedback').select('*').order('created_at', { ascending: false });
             if (fbData) feedbackComments = fbData;
+
+            const { data: chatData } = await _supabase.from('chat_messages').select('*').order('created_at', { ascending: true });
+            if (chatData) chatMessages = chatData;
         }
 
-        function checkAutoClosureDeadline() {
+        // Requirement 3: Pending Phase & Auto-Closure Verification
+        async function checkScheduledPublishAndClosure() {
+            const now = new Date();
+
+            // 1. Check Scheduled Publication
+            if (!isPublished && scheduledPublishTime) {
+                const pubTime = new Date(scheduledPublishTime);
+                const diffMins = (pubTime - now) / (1000 * 60);
+
+                if (diffMins <= 0) {
+                    // Trigger live publication!
+                    isPublished = true;
+                    isPending = false;
+                    scheduledPublishTime = null;
+                    await _supabase.from('app_state').update({
+                        is_published: true,
+                        is_pending: false,
+                        scheduled_publish_time: null
+                    }).eq('id', 1);
+                    await fetchCloudState();
+                    updateUI();
+                    showToast(`Quiz #${currentQuizSession} is now LIVE!`, "success");
+                } else if (diffMins <= 15 && !isPending) {
+                    // Enter Pending Phase exactly 15 minutes before
+                    isPending = true;
+                    await _supabase.from('app_state').update({ is_pending: true }).eq('id', 1);
+                    await fetchCloudState();
+                    updateUI();
+                    showToast("Quiz entered 'Pending' phase. Questions repository is now locked.", "info");
+                }
+            }
+
+            // 2. Check Closure Deadline
             if (isPublished && quizDueDate) {
-                const now = new Date();
                 const deadline = new Date(quizDueDate);
                 if (now >= deadline) {
                     unpublishQuiz(true);
@@ -1190,38 +1376,31 @@
             _supabase.channel('public-db-changes')
                 .on('postgres_changes', { event: '*', schema: 'public' }, async () => {
                     await fetchCloudState();
-                    populateLoginDropdown();
                     updateUI();
+                    if (activeTab === 'dashboard') renderChatroom();
                 })
                 .subscribe();
         }
 
-        function populateLoginDropdown() {
-            const select = document.getElementById('loginUserSelect');
-            select.innerHTML = '';
-            users.forEach(u => {
-                const opt = document.createElement('option');
-                opt.value = u.name;
-                opt.textContent = `${u.name} (${u.role.toUpperCase()})`;
-                select.appendChild(opt);
-            });
-        }
-
+        // Requirement 5: Login with case-sensitive text input
         async function handleLogin(e) {
             e.preventDefault();
             isGuestMode = false;
-            const username = document.getElementById('loginUserSelect').value;
+            const typedName = document.getElementById('loginUserNameInput').value.trim();
             const passwordInput = document.getElementById('loginPassword').value;
 
-            const found = users.find(u => u.name === username);
+            // Case sensitive match
+            const found = users.find(u => u.name === typedName);
+
             if (!found || found.pass !== passwordInput) {
-                showToast("Invalid password!", "error");
+                showToast("Invalid user account name or password!", "error");
                 return;
             }
 
             currentUser = found;
             localStorage.setItem('quiz_current_user', JSON.stringify(currentUser));
             document.getElementById('loginPassword').value = '';
+            document.getElementById('loginUserNameInput').value = '';
             showToast(`Welcome back, ${currentUser.name}!`, "success");
             
             updateUI();
@@ -1316,47 +1495,50 @@
 
         function updateUI() {
             const userHeader = document.getElementById('userProfileHeader');
+            const guestHeader = document.getElementById('guestProfileHeader');
             const nav = document.getElementById('appNav');
 
             if (!currentUser) {
                 userHeader.classList.add('hidden');
+                guestHeader.classList.add('hidden');
                 nav.classList.add('hidden');
                 document.getElementById('view-login').classList.remove('hidden');
             } else {
-                userHeader.classList.remove('hidden');
-                
                 if (isGuestMode) {
+                    userHeader.classList.add('hidden');
+                    guestHeader.classList.remove('hidden');
                     nav.classList.add('hidden');
                 } else {
+                    userHeader.classList.remove('hidden');
+                    guestHeader.classList.add('hidden');
                     nav.classList.remove('hidden');
                 }
 
                 document.getElementById('view-login').classList.add('hidden');
 
-                document.getElementById('headerUserName').textContent = currentUser.name;
-                document.getElementById('headerUserRole').textContent = currentUser.role;
+                if (!isGuestMode) {
+                    document.getElementById('headerUserName').textContent = currentUser.name;
+                    document.getElementById('headerUserRole').textContent = currentUser.role;
 
-                const avatarImg = document.getElementById('headerUserAvatar');
-                const defaultIcon = document.getElementById('headerSettingsDefaultIcon');
+                    const avatarImg = document.getElementById('headerUserAvatar');
+                    const defaultIcon = document.getElementById('headerSettingsDefaultIcon');
 
-                if (currentUser.avatar_url) {
-                    avatarImg.src = currentUser.avatar_url;
-                    avatarImg.classList.remove('hidden');
-                    defaultIcon.classList.add('hidden');
-                } else {
-                    avatarImg.classList.add('hidden');
-                    defaultIcon.classList.remove('hidden');
+                    if (currentUser.avatar_url) {
+                        avatarImg.src = currentUser.avatar_url;
+                        avatarImg.classList.remove('hidden');
+                        defaultIcon.classList.add('hidden');
+                    } else {
+                        avatarImg.classList.add('hidden');
+                        defaultIcon.classList.remove('hidden');
+                    }
                 }
 
                 const hostNavBtn = document.getElementById('nav-host-controls');
-                const dashPublishBtn = document.getElementById('dashPublishBtn');
 
                 if (isHostOrCoHost() && !isGuestMode) {
                     hostNavBtn.classList.remove('hidden');
-                    dashPublishBtn.classList.remove('hidden');
                 } else {
                     hostNavBtn.classList.add('hidden');
-                    dashPublishBtn.classList.add('hidden');
                 }
 
                 syncPublishButtonsUI();
@@ -1370,43 +1552,70 @@
             lucide.createIcons();
         }
 
+        // Requirement 6: Ensure NO phase labels appear on Login or Guest Mode
         function syncPublishButtonsUI() {
+            const langData = i18n[currentLang] || i18n.EN;
             const dashPublishBtn = document.getElementById('dashPublishBtn');
             const dashPublishText = document.getElementById('dashPublishBtnText');
             const ctrlPublishText = document.getElementById('ctrlCenterPublishBtnText');
             const ctrlPublishBtn = document.getElementById('ctrlCenterPublishBtn');
             const badge = document.getElementById('publishingBadge');
 
+            // Hide status badge completely for Login & Guest Mode
+            if (!currentUser || isGuestMode) {
+                badge.classList.add('hidden');
+                return;
+            } else {
+                badge.classList.remove('hidden');
+            }
+
+            if (!isHostOrCoHost()) {
+                if (dashPublishBtn) dashPublishBtn.classList.add('hidden');
+            } else {
+                if (dashPublishBtn) dashPublishBtn.classList.remove('hidden');
+            }
+
             if (isPublished) {
-                dashPublishBtn.className = "bg-amber-600 hover:bg-amber-700 text-white px-4 py-2.5 rounded-lg font-semibold text-sm transition shadow flex items-center gap-2";
-                dashPublishText.textContent = currentLang === '繁' ? "取消發布題庫" : "Unpublish Quiz Bank";
+                if (dashPublishBtn) dashPublishBtn.className = "bg-amber-600 hover:bg-amber-700 text-white px-4 py-2.5 rounded-lg font-semibold text-sm transition shadow flex items-center gap-2";
+                if (dashPublishText) dashPublishText.textContent = langData.btnUnpublishQuizBank;
 
                 if (ctrlPublishBtn) {
                     ctrlPublishBtn.className = "px-5 py-3 rounded-xl font-bold text-sm shadow-lg transition flex items-center gap-2 bg-amber-600 hover:bg-amber-700 text-white";
-                    ctrlPublishText.textContent = currentLang === '繁' ? "取消發布題庫" : "Unpublish Quiz Bank";
+                    ctrlPublishText.textContent = langData.btnUnpublishQuizBank;
                 }
 
                 let dueText = quizDueDate ? ` | Due: ${new Date(quizDueDate).toLocaleString()}` : '';
                 badge.className = "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30";
                 badge.innerHTML = `<i data-lucide="check-circle" class="w-3.5 h-3.5"></i> Quiz #${currentQuizSession} Live${dueText}`;
-            } else {
-                dashPublishBtn.className = "bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-lg font-semibold text-sm transition shadow flex items-center gap-2";
-                dashPublishText.textContent = currentLang === '繁' ? "發布測驗題庫" : "Publish Quiz Bank";
+            } else if (isPending) {
+                if (dashPublishBtn) dashPublishBtn.className = "bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-lg font-semibold text-sm transition shadow flex items-center gap-2";
+                if (dashPublishText) dashPublishText.textContent = langData.btnPublishQuizBank;
 
                 if (ctrlPublishBtn) {
                     ctrlPublishBtn.className = "px-5 py-3 rounded-xl font-bold text-sm shadow-lg transition flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white";
-                    ctrlPublishText.textContent = currentLang === '繁' ? "發布所有題目" : "Publish All Questions";
+                    ctrlPublishText.textContent = langData.btnPublishAllQuestions;
+                }
+
+                badge.className = "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/30 text-amber-300 border border-amber-500/40";
+                badge.innerHTML = `<i data-lucide="clock" class="w-3.5 h-3.5"></i> <span data-i18n="badgePendingPhase">${langData.badgePendingPhase}</span>`;
+            } else {
+                if (dashPublishBtn) dashPublishBtn.className = "bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-lg font-semibold text-sm transition shadow flex items-center gap-2";
+                if (dashPublishText) dashPublishText.textContent = langData.btnPublishQuizBank;
+
+                if (ctrlPublishBtn) {
+                    ctrlPublishBtn.className = "px-5 py-3 rounded-xl font-bold text-sm shadow-lg transition flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white";
+                    ctrlPublishText.textContent = langData.btnPublishAllQuestions;
                 }
 
                 badge.className = "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/30";
-                badge.innerHTML = `<i data-lucide="clock" class="w-3.5 h-3.5"></i> <span data-i18n="badgeCreationPhase">Creation Phase</span>`;
+                badge.innerHTML = `<i data-lucide="clock" class="w-3.5 h-3.5"></i> <span data-i18n="badgeCreationPhase">${langData.badgeCreationPhase}</span>`;
             }
             lucide.createIcons();
         }
 
         function renderCurrentView() {
             if (!currentUser) return;
-            if (activeTab === 'dashboard') renderDashboard();
+            if (activeTab === 'dashboard') { renderDashboard(); renderChatroom(); }
             else if (activeTab === 'my-questions') renderMyQuestions();
             else if (activeTab === 'past-paper-vault') renderPastPaperVault();
             else if (activeTab === 'take-quiz') renderTakeQuiz();
@@ -1416,12 +1625,13 @@
         }
 
         function renderDashboard() {
+            const langData = i18n[currentLang] || i18n.EN;
             document.getElementById('dashUserName').textContent = currentUser.name;
 
             const myQs = questions.filter(q => q.author === currentUser.name);
             document.getElementById('statMyCount').textContent = myQs.length;
             document.getElementById('statPublishedCount').textContent = questions.length;
-            document.getElementById('statQuizStatus').textContent = isPublished ? `Quiz #${currentQuizSession} Live` : "Draft";
+            document.getElementById('statQuizStatus').textContent = isPublished ? `Quiz #${currentQuizSession} Live` : isPending ? "Pending" : "Draft";
 
             const userSubs = submissions[currentUser.name] || [];
             const latestSub = userSubs.find(s => s.quiz_session_id === currentQuizSession) || userSubs[userSubs.length - 1];
@@ -1434,18 +1644,29 @@
 
             const card = document.getElementById('dashStatusCard');
             if (isPublished) {
+                const titleStr = langData.dashBankIsLive.replace('{session}', currentQuizSession);
                 card.innerHTML = `
                     <div class="flex items-start gap-4">
                         <div class="p-3 bg-emerald-100 text-emerald-700 rounded-xl shrink-0"><i data-lucide="check-circle-2" class="w-6 h-6"></i></div>
                         <div class="space-y-1">
-                            <h4 class="font-bold text-slate-800">Quiz Bank #${currentQuizSession} is Live</h4>
+                            <h4 class="font-bold text-slate-800">${titleStr}</h4>
                             <p class="text-sm text-slate-600">
                                 ${quizDurationMins ? 'Timer limit: ' + quizDurationMins + ' minutes. ' : 'No timer limit. '}
                                 ${quizDueDate ? 'Due date: ' + new Date(quizDueDate).toLocaleString() : ''}
                             </p>
                             <button onclick="switchTab('take-quiz')" class="mt-3 inline-flex items-center gap-2 text-sm font-semibold text-blue-600 hover:text-blue-800">
-                                Take Quiz Now <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                                ${langData.btnTakeQuiz} <i data-lucide="arrow-right" class="w-4 h-4"></i>
                             </button>
+                        </div>
+                    </div>
+                `;
+            } else if (isPending) {
+                card.innerHTML = `
+                    <div class="flex items-start gap-4">
+                        <div class="p-3 bg-indigo-100 text-indigo-700 rounded-xl shrink-0"><i data-lucide="clock" class="w-6 h-6 animate-spin"></i></div>
+                        <div class="space-y-1">
+                            <h4 class="font-bold text-slate-800">${langData.dashPendingPhaseActive}</h4>
+                            <p class="text-sm text-slate-600">${langData.dashPendingPhaseSub}</p>
                         </div>
                     </div>
                 `;
@@ -1454,10 +1675,10 @@
                     <div class="flex items-start gap-4">
                         <div class="p-3 bg-amber-100 text-amber-700 rounded-xl shrink-0"><i data-lucide="info" class="w-6 h-6"></i></div>
                         <div class="space-y-1">
-                            <h4 class="font-bold text-slate-800">Creation Phase Active</h4>
-                            <p class="text-sm text-slate-600">You can upload and edit your questions. Other users cannot view your uploaded questions until published.</p>
+                            <h4 class="font-bold text-slate-800">${langData.dashCreationPhaseActive}</h4>
+                            <p class="text-sm text-slate-600">${langData.dashCreationPhaseSub}</p>
                             <button onclick="switchTab('my-questions')" class="mt-3 inline-flex items-center gap-2 text-sm font-semibold text-blue-600 hover:text-blue-800">
-                                Create Questions <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                                ${langData.btnManageQuestions} <i data-lucide="arrow-right" class="w-4 h-4"></i>
                             </button>
                         </div>
                     </div>
@@ -1465,9 +1686,127 @@
             }
         }
 
+        // Requirement 8 & 9: Chatroom Rendering & Announcement Pinning Logic
+        function renderChatroom() {
+            const historyContainer = document.getElementById('chatHistoryContainer');
+            const pinnedContainer = document.getElementById('pinnedAnnouncementsContainer');
+            const toggleBtnContainer = document.getElementById('announcementToggleBtnContainer');
+
+            if (isHostOrCoHost()) {
+                toggleBtnContainer.classList.remove('hidden');
+            } else {
+                toggleBtnContainer.classList.add('hidden');
+            }
+
+            // Filter Pinned Announcements (Max 2, latest 2 if more exist)
+            const announcements = chatMessages.filter(m => m.is_announcement);
+            const pinnedAnnouncements = announcements.slice(-2);
+
+            if (pinnedAnnouncements.length > 0) {
+                pinnedContainer.classList.remove('hidden');
+                pinnedContainer.innerHTML = pinnedAnnouncements.map(a => `
+                    <div class="bg-amber-100 border-l-4 border-amber-500 p-2.5 rounded-r-lg shadow-sm flex items-start justify-between gap-2">
+                        <div class="flex gap-2">
+                            <i data-lucide="pin" class="w-4 h-4 text-amber-600 shrink-0 mt-0.5"></i>
+                            <div>
+                                <div class="flex items-center gap-2 text-xs">
+                                    <span class="font-bold text-amber-900">${escapeHTML(a.username)}</span>
+                                    <span class="px-1.5 py-0.2 bg-amber-200 text-amber-800 text-[10px] font-bold rounded uppercase">ANNOUNCEMENT</span>
+                                    <span class="text-slate-400 text-[10px]">${new Date(a.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+                                </div>
+                                <p class="text-xs font-semibold text-slate-800 mt-0.5">${escapeHTML(a.text)}</p>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            } else {
+                pinnedContainer.classList.add('hidden');
+            }
+
+            if (chatMessages.length === 0) {
+                historyContainer.innerHTML = `<div class="text-center text-slate-400 text-xs py-10">No messages yet. Start the conversation!</div>`;
+                return;
+            }
+
+            historyContainer.innerHTML = chatMessages.map(m => {
+                const isMe = currentUser && m.username === currentUser.name;
+                const avatarTag = m.user_avatar ? `<img src="${m.user_avatar}" class="w-7 h-7 rounded-full object-cover border">` : `<div class="w-7 h-7 rounded-full bg-slate-300 flex items-center justify-center text-slate-600 font-bold text-xs">${m.username.charAt(0).toUpperCase()}</div>`;
+                const timeStr = new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+                if (m.is_announcement) {
+                    return `
+                        <div class="flex justify-center my-2">
+                            <div class="bg-amber-50 border border-amber-300 text-amber-900 p-3 rounded-2xl max-w-md w-full shadow-sm text-center space-y-1">
+                                <div class="flex items-center justify-center gap-1.5 text-xs font-bold text-amber-700">
+                                    <i data-lucide="mega-phone" class="w-3.5 h-3.5"></i> <span>ANNOUNCEMENT by ${escapeHTML(m.username)}</span>
+                                </div>
+                                <p class="text-sm font-semibold">${escapeHTML(m.text)}</p>
+                                <span class="text-[10px] text-amber-600 block">${timeStr}</span>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                return `
+                    <div class="flex gap-2.5 ${isMe ? 'flex-row-reverse' : 'flex-row'} items-end">
+                        ${avatarTag}
+                        <div class="max-w-[75%] space-y-1">
+                            <div class="text-[10px] text-slate-400 font-medium ${isMe ? 'text-right' : 'text-left'} px-1">${escapeHTML(m.username)}</div>
+                            <div class="p-3 rounded-2xl text-sm ${isMe ? 'bg-blue-600 text-white rounded-br-none shadow' : 'bg-white text-slate-800 rounded-bl-none border border-slate-200 shadow-sm'}">
+                                ${escapeHTML(m.text)}
+                            </div>
+                            <div class="text-[10px] text-slate-400 ${isMe ? 'text-right' : 'text-left'} px-1">${timeStr}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // Auto-scroll to bottom
+            setTimeout(() => {
+                historyContainer.scrollTop = historyContainer.scrollHeight;
+            }, 50);
+
+            lucide.createIcons();
+        }
+
+        function toggleAnnouncementMode() {
+            isAnnouncementMode = !isAnnouncementMode;
+            const lbl = document.getElementById('announcementToggleLabel');
+            const btn = document.getElementById('chatAnnouncementToggle');
+            if (isAnnouncementMode) {
+                lbl.textContent = "Pinned";
+                btn.className = "px-2.5 py-2 rounded-lg text-xs font-bold border border-amber-500 bg-amber-500 text-white transition flex items-center gap-1 shrink-0";
+            } else {
+                lbl.textContent = "Normal";
+                btn.className = "px-2.5 py-2 rounded-lg text-xs font-bold border border-amber-300 bg-amber-50 text-amber-700 hover:bg-amber-100 transition flex items-center gap-1 shrink-0";
+            }
+        }
+
+        async function handleSendChatMessage(e) {
+            e.preventDefault();
+            const input = document.getElementById('chatMessageInput');
+            const text = input.value.trim();
+            if (!text || !currentUser) return;
+
+            const newMsg = {
+                username: currentUser.name,
+                text: text,
+                user_avatar: currentUser.avatar_url || '',
+                is_announcement: isAnnouncementMode && isHostOrCoHost(),
+                created_at: new Date().toISOString()
+            };
+
+            await _supabase.from('chat_messages').insert(newMsg);
+            input.value = '';
+            await fetchCloudState();
+            renderChatroom();
+        }
+
+        // Requirement 3: Disable question repository during Published or Pending
         function renderMyQuestions() {
             const list = document.getElementById('myQuestionsList');
             const lockedNotice = document.getElementById('questionsLockedNotice');
+            const lockedNoticeText = document.getElementById('questionsLockedNoticeText');
             const addBtn = document.getElementById('addQBtn');
             const filterVal = document.getElementById('myQTypeFilter').value;
 
@@ -1476,10 +1815,13 @@
                 myQs = myQs.filter(q => q.type.toUpperCase() === filterVal);
             }
 
-            if (isPublished) {
+            if (isPublished || isPending) {
                 lockedNotice.classList.remove('hidden');
                 addBtn.disabled = true;
                 addBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                lockedNoticeText.innerHTML = isPending ? 
+                    "<strong>Quiz Phase Locked (Pending):</strong> The quiz is scheduled to be published shortly. Adding or editing questions is disabled." : 
+                    "<strong>Quiz Phase Locked:</strong> The quiz bank is published and active. Editing and adding questions is disabled.";
             } else {
                 lockedNotice.classList.add('hidden');
                 addBtn.disabled = false;
@@ -1506,7 +1848,7 @@
                             </span>
                             <span class="text-xs text-slate-400">Question #${idx + 1}</span>
                         </div>
-                        ${!isPublished ? `
+                        ${(!isPublished && !isPending) ? `
                             <div class="flex items-center gap-1">
                                 <button onclick="editQuestion('${q.id}')" class="p-1.5 text-slate-500 hover:text-blue-600 rounded hover:bg-slate-100"><i data-lucide="pencil" class="w-4 h-4"></i></button>
                                 <button onclick="deleteQuestion('${q.id}')" class="p-1.5 text-slate-500 hover:text-red-600 rounded hover:bg-slate-100"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
@@ -1523,6 +1865,7 @@
         }
 
         function renderPastPaperVault() {
+            const langData = i18n[currentLang] || i18n.EN;
             const list = document.getElementById('pastPaperVaultList');
             const clearBtn = document.getElementById('clearVaultBtn');
             const republishBtn = document.getElementById('republishGuestChallengeBtn');
@@ -1555,7 +1898,7 @@
                                 ${q.type === 'mcq' ? 'MCQ' : q.type === 'tf' ? 'True/False/Not Given' : q.type === 'fill' ? 'Fill Blank' : q.type === 'matching' ? 'Matching' : 'Ordering'}
                             </span>
                             <span class="text-xs font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded">Quiz #${q.quiz_session_id || 1}</span>
-                            <span class="text-xs text-slate-400">| Original Author: ${escapeHTML(q.author)}</span>
+                            <span class="text-xs text-slate-400">| ${langData.lblOriginalAuthor}: ${escapeHTML(q.author)}</span>
                         </div>
                         ${isHost ? `
                             <div class="flex items-center gap-1">
@@ -1624,11 +1967,12 @@
         }
 
         function renderAchievements() {
+            const langData = i18n[currentLang] || i18n.EN;
             const locked = document.getElementById('achievementsLockedScreen');
             const content = document.getElementById('achievementsContent');
             const filterSelect = document.getElementById('achievementFilterSelect');
 
-            if (isPublished && !isGuestMode) {
+            if ((isPublished || isPending) && !isGuestMode) {
                 locked.classList.remove('hidden');
                 content.classList.add('hidden');
                 return;
@@ -1640,8 +1984,8 @@
             const currentSelected = filterSelect.value || "COMPOSITE_JOINED";
 
             let optionsHTML = `
-                <option value="COMPOSITE_JOINED" ${currentSelected === 'COMPOSITE_JOINED' ? 'selected' : ''}>Composite (Joined Quizzes Only)</option>
-                <option value="COMPOSITE_ALL" ${currentSelected === 'COMPOSITE_ALL' ? 'selected' : ''}>Composite (All Published Quizzes)</option>
+                <option value="COMPOSITE_JOINED" ${currentSelected === 'COMPOSITE_JOINED' ? 'selected' : ''}>${langData.optCompositeJoined}</option>
+                <option value="COMPOSITE_ALL" ${currentSelected === 'COMPOSITE_ALL' ? 'selected' : ''}>${langData.optCompositeAll}</option>
             `;
             quizRecords.forEach(r => {
                 const optVal = `SESSION_${r.quiz_session_id}`;
@@ -1659,6 +2003,7 @@
         }
 
         function renderAchievementsTableOnly() {
+            const langData = i18n[currentLang] || i18n.EN;
             const table = document.getElementById('achievementsLeaderboardTable');
             const filterSelect = document.getElementById('achievementFilterSelect');
             const lastColHeader = document.getElementById('achievementsLastColHeader');
@@ -1668,7 +2013,7 @@
             let leaderboardData = [];
 
             if (selectedFilter.startsWith("SESSION_")) {
-                lastColHeader.textContent = currentLang === '繁' ? "提交時間" : "SUBMITTED TIME";
+                lastColHeader.textContent = langData.colSubmittedTime;
 
                 const sessId = parseInt(selectedFilter.replace("SESSION_", ""));
                 const sessRecord = quizRecords.find(r => r.quiz_session_id === sessId);
@@ -1695,7 +2040,7 @@
                 leaderboardData.sort((a, b) => b.accPerc - a.accPerc || a.time_taken_seconds - b.time_taken_seconds);
 
             } else if (selectedFilter === "COMPOSITE_JOINED") {
-                lastColHeader.textContent = currentLang === '繁' ? "參加測驗數" : "Quizzes Taken";
+                lastColHeader.textContent = langData.colQuizzesTaken;
 
                 const userGrouped = {};
                 allSubmissionsList.forEach(s => {
@@ -1713,7 +2058,7 @@
                     const N = u.totalN;
                     const Q = u.totalQ || 1;
                     const acc = Math.round((N / Q) * 100);
-                    const qUnit = u.joinedCount === 1 ? '1 Quiz' : `${u.joinedCount} Quizzes`;
+                    const qUnit = u.joinedCount === 1 ? `1 ${langData.questions}` : `${u.joinedCount} ${langData.questions}`;
                     return {
                         username: u.username,
                         user_avatar: u.user_avatar,
@@ -1728,7 +2073,7 @@
                 leaderboardData.sort((a, b) => b.accPerc - a.accPerc || a.time_taken_seconds - b.time_taken_seconds);
 
             } else if (selectedFilter === "COMPOSITE_ALL") {
-                lastColHeader.textContent = currentLang === '繁' ? "參加測驗數" : "Quizzes Taken";
+                lastColHeader.textContent = langData.colQuizzesTaken;
 
                 const grandTotalQAcrossAllPublished = quizRecords.reduce((sum, r) => sum + r.total_questions, 0);
 
@@ -1749,7 +2094,7 @@
                     const N = u.totalN;
                     const Q = u.totalQ || 1;
                     const acc = Math.round((N / Q) * 100);
-                    const qUnit = u.joinedCount === 1 ? '1 Quiz' : `${u.joinedCount} Quizzes`;
+                    const qUnit = u.joinedCount === 1 ? `1 ${langData.questions}` : `${u.joinedCount} ${langData.questions}`;
                     return {
                         username: u.username,
                         user_avatar: u.user_avatar,
@@ -1857,11 +2202,26 @@
 
         function renderTakeQuiz() {
             const notPub = document.getElementById('quizNotPublishedScreen');
+            const notPubTitle = document.getElementById('quizNotPublishedTitle');
+            const notPubSub = document.getElementById('quizNotPublishedSub');
             const container = document.getElementById('quizContainer');
+
+            if (isPending && !isGuestMode) {
+                notPub.classList.remove('hidden');
+                container.classList.add('hidden');
+                notPubTitle.setAttribute('data-i18n', 'quizInPendingTitle');
+                notPubSub.setAttribute('data-i18n', 'quizInPendingSub');
+                applyLanguage();
+                if (timerInterval) clearInterval(timerInterval);
+                return;
+            }
 
             if (!isPublished && !isGuestMode) {
                 notPub.classList.remove('hidden');
                 container.classList.add('hidden');
+                notPubTitle.setAttribute('data-i18n', 'quizNotPublished');
+                notPubSub.setAttribute('data-i18n', 'quizNotPublishedSub');
+                applyLanguage();
                 if (timerInterval) clearInterval(timerInterval);
                 return;
             }
@@ -2245,7 +2605,6 @@
                 const roleBadge = document.getElementById('settingsCurrentUserRole');
                 roleBadge.textContent = currentUser.role;
 
-                // Requirement 2: Enlarged / Zoom out icon display logic
                 const avatarPrev = document.getElementById('settingsAvatarPreview');
                 const fallbackIcon = document.getElementById('settingsAvatarFallbackIcon');
                 
@@ -2271,10 +2630,48 @@
             }
             document.getElementById(modalId).classList.remove('hidden');
             applyLanguage();
+            applyMobileRules();
         }
 
         function closeModal(modalId) {
             document.getElementById(modalId).classList.add('hidden');
+        }
+
+        // Requirement 10: Profile Picture Enlargement / Zoom
+        function zoomProfilePicture() {
+            if (!currentUser) return;
+            const zoomedImg = document.getElementById('zoomedAvatarImg');
+            const zoomedName = document.getElementById('zoomedAvatarName');
+            
+            if (currentUser.avatar_url) {
+                zoomedImg.src = currentUser.avatar_url;
+            } else {
+                zoomedImg.src = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 24 24' fill='none' stroke='%23cbd5e1' stroke-width='2'><path d='M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2'/><circle cx='12' cy='7' r='4'/></svg>";
+            }
+            zoomedName.textContent = currentUser.name;
+            openModal('pfpZoomModal');
+        }
+
+        // Requirement 1: Permanent Account Deletion Logic
+        async function deleteSelfAccount() {
+            if (!currentUser || isGuestMode) return;
+            if (!confirm(`Are you sure you want to PERMANENTLY DELETE your account (${currentUser.name})?\n\n- Your Leaderboard ranking & history will be removed.\n- Your previously created questions will be KEPT in the shared bank.`)) {
+                return;
+            }
+
+            const targetName = currentUser.name;
+
+            // 1. Delete user submissions (removes leaderboard ranking and historical records)
+            await _supabase.from('submissions').delete().eq('username', targetName);
+
+            // 2. Delete app user record
+            await _supabase.from('app_users').delete().eq('name', targetName);
+
+            // Notice: Previously created questions in 'questions' table are preserved
+
+            closeModal('settingsModal');
+            showToast("Your account and leaderboard records have been deleted.", "info");
+            logout();
         }
 
         async function submitUserFeedback() {
@@ -2294,7 +2691,6 @@
             await fetchCloudState();
         }
 
-        // Requirement 3 & 4: Fix Host/Co-host View Feedback & Delete Comment functionality
         async function openViewFeedbackModal() {
             closeModal('settingsModal');
             await fetchCloudState();
@@ -2345,21 +2741,61 @@
             }
         }
 
+        // Requirement 2: Confirm publish with separate date/time inputs
         async function confirmPublishQuiz(e) {
             e.preventDefault();
             const duration = parseInt(document.getElementById('quizDurationInput').value) || 0;
-            const dueDateVal = document.getElementById('quizDueDateInput').value || null;
+
+            const pubDate = document.getElementById('quizPublishDateInput').value;
+            const pubTime = document.getElementById('quizPublishTimeInput').value;
+            const dueDate = document.getElementById('quizDueDateDateInput').value;
+            const dueTime = document.getElementById('quizDueDateTimeInput').value;
+
+            let scheduledPubISO = null;
+            if (pubDate && pubTime) {
+                scheduledPubISO = new Date(`${pubDate}T${pubTime}`).toISOString();
+            }
+
+            let quizDueISO = null;
+            if (dueDate && dueTime) {
+                quizDueISO = new Date(`${dueDate}T${dueTime}`).toISOString();
+            }
+
+            const now = new Date();
+            let shouldBeLive = true;
+            let shouldBePending = false;
+
+            if (scheduledPubISO) {
+                const pTime = new Date(scheduledPubISO);
+                const diffMins = (pTime - now) / (1000 * 60);
+
+                if (diffMins > 0) {
+                    shouldBeLive = false;
+                    if (diffMins <= 15) {
+                        shouldBePending = true;
+                    }
+                }
+            }
 
             await _supabase.from('app_state').update({
-                is_published: true,
+                is_published: shouldBeLive,
+                is_pending: shouldBePending,
+                scheduled_publish_time: scheduledPubISO,
                 duration_mins: duration,
-                due_datetime: dueDateVal ? new Date(dueDateVal).toISOString() : null
+                due_datetime: quizDueISO
             }).eq('id', 1);
 
             await fetchCloudState();
             closeModal('publishModal');
             updateUI();
-            showToast(`Quiz #${currentQuizSession} Published successfully!`, "success");
+
+            if (shouldBeLive) {
+                showToast(`Quiz #${currentQuizSession} Published Live successfully!`, "success");
+            } else if (shouldBePending) {
+                showToast(`Scheduled! Quiz entered 'Pending' phase (Live in <15 mins).`, "info");
+            } else {
+                showToast(`Quiz scheduled for ${new Date(scheduledPubISO).toLocaleString()}!`, "info");
+            }
         }
 
         async function unpublishQuiz(isAutoClose = false) {
@@ -2380,6 +2816,8 @@
             const nextSession = currentQuizSession + 1;
             await _supabase.from('app_state').update({
                 is_published: false,
+                is_pending: false,
+                scheduled_publish_time: null,
                 duration_mins: 0,
                 due_datetime: null,
                 current_quiz_session: nextSession
@@ -2399,7 +2837,6 @@
             const isHost = currentUser.role === 'host';
             const isMobile = isMobileView();
             
-            // Mobile simplified view rules
             document.getElementById('hostAddAccountBtn').style.display = (isHost && !isMobile) ? 'flex' : 'none';
             document.getElementById('resetQuizRecordsBtn').style.display = isHost ? 'flex' : 'none';
 
@@ -2408,9 +2845,12 @@
             if (isPublished) {
                 statusTxt.textContent = `Published & Live (Quiz #${currentQuizSession})`;
                 statusTxt.className = "text-xl font-bold text-emerald-600 mt-1";
+            } else if (isPending) {
+                statusTxt.textContent = "Pending Phase (Locked)";
+                statusTxt.className = "text-xl font-bold text-amber-600 mt-1";
             } else {
                 statusTxt.textContent = "Unpublished (Creation Phase)";
-                statusTxt.className = "text-xl font-bold text-amber-600 mt-1";
+                statusTxt.className = "text-xl font-bold text-slate-600 mt-1";
             }
 
             const recordsTable = document.getElementById('quizRecordsTableBody');
@@ -2485,16 +2925,21 @@
             lucide.createIcons();
         }
 
+        // Requirement 4: Reset Records also resets Quiz Number (Quiz ##)
         async function resetQuizRecords() {
             if (currentUser.role !== 'host') return;
-            if (!confirm("Are you sure you want to clear ALL historical published quiz records AND user leaderboard submissions?")) return;
+            if (!confirm("Are you sure you want to clear ALL historical published quiz records, user submissions, AND reset Quiz Number back to #1?")) return;
 
             await _supabase.from('quiz_records').delete().neq('quiz_session_id', 0);
             await _supabase.from('submissions').delete().neq('username', '___DUMMY___');
 
+            // Reset Quiz Session Counter back to 1
+            await _supabase.from('app_state').update({ current_quiz_session: 1 }).eq('id', 1);
+
             await fetchCloudState();
             renderHostControls();
-            showToast("Historical quiz records and leaderboard submissions have been completely reset.", "info");
+            updateUI();
+            showToast("Historical quiz records, leaderboard submissions, and Quiz Session Number reset to #1.", "info");
         }
 
         function handleDragStart(e, index) { draggedUserIndex = index; }
@@ -2522,6 +2967,8 @@
 
         async function handleSaveQuestion(e) {
             e.preventDefault();
+            if (isPending || isPublished) return showToast("Question repository is locked during pending/published phase.", "error");
+
             const id = document.getElementById('qId').value;
             const type = document.getElementById('qType').value;
             const prompt = document.getElementById('qPrompt').value.trim();
@@ -2899,9 +3346,12 @@
             return `${yyyy}/${mm}/${dd}, ${formattedHours}:${minutes}:${seconds} ${ampm}`;
         }
 
+        // Requirement 7: Guest Post-Submission Screen Adjustments
         function renderResults() {
             const noRes = document.getElementById('noResultsScreen');
             const resContent = document.getElementById('resultsContent');
+            const guestRetakeBox = document.getElementById('guestRetakeBox');
+            const resultsTitleHeader = document.getElementById('resultsTitleHeader');
             const userSubs = submissions[currentUser.name] || [];
             const targetSess = isGuestMode ? 999999 : currentQuizSession;
             const userSub = userSubs.find(s => s.quiz_session_id === targetSess) || userSubs[userSubs.length - 1];
@@ -2914,6 +3364,16 @@
 
             noRes.classList.add('hidden');
             resContent.classList.remove('hidden');
+
+            if (isGuestMode) {
+                guestRetakeBox.classList.remove('hidden');
+                resultsTitleHeader.setAttribute('data-i18n', 'titleGuestResults');
+            } else {
+                guestRetakeBox.classList.add('hidden');
+                resultsTitleHeader.setAttribute('data-i18n', 'titleQuizResults');
+            }
+
+            applyLanguage();
 
             document.getElementById('resultScoreFraction').textContent = `${userSub.score} / ${userSub.total}`;
             document.getElementById('resultPercentage').textContent = `${userSub.percentage}%`;
@@ -2938,6 +3398,10 @@
                 `;
             }).join('');
             lucide.createIcons();
+        }
+
+        function retakeGuestChallenge() {
+            startGuestMode();
         }
 
         function renderSolutionDetail(q, ansObj) {
