@@ -3708,8 +3708,13 @@
             const guestRetakeBox = document.getElementById('guestRetakeBox');
             const resultsTitleHeader = document.getElementById('resultsTitleHeader');
             const userSubs = submissions[currentUser.name] || [];
+            
+            // Robust fallback: try exact session match, otherwise sort by latest timestamp to grab the most recent submission
             const targetSess = isGuestMode ? 999999 : currentQuizSession;
-            const userSub = userSubs.find(s => s.quiz_session_id === targetSess) || userSubs[userSubs.length - 1];
+            let userSub = userSubs.find(s => s.quiz_session_id === targetSess);
+            if (!userSub && userSubs.length > 0) {
+                userSub = userSubs.slice().sort((a, b) => new Date(b.timestamp || 0) - new Date(a.timestamp || 0))[0];
+            }
 
             if (!userSub) {
                 noRes.classList.remove('hidden');
