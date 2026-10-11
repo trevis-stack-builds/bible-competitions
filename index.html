@@ -105,7 +105,7 @@
 
     <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
 
-        <!-- HTML 1: VIEW: LOGIN -->
+        <!-- VIEW: LOGIN -->
         <section id="view-login" class="max-w-md mx-auto my-8 sm:my-12 bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden hidden">
             <div class="bg-slate-900 p-8 text-center text-white relative">
                 <div class="w-16 h-16 bg-amber-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg shadow-amber-500/30">
@@ -247,25 +247,22 @@
                     <select id="myQTypeFilter" onchange="renderMyQuestions()" class="px-3 py-2 rounded-lg border border-slate-300 text-xs font-semibold bg-white shadow-sm focus:ring-2 focus:ring-blue-500">
                         <option value="ALL" data-i18n="optAllTypes">All Question Types</option>
                         <option value="MCQ">MCQ</option>
-                        <option value="TF">TRUE / FALSE / NOT GIVEN</option>
-                        <option value="FILL">FILL BLANK</option>
+                        <option value="TFNGQ">TFNGQ</option>
+                        <option value="FILL_BLANK">FILL_BLANK</option>
                         <option value="MATCHING">MATCHING</option>
                         <option value="ORDERING">ORDERING</option>
                     </select>
 
-                    <div class="desktop-batch-tools flex items-center gap-2">
-                        <button onclick="downloadBatchTemplate('mcq')" class="bg-slate-800 hover:bg-slate-900 text-white px-3 py-2 rounded-lg font-medium text-xs shadow transition flex items-center gap-1.5" title="Export MCQ Questions to Excel">
-                            <i data-lucide="download" class="w-3.5 h-3.5"></i> MCQ (.xlsx)
+                    <div class="flex items-center gap-2">
+                        <button onclick="downloadUnifiedBatchExcel()" class="bg-slate-800 hover:bg-slate-900 text-white px-3 py-2 rounded-lg font-medium text-xs shadow transition flex items-center gap-1.5" title="Export Questions in Unified Format">
+                            <i data-lucide="download" class="w-3.5 h-3.5"></i> Single Batch Download
                         </button>
-                        <button onclick="downloadBatchTemplate('fill')" class="bg-slate-800 hover:bg-slate-900 text-white px-3 py-2 rounded-lg font-medium text-xs shadow transition flex items-center gap-1.5" title="Export Fill Blank Questions to Excel">
-                            <i data-lucide="download" class="w-3.5 h-3.5"></i> Fill Blank (.xlsx)
+                        <button onclick="downloadUnifiedTemplate()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-lg font-medium text-xs shadow transition flex items-center gap-1.5" title="Download Clean Pre-Formatted Blank Template CSV">
+                            <i data-lucide="file-spreadsheet" class="w-3.5 h-3.5"></i> Download Template
                         </button>
-                        <button onclick="downloadBatchTemplate('ordering')" class="bg-slate-800 hover:bg-slate-900 text-white px-3 py-2 rounded-lg font-medium text-xs shadow transition flex items-center gap-1.5" title="Export Ordering Questions to Excel">
-                            <i data-lucide="download" class="w-3.5 h-3.5"></i> Ordering (.xlsx)
-                        </button>
-                        <label class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg font-medium text-xs shadow transition flex items-center gap-1.5 cursor-pointer">
-                            <i data-lucide="file-up" class="w-3.5 h-3.5"></i> Batch Upload
-                            <input type="file" id="batchFileInput" accept=".xlsx, .xls, .csv, .numbers, .gsheet" onchange="handleBatchFileUpload(event)" class="hidden">
+                        <label class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg font-medium text-xs shadow transition flex items-center gap-1.5 cursor-pointer" title="Import Unified Spreadsheet">
+                            <i data-lucide="file-up" class="w-3.5 h-3.5"></i> Single Batch Upload
+                            <input type="file" id="batchFileInput" accept=".xlsx, .xls, .csv, .txt, .numbers, .gsheet" onchange="handleBatchFileUpload(event)" class="hidden">
                         </label>
                     </div>
 
@@ -1219,7 +1216,11 @@
 
         // JavaScript 2
         window.onload = async function() {
-            // Restore session immediately to prevent login flash const savedCurrentUser = localStorage.getItem('quiz_current_user'); if (savedCurrentUser) { currentUser = JSON.parse(savedCurrentUser); activeTab = localStorage.getItem('quiz_active_tab') || 'dashboard'; }
+            const savedCurrentUser = localStorage.getItem('quiz_current_user'); 
+            if (savedCurrentUser) { 
+                currentUser = JSON.parse(savedCurrentUser); 
+                activeTab = localStorage.getItem('quiz_active_tab') || 'dashboard'; 
+            }
             
             await fetchCloudState();
             checkScheduledPublishAndClosure();
@@ -1228,7 +1229,7 @@
             applyMobileRules();
             applyLanguage();
             updateUI();
-            renderChatroom(); // Ensure chat messages are rendered immediately
+            renderChatroom();
             lucide.createIcons();
 
             setInterval(checkScheduledPublishAndClosure, 5000);
@@ -1237,9 +1238,6 @@
 
         function applyMobileRules() {
             const isMobile = isMobileView();
-            
-            const desktopBatchTools = document.querySelectorAll('.desktop-batch-tools');
-            desktopBatchTools.forEach(el => el.style.display = isMobile ? 'none' : 'flex');
 
             const hostHistBlock = document.getElementById('hostHistoricalRecordsBlock');
             if (hostHistBlock) hostHistBlock.style.display = isMobile ? 'none' : 'block';
@@ -1317,10 +1315,8 @@
             const { data: recData } = await _supabase.from('quiz_records').select('*').order('quiz_session_id', { ascending: false });
             if (recData) quizRecords = recData;
 
-            // --- ADD THIS BLOCK TO FETCH FEEDBACK FROM SUPABASE ---
             const { data: fbData } = await _supabase.from('feedback').select('*').order('created_at', { ascending: false });
             if (fbData) feedbackComments = fbData;
-            // -----------------------------------------------------
 
             const { data: chatData } = await _supabase.from('chat_messages').select('*').order('created_at', { ascending: true });
             if (chatData) chatMessages = chatData;
@@ -1765,14 +1761,15 @@
         }
 
         async function clearAllChatHistory() {
-            if (!currentUser || currentUser.role !== 'host') return;
-            if (!confirm("Are you sure you want to clear ALL chat messages and announcements from the chatroom board?")) return;
+	    if (!currentUser || currentUser.role !== 'host') return;
+	    if (!confirm("Are you sure you want to clear ALL chat messages and announcements from the chatroom board?")) return;
 
-            await _supabase.from('chat_messages').delete().neq('id', 0);
-            await fetchCloudState();
-            renderChatroom();
-            showToast("All chat history cleared successfully.", "info");
-        }
+	    // Replace .neq('id', 0) with a universal condition compatible with UUID/Int IDs
+	    await _supabase.from('chat_messages').delete().not('id', 'is', null);
+	    await fetchCloudState();
+	    renderChatroom();
+	    showToast("All chat history cleared successfully.", "info");
+	}
 
         function toggleAnnouncementMode() {
             isAnnouncementMode = !isAnnouncementMode;
@@ -1817,7 +1814,15 @@
 
             let myQs = questions.filter(q => q.author === currentUser.name);
             if (filterVal !== 'ALL') {
-                myQs = myQs.filter(q => q.type.toUpperCase() === filterVal);
+                myQs = myQs.filter(q => {
+                    const qt = (q.type || '').toUpperCase();
+                    if (filterVal === 'MCQ') return qt === 'MCQ';
+                    if (filterVal === 'TFNGQ') return qt === 'TF' || qt === 'TFNGQ';
+                    if (filterVal === 'FILL_BLANK') return qt === 'FILL' || qt === 'FILL_BLANK';
+                    if (filterVal === 'MATCHING') return qt === 'MATCHING';
+                    if (filterVal === 'ORDERING') return qt === 'ORDERING';
+                    return qt === filterVal;
+                });
             }
 
             if (isPublished || isPending) {
@@ -1849,7 +1854,7 @@
                     <div class="flex justify-between items-start gap-4">
                         <div class="flex items-center gap-2">
                             <span class="px-2.5 py-1 bg-slate-100 text-slate-700 font-bold text-xs rounded-md uppercase">
-                                ${q.type === 'mcq' ? 'MCQ' : q.type === 'tf' ? 'True/False/Not Given' : q.type === 'fill' ? 'Fill Blank' : q.type === 'matching' ? 'Matching' : 'Ordering'}
+                                ${q.type === 'mcq' ? 'MCQ' : q.type === 'tf' ? 'TFNGQ' : q.type === 'fill' ? 'FILL_BLANK' : q.type === 'matching' ? 'MATCHING' : 'ORDERING'}
                             </span>
                             <span class="text-xs text-slate-400">Question #${idx + 1}</span>
                         </div>
@@ -1900,7 +1905,7 @@
                     <div class="flex justify-between items-start gap-4">
                         <div class="flex items-center gap-2">
                             <span class="px-2.5 py-1 bg-amber-100 text-amber-800 font-bold text-xs rounded-md uppercase">
-                                ${q.type === 'mcq' ? 'MCQ' : q.type === 'tf' ? 'True/False/Not Given' : q.type === 'fill' ? 'Fill Blank' : q.type === 'matching' ? 'Matching' : 'Ordering'}
+                                ${q.type === 'mcq' ? 'MCQ' : q.type === 'tf' ? 'TFNGQ' : q.type === 'fill' ? 'FILL_BLANK' : q.type === 'matching' ? 'MATCHING' : 'ORDERING'}
                             </span>
                             <span class="text-xs font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded">Quiz #${q.quiz_session_id || 1}</span>
                             <span class="text-xs text-slate-400">| ${langData.lblOriginalAuthor}: ${escapeHTML(q.author)}</span>
@@ -2363,54 +2368,69 @@
             return '';
         }
 
-        function downloadBatchTemplate(type) {
-            let data = [];
-            let filename = "";
+        // ==========================================
+        // REFACTORED BATCH UPLOAD/DOWNLOAD & TEMPLATE GENERATOR
+        // ==========================================
 
-            if (type === 'mcq') {
-                filename = "MCQ_Batch_Questions.xlsx";
-                data.push(["{Q_id}", "{Q_type}", "{Q_msg}", "{Option_A}", "{Option_B}", "{Option_C}", "{Option_D}", "{A_msg}", "{Soln_exp}", "{Actn}"]);
-                const myMcqs = questions.filter(q => q.author === currentUser.name && q.type === 'mcq');
-                if (myMcqs.length > 0) {
-                    myMcqs.forEach((q, i) => {
-                        const correctLetter = String.fromCharCode(65 + parseInt(q.correctAnswer));
-                        data.push([i + 1, "MCQ", q.prompt, q.options[0]||"", q.options[1]||"", q.options[2]||"", q.options[3]||"", correctLetter, q.explanation||"", "U"]);
-                    });
-                } else {
-                    data.push([1, "MCQ", "Which book comes first in the Bible?", "Genesis", "Exodus", "Leviticus", "Numbers", "A", "Genesis is the first book.", "A"]);
-                }
-            } else if (type === 'fill') {
-                filename = "FillBlank_Batch_Questions.xlsx";
-                data.push(["{Q_id}", "{Q_type}", "{Q_msg}", "{A_msg}", "{Soln_exp}", "{Actn}"]);
-                const myFills = questions.filter(q => q.author === currentUser.name && q.type === 'fill');
-
-                if (myFills.length > 0) {
-                    myFills.forEach((q, i) => {
-                        data.push([i + 1, "FILL BLANK", q.prompt, q.correctAnswer, q.explanation||"", "U"]);
-                    });
-                } else {
-                    data.push([1, "FILL BLANK", "Jesus was born in ____.", "Bethlehem", "Micah 5:2 prophecies Jesus birth in Bethlehem.", "A"]);
-                }
-            } else if (type === 'ordering') {
-                filename = "Ordering_Batch_Questions.xlsx";
-                data.push(["{Q_id}", "{Q_type}", "{Q_msg}", "{A_msg}", "{Soln_exp}", "{Actn}"]);
-                const myOrderings = questions.filter(q => q.author === currentUser.name && q.type === 'ordering');
-
-                if (myOrderings.length > 0) {
-                    myOrderings.forEach((q, i) => {
-                        const sequence = Array.isArray(q.orderedItems) ? q.orderedItems.join('|') : q.correctAnswer;
-                        data.push([i + 1, "ORDERING", q.prompt, sequence, q.explanation||"", "U"]);
-                    });
-                } else {
-                    data.push([1, "ORDERING", "Arrange the first 4 books of the Old Testament in chronological order.", "Genesis|Exodus|Leviticus|Numbers", "The Pentateuch sequence.", "A"]);
-                }
-            }
+        function downloadUnifiedTemplate() {
+            const data = [
+                ["{Q_id}", "{Q_type}", "{Q_msg}", "{Choice_Pool}", "{A_msg}", "{Soln_exp}", "{Actn}"],
+                [101, "MCQ", "Which book comes first in the New Testament?", "Matthew|Mark|Luke|John", "A", "Matthew is the first Gospel.", "A"],
+                [102, "TFNGQ", "King David committed no sins in his entire life.", "True|False|Not Given", "False", "David committed grave sins such as adultery.", "A"],
+                [103, "FILL_BLANK", "Jesus was born in the town of ____.", "", "Bethlehem", "Prophesied in Micah 5:2.", "A"],
+                [104, "MATCHING", "Match each apostle to their symbolic identifier.", "Peter|Paul|John|Matthew", "Rock|Epistles Writer|Revelation Visionary|Tax Collector", "Apostolic traditions and writings.", "A"],
+                [105, "ORDERING", "Arrange the following major Old Testament prophets in chronological order.", "Isaiah|Jeremiah|Ezekiel|Daniel", "Isaiah|Jeremiah|Ezekiel|Daniel", "Chronological prophetic timeline.", "A"]
+            ];
 
             const ws = XLSX.utils.aoa_to_sheet(data);
             const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Questions");
-            XLSX.writeFile(wb, filename);
-            showToast(`Exported ${type.toUpperCase()} template successfully!`, "success");
+            XLSX.utils.book_append_sheet(wb, ws, "Template");
+            XLSX.writeFile(wb, "Bible_QuizCraft_Unified_Template.csv");
+            showToast("Clean template CSV generated and downloaded successfully!", "success");
+        }
+
+        function downloadUnifiedBatchExcel() {
+            const myQs = questions.filter(q => q.author === currentUser.name);
+            const data = [
+                ["{Q_id}", "{Q_type}", "{Q_msg}", "{Choice_Pool}", "{A_msg}", "{Soln_exp}", "{Actn}"]
+            ];
+
+            myQs.forEach((q, idx) => {
+                const qId = 101 + idx;
+                const qType = q.type === 'mcq' ? 'MCQ' : q.type === 'tf' ? 'TFNGQ' : q.type === 'fill' ? 'FILL_BLANK' : q.type === 'matching' ? 'MATCHING' : 'ORDERING';
+                const qMsg = q.prompt || '';
+                let choicePool = '';
+                let aMsg = '';
+                const solnExp = q.explanation || '';
+                const actn = 'U';
+
+                if (q.type === 'mcq') {
+                    choicePool = (q.options || []).join('|');
+                    const cIdx = parseInt(q.correctAnswer);
+                    aMsg = !isNaN(cIdx) ? String.fromCharCode(65 + cIdx) : 'A';
+                } else if (q.type === 'tf') {
+                    choicePool = 'True|False|Not Given';
+                    aMsg = q.correctAnswer === 'true' ? 'True' : q.correctAnswer === 'false' ? 'False' : 'Not Given';
+                } else if (q.type === 'fill') {
+                    choicePool = '';
+                    aMsg = q.correctAnswer || '';
+                } else if (q.type === 'matching') {
+                    choicePool = (q.pairs || []).map(p => p.item).join('|');
+                    aMsg = (q.pairs || []).map(p => p.match).join('|');
+                } else if (q.type === 'ordering') {
+                    const items = Array.isArray(q.orderedItems) ? q.orderedItems : (q.correctAnswer ? q.correctAnswer.split('|') : []);
+                    choicePool = items.join('|');
+                    aMsg = items.join('|');
+                }
+
+                data.push([qId, qType, qMsg, choicePool, aMsg, solnExp, actn]);
+            });
+
+            const ws = XLSX.utils.aoa_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "MyQuestions");
+            XLSX.writeFile(wb, "My_Question_Repository_Unified.xlsx");
+            showToast("Exported repository successfully in unified format!", "success");
         }
 
         async function handleBatchFileUpload(e) {
@@ -2437,119 +2457,143 @@
                     const qIdIdx = headers.indexOf("{Q_ID}");
                     const qTypeIdx = headers.indexOf("{Q_TYPE}");
                     const qMsgIdx = headers.indexOf("{Q_MSG}");
+                    const choicePoolIdx = headers.indexOf("{CHOICE_POOL}");
                     const aMsgIdx = headers.indexOf("{A_MSG}");
-                    const optAIdx = headers.indexOf("{OPTION_A}");
-                    const optBIdx = headers.indexOf("{OPTION_B}");
-                    const optCIdx = headers.indexOf("{OPTION_C}");
-                    const optDIdx = headers.indexOf("{OPTION_D}");
                     const solnIdx = headers.indexOf("{SOLN_EXP}");
                     const actnIdx = headers.indexOf("{ACTN}");
 
-                    const parsedRows = [];
+                    if (qIdIdx === -1 || qTypeIdx === -1 || qMsgIdx === -1 || aMsgIdx === -1 || actnIdx === -1) {
+                        fileInput.value = '';
+                        return showToast("Upload Failed: Spreadsheet headers do not match the exact 7-field structure ({Q_id}; {Q_type}; {Q_msg}; {Choice_Pool}; {A_msg}; {Soln_exp}; {Actn}).", "error");
+                    }
+
+                    const rawRows = [];
 
                     for (let rowNum = 2; rowNum <= rows.length; rowNum++) {
                         const row = rows[rowNum - 1];
                         if (!row || row.length === 0) continue;
 
-                        const rawActn = actnIdx !== -1 && row[actnIdx] !== undefined && row[actnIdx] !== null ? String(row[actnIdx]).trim().toUpperCase() : '';
+                        const rawActn = row[actnIdx] !== undefined && row[actnIdx] !== null ? String(row[actnIdx]).trim().toUpperCase() : '';
                         if (!rawActn) continue;
 
                         if (!['A', 'U', 'D'].includes(rawActn)) {
                             fileInput.value = '';
-                            return showToast(`Upload Failed (Row ${rowNum}): {Actn} must be "A", "U", or "D".`, "error");
+                            return showToast(`Upload Failed (Row ${rowNum}): {Actn} must be strictly 'A', 'U', or 'D'.`, "error");
                         }
 
-                        const rawQId = qIdIdx !== -1 && row[qIdIdx] !== undefined ? String(row[qIdIdx]).trim() : '';
+                        const rawQId = row[qIdIdx] !== undefined ? String(row[qIdIdx]).trim() : '';
                         if (!rawQId) {
                             fileInput.value = '';
                             return showToast(`Upload Failed (Row ${rowNum}): {Q_id} cannot be empty.`, "error");
                         }
 
-                        let rawType = qTypeIdx !== -1 ? String(row[qTypeIdx] || '').trim().toUpperCase() : 'MCQ';
+                        let rawType = String(row[qTypeIdx] || '').trim().toUpperCase();
                         let qType = 'MCQ';
-                        if (rawType.includes('FILL')) qType = 'FILL';
-                        else if (rawType.includes('TRUE') || rawType === 'TF') qType = 'TF';
+                        if (rawType.includes('TFNG') || rawType === 'TF') qType = 'TFNGQ';
+                        else if (rawType.includes('FILL')) qType = 'FILL_BLANK';
                         else if (rawType.includes('MATCH')) qType = 'MATCHING';
                         else if (rawType.includes('ORDER')) qType = 'ORDERING';
                         else if (rawType === 'MCQ') qType = 'MCQ';
 
-                        parsedRows.push({
+                        rawRows.push({
                             rowNum,
                             actn: rawActn,
                             rawQId,
                             qType,
-                            prompt: qMsgIdx !== -1 ? String(row[qMsgIdx] || '').trim() : '',
-                            aMsg: aMsgIdx !== -1 ? String(row[aMsgIdx] || '').trim() : '',
-                            optA: optAIdx !== -1 ? String(row[optAIdx] || '').trim() : '',
-                            optB: optBIdx !== -1 ? String(row[optBIdx] || '').trim() : '',
-                            optC: optCIdx !== -1 ? String(row[optCIdx] || '').trim() : '',
-                            optD: optDIdx !== -1 ? String(row[optDIdx] || '').trim() : '',
-                            soln: solnIdx !== -1 ? String(row[solnIdx] || '').trim() : ''
+                            prompt: row[qMsgIdx] !== undefined ? String(row[qMsgIdx]).trim() : '',
+                            choicePool: choicePoolIdx !== -1 && row[choicePoolIdx] !== undefined ? String(row[choicePoolIdx]).trim() : '',
+                            aMsg: row[aMsgIdx] !== undefined ? String(row[aMsgIdx]).trim() : '',
+                            soln: solnIdx !== -1 && row[solnIdx] !== undefined ? String(row[solnIdx]).trim() : ''
                         });
                     }
 
-                    if (parsedRows.length === 0) {
+                    if (rawRows.length === 0) {
                         fileInput.value = '';
                         return showToast("No executable data rows found in uploaded file.", "info");
                     }
 
-                    const qIdMap = {};
-                    parsedRows.forEach(item => {
-                        qIdMap[item.rawQId] = item;
+                    // Intra-file Precedence & Latest-Row Resolution Map
+                    const resolvedMap = {};
+                    rawRows.forEach(item => {
+                        resolvedMap[item.rawQId] = item;
                     });
 
-                    const uniqueQIds = Object.keys(qIdMap).sort((a, b) => parseInt(a) - parseInt(b));
+                    const evaluatedQIds = Object.keys(resolvedMap).sort((a, b) => parseInt(a) - parseInt(b));
+
+                    // Empty Repository & Missing Predecessor Validation Rule
                     if (myUserQs.length === 0) {
-                        const firstQId = parseInt(uniqueQIds[0]);
-                        if (firstQId !== 1 || qIdMap[uniqueQIds[0]].actn === 'D') {
+                        const firstQIdNum = parseInt(evaluatedQIds[0]);
+                        const firstItem = resolvedMap[evaluatedQIds[0]];
+                        if (firstQIdNum !== 1 || firstItem.actn === 'D') {
                             fileInput.value = '';
-                            return showToast("Upload Rejected: Repository is completely empty and file attempts to delete or start/jump directly past Question #1.", "error");
+                            return showToast("Upload Rejected: Repository is completely empty, and the upload attempts to delete or start/jump directly past Question #1.", "error");
                         }
                     }
 
                     let added = 0, updated = 0, deleted = 0;
-                    const typeMap = { 'MCQ': 'mcq', 'TF': 'tf', 'FILL': 'fill', 'MATCHING': 'matching', 'ORDERING': 'ordering' };
+                    const typeMap = { 'MCQ': 'mcq', 'TFNGQ': 'tf', 'FILL_BLANK': 'fill', 'MATCHING': 'matching', 'ORDERING': 'ordering' };
 
-                    for (const qId of uniqueQIds) {
-                        const item = qIdMap[qId];
+                    for (const qIdKey of evaluatedQIds) {
+                        const item = resolvedMap[qIdKey];
                         const targetType = typeMap[item.qType] || 'mcq';
-                        const matchedQuestion = myUserQs.find((q, index) => String(index + 1) === qId || q.id === qId);
+                        const existingMatch = myUserQs.find((q, index) => String(index + 1) === qIdKey || q.id === qIdKey);
 
                         if (item.actn === 'D') {
-                            if (matchedQuestion) {
-                                await _supabase.from('questions').delete().eq('id', matchedQuestion.id);
+                            if (existingMatch) {
+                                await _supabase.from('questions').delete().eq('id', existingMatch.id);
                                 deleted++;
                             }
                         } else if (item.actn === 'U') {
-                            if (matchedQuestion) {
+                            if (existingMatch) {
                                 let updatePayload = {
                                     type: targetType,
-                                    prompt: item.prompt || matchedQuestion.prompt,
-                                    explanation: item.soln || matchedQuestion.explanation
+                                    prompt: item.prompt || existingMatch.prompt,
+                                    explanation: item.soln || existingMatch.explanation
                                 };
 
                                 if (targetType === 'mcq') {
+                                    const opts = item.choicePool ? item.choicePool.split('|').map(s => s.trim()) : ['', '', '', ''];
                                     const aLetter = item.aMsg.toUpperCase();
                                     const cIdx = aLetter === 'B' ? '1' : aLetter === 'C' ? '2' : aLetter === 'D' ? '3' : '0';
-                                    updatePayload.options = [item.optA, item.optB, item.optC, item.optD];
-                                    updatePayload.correctAnswer = cIdx;
+                                    updatePayload.options = opts;
+                                    updatePayload.correctAnswer = String(cIdx);
                                     updatePayload.orderedItems = null;
+                                    updatePayload.pairs = null;
+                                } else if (targetType === 'tf') {
+                                    const tfVal = item.aMsg.toLowerCase();
+                                    updatePayload.correctAnswer = tfVal.includes('not') ? 'not_given' : tfVal.includes('false') ? 'false' : 'true';
+                                    updatePayload.options = null;
+                                    updatePayload.orderedItems = null;
+                                    updatePayload.pairs = null;
+                                } else if (targetType === 'fill') {
+                                    updatePayload.correctAnswer = item.aMsg;
+                                    updatePayload.options = null;
+                                    updatePayload.orderedItems = null;
+                                    updatePayload.pairs = null;
+                                } else if (targetType === 'matching') {
+                                    const keys = item.choicePool.split('|').map(s => s.trim());
+                                    const values = item.aMsg.split('|').map(s => s.trim());
+                                    const pairs = [];
+                                    for (let i = 0; i < Math.min(keys.length, values.length); i++) {
+                                        pairs.push({ item: keys[i], match: values[i] });
+                                    }
+                                    updatePayload.pairs = pairs;
+                                    updatePayload.options = null;
+                                    updatePayload.orderedItems = null;
+                                    updatePayload.correctAnswer = null;
                                 } else if (targetType === 'ordering') {
                                     const orderedArr = item.aMsg.split('|').map(s => s.trim()).filter(Boolean);
                                     updatePayload.orderedItems = orderedArr;
                                     updatePayload.correctAnswer = item.aMsg;
                                     updatePayload.options = null;
-                                } else {
-                                    updatePayload.correctAnswer = item.aMsg;
-                                    updatePayload.options = null;
-                                    updatePayload.orderedItems = null;
+                                    updatePayload.pairs = null;
                                 }
 
-                                await _supabase.from('questions').update(updatePayload).eq('id', matchedQuestion.id);
+                                await _supabase.from('questions').update(updatePayload).eq('id', existingMatch.id);
                                 updated++;
                             }
                         } else if (item.actn === 'A') {
-                            if (!matchedQuestion) {
+                            if (!existingMatch) {
                                 let newQ = {
                                     id: 'q-' + Date.now() + '-' + Math.random().toString(36).substring(2, 7),
                                     author: currentUser.name,
@@ -2561,14 +2605,27 @@
                                 };
 
                                 if (targetType === 'mcq') {
+                                    const opts = item.choicePool ? item.choicePool.split('|').map(s => s.trim()) : ['', '', '', ''];
                                     const aLetter = item.aMsg.toUpperCase();
                                     const cIdx = aLetter === 'B' ? '1' : aLetter === 'C' ? '2' : aLetter === 'D' ? '3' : '0';
-                                    newQ.options = [item.optA, item.optB, item.optC, item.optD];
-                                    newQ.correctAnswer = cIdx;
-                                } else if (targetType === 'ordering') {
-                                    newQ.orderedItems = item.aMsg.split('|').map(s => s.trim()).filter(Boolean);
+                                    newQ.options = opts;
+                                    newQ.correctAnswer = String(cIdx);
+                                } else if (targetType === 'tf') {
+                                    const tfVal = item.aMsg.toLowerCase();
+                                    newQ.correctAnswer = tfVal.includes('not') ? 'not_given' : tfVal.includes('false') ? 'false' : 'true';
+                                } else if (targetType === 'fill') {
                                     newQ.correctAnswer = item.aMsg;
-                                } else {
+                                } else if (targetType === 'matching') {
+                                    const keys = item.choicePool.split('|').map(s => s.trim());
+                                    const values = item.aMsg.split('|').map(s => s.trim());
+                                    const pairs = [];
+                                    for (let i = 0; i < Math.min(keys.length, values.length); i++) {
+                                        pairs.push({ item: keys[i], match: values[i] });
+                                    }
+                                    newQ.pairs = pairs;
+                                } else if (targetType === 'ordering') {
+                                    const orderedArr = item.aMsg.split('|').map(s => s.trim()).filter(Boolean);
+                                    newQ.orderedItems = orderedArr;
                                     newQ.correctAnswer = item.aMsg;
                                 }
 
@@ -2586,11 +2643,13 @@
                 } catch (err) {
                     console.error(err);
                     fileInput.value = '';
-                    showToast("Error reading file. Please ensure valid Excel (.xlsx) or CSV format.", "error");
+                    showToast("Error processing spreadsheet. Please verify file format and header layout.", "error");
                 }
             };
             reader.readAsArrayBuffer(file);
         }
+
+        // ==========================================
 
         function openModal(modalId) {
             if (modalId === 'settingsModal' && currentUser) {
