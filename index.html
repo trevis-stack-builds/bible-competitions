@@ -777,7 +777,7 @@
                 <div id="settingsFeedbackSection" class="pt-4 border-t border-slate-100 space-y-3">
                     <div id="participantFeedbackBlock" class="hidden space-y-2">
                         <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider" data-i18n="lblSendFeedback">Send Feedback to Host & Co-host</label>
-                        <textarea id="userFeedbackInput" rows="3" placeholder="Write your comments or suggestions..." class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 text-sm"></textarea>
+                        <textarea id="userFeedbackInput" rows="3" data-i18n-placeholder="placeholderFeedback" placeholder="Write your comments or suggestions..." class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 text-sm"></textarea>
                         <button type="button" onclick="submitUserFeedback()" class="w-full py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-lg transition shadow" data-i18n="btnSendComment">
                             Send Comment
                         </button>
@@ -1040,6 +1040,7 @@
                 noArchivedQuizRecords: "No published quiz records archived yet.",
                 noMessageYet: "No message yet. Start the conversation!",
                 placeholderTypeMessage: "Type a message",
+                placeholderFeedback: "Write your comments or suggestions...",
                 badgeNormal: "Normal",
                 badgePinned: "Pinned",
                 noSubmissionsForFilter: "No submissions found for selected filter.",
@@ -1054,7 +1055,8 @@
                 lblScheduledPublishTime: "Scheduled Publication Time",
                 btnCancelSchedule: "Cancel Schedule",
                 btnBack: "Back",
-                btnAlreadyScheduled: "Already Scheduled"
+                btnAlreadyScheduled: "Already Scheduled",
+                noFeedbackReceived: "No user feedback comments received yet."
             },
             繁: {
                 appSubtitle: "互動式聖經問答平台",
@@ -1201,6 +1203,7 @@
                 noArchivedQuizRecords: "尚無已存檔的已發布測驗紀錄。",
                 noMessageYet: "目前尚無訊息。開始對話吧！",
                 placeholderTypeMessage: "輸入訊息",
+                placeholderFeedback: "請在此寫下您的意見或建議...",
                 badgeNormal: "一般",
                 badgePinned: "置頂",
                 noSubmissionsForFilter: "找不到符合所選篩選條件的提交紀錄。",
@@ -1215,7 +1218,8 @@
                 lblScheduledPublishTime: "預定發布時間",
                 btnCancelSchedule: "取消排程",
                 btnBack: "返回",
-                btnAlreadyScheduled: "已排程發布"
+                btnAlreadyScheduled: "已排程發布",
+                noFeedbackReceived: "目前尚未收到任何使用者意見回饋。"
             }
         };
 
@@ -1705,10 +1709,8 @@
         function handlePublishActionClick() {
             if (isPublished) {
                 unpublishQuiz(false);
-            } else if (scheduledPublishTime) {
-                document.getElementById('modalScheduleTimeDisplay').textContent = new Date(scheduledPublishTime).toLocaleString();
-                openModal('scheduleDetailsModal');
             } else {
+                // FIXED: Direct call to openPublishModal() or handle scheduled state properly
                 openPublishModal();
             }
         }
@@ -2879,10 +2881,11 @@
         }
 
         function renderFeedbackCommentsList() {
+            const langData = i18n[currentLang] || i18n.EN;
             const container = document.getElementById('feedbackListContainer');
 
             if (!feedbackComments || feedbackComments.length === 0) {
-                container.innerHTML = `<div class="text-center text-slate-400 text-sm py-6">No user feedback comments received yet.</div>`;
+                container.innerHTML = `<div class="text-center text-slate-400 text-sm py-6">${langData.noFeedbackReceived}</div>`;
             } else {
                 container.innerHTML = feedbackComments.map(fb => `
                     <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2">
