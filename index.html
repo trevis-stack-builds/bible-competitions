@@ -106,7 +106,7 @@
     <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
 
         <!-- VIEW: LOGIN -->
-        <section id="view-login" class="max-w-md mx-auto my-8 sm:my-12 bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden">
+	<section id="view-login" class="max-w-md mx-auto my-8 sm:my-12 bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden hidden">
             <div class="bg-slate-900 p-8 text-center text-white relative">
                 <div class="w-16 h-16 bg-amber-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg shadow-amber-500/30">
                     <i data-lucide="book-open" class="w-8 h-8 text-white"></i>
@@ -1218,21 +1218,17 @@
 
         // Requirement 7: Browser Refresh / Page Reload State Persistence Fix
         window.onload = async function() {
+            // Restore session immediately to prevent login flash
+            const savedCurrentUser = localStorage.getItem('quiz_current_user');
+            if (savedCurrentUser) {
+                currentUser = JSON.parse(savedCurrentUser);
+                activeTab = localStorage.getItem('quiz_active_tab') || 'dashboard';
+            }
+
             await fetchCloudState();
             checkScheduledPublishAndClosure();
             setupRealtimeSubscriptions();
             
-            const savedCurrentUser = localStorage.getItem('quiz_current_user');
-            if (savedCurrentUser) {
-                const stored = JSON.parse(savedCurrentUser);
-                const freshUser = users.find(u => u.name === stored.name);
-                currentUser = freshUser || stored;
-                
-                // Restore last active tab or default to dashboard without forcing login reset
-                const savedTab = localStorage.getItem('quiz_active_tab') || 'dashboard';
-                activeTab = savedTab;
-            }
-
             applyMobileRules();
             applyLanguage();
             updateUI();
