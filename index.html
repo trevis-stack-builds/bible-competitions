@@ -281,7 +281,7 @@
 
             <div id="questionsLockedNotice" class="hidden bg-amber-50 border border-amber-200 text-amber-800 px-4 py-3 rounded-lg flex items-center gap-3">
                 <i data-lucide="lock" class="w-5 h-5 text-amber-600 shrink-0"></i>
-                <div class="text-sm" id="questionsLockedNoticeText"><strong>Quiz Phase Locked:</strong> Editing and adding new questions is currently disabled.</div>
+                <div class="text-sm" id="questionsLockedNoticeText" data-i18n="quizLockedPublishedMsg"><strong>Quiz Phase Locked:</strong> The quiz bank is published and active. Editing and adding questions is disabled.</div>
             </div>
 
             <div id="myQuestionsList" class="space-y-4"></div>
@@ -298,7 +298,6 @@
                     <button id="republishGuestChallengeBtn" onclick="openRepublishGuestModal()" class="hidden bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-medium text-xs shadow transition flex items-center gap-1.5">
                         <i data-lucide="zap" class="w-4 h-4"></i> <span data-i18n="btnRepublishGuest">Republish Guest Challenge</span>
                     </button>
-                    <!-- Requirement 2: Ensure 'Empty History' button correctly triggers immediate state clear and DOM re-render without manual refresh -->
                     <button id="clearVaultBtn" onclick="clearPastPaperVault()" class="hidden bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium text-xs shadow transition flex items-center gap-1.5">
                         <i data-lucide="trash" class="w-4 h-4"></i> <span data-i18n="btnEmptyHistory">Empty History</span>
                     </button>
@@ -320,8 +319,7 @@
             <div id="quizContainer" class="hidden space-y-6 max-w-3xl mx-auto">
                 <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex flex-wrap justify-between items-center gap-4 sticky top-16 z-30">
                     <div>
-                        <!-- Requirement 1: Localized key integration for 'Live Bible Quiz Assessment' -->
-                        <h2 class="text-2xl font-bold text-slate-800" data-i18n="quizTitleHeader">Live Bible Quiz Assessment</h2>
+                        <h2 class="text-2xl font-bold text-slate-800" data-i18n="Live Bible Quiz Assessment">Live Bible Quiz Assessment</h2>
                         <p class="text-slate-500 text-sm" data-i18n="quizAnswerInstructions">Answer all questions below and click submit to receive immediate scoring.</p>
                     </div>
                     <div class="flex items-center gap-3">
@@ -469,7 +467,6 @@
                     </div>
 
                     <div class="flex flex-wrap gap-3">
-                        <!-- Requirement 3 & 4: Button transforms dynamically via handlePublishActionClick and syncPublishButtonsUI for Host/Co-host -->
                         <button id="ctrlCenterPublishBtn" onclick="handlePublishActionClick()" class="px-5 py-3 rounded-xl font-bold text-sm shadow-lg transition flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white">
                             <i data-lucide="upload-cloud" class="w-5 h-5"></i> <span id="ctrlCenterPublishBtnText" data-i18n="btnPublishAllQuestions">Publish All Questions</span>
                         </button>
@@ -485,7 +482,6 @@
 
                 <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
                     <div class="text-xs text-slate-500 font-medium" data-i18n="statPublishStatus">Publish Status</div>
-                    <!-- Requirement 3: Dynamic publish status updates ('Unpublished (Pending)', 'Published (Quiz #{i} Live)', etc.) -->
                     <div id="hostPublishStatusText" class="text-xl font-bold text-amber-600 mt-1" data-i18n="unpublishedCreationPhase">Unpublished (Creation Phase)</div>
                 </div>
 
@@ -557,7 +553,6 @@
     </main>
 
     <!-- MODAL: SCHEDULE DETAILS / ALREADY SCHEDULED -->
-    <!-- Requirement 4: Modal displaying scheduled publication time and action to cancel schedule -->
     <div id="scheduleDetailsModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-slate-100 overflow-hidden">
             <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
@@ -1072,11 +1067,9 @@
                 btnBack: "Back",
                 btnAlreadyScheduled: "Already Scheduled",
                 noFeedbackReceived: "No user feedback comments received yet.",
-                // Requirement 1: Added exact localization string mappings for the requested terms
-                'Live Bible Quiz Assessment': "Live Bible Quiz Assessment",
-                'Past Paper Vault is Empty': "Past Paper Vault is Empty",
-                'Questions will be automatically archived here whenever the Host/Co-host unpublishes a Quiz Bank.': "Questions will be automatically archived here whenever the Host/Co-host unpublishes a Quiz Bank.",
-                'Quiz Phase Locked (Pending): The quiz starts in # minutes. Managing your Question Repository is now disabled.': "Quiz Phase Locked (Pending): The quiz starts in # minutes. Managing your Question Repository is now disabled."
+                // Added localization mappings for requested terms
+                'quizLockedPublishedMsg': "Quiz Phase Locked: The quiz bank is published and active. Editing and adding questions is disabled.",
+                'Live Bible Quiz Assessment': "Live Bible Quiz Assessment"
             },
             繁: {
                 appSubtitle: "互動式聖經問答平台",
@@ -1240,11 +1233,9 @@
                 btnBack: "返回",
                 btnAlreadyScheduled: "已排程發布",
                 noFeedbackReceived: "目前尚未收到任何使用者意見回饋.",
-                // Requirement 1: Added Traditional Chinese translation dictionary entries
-                'Live Bible Quiz Assessment': "即時聖經問答測驗",
-                'Past Paper Vault is Empty': "歷屆試題庫目前是空的",
-                'Questions will be automatically archived here whenever the Host/Co-host unpublishes a Quiz Bank.': "每當主持人或副主持人取消發布題庫時，題目將自動歸檔在此處。",
-                'Quiz Phase Locked (Pending): The quiz starts in # minutes. Managing your Question Repository is now disabled.': "測驗階段已鎖定（準備中）：測驗將在 # 分鐘後開始。目前已停用題目儲存庫管理功能。"
+                // Added Traditional Chinese translations for requested terms
+                'quizLockedPublishedMsg': "測驗階段已鎖定：題庫已發布並處於啟用狀態，目前已停用題目的新增與編輯功能。",
+                'Live Bible Quiz Assessment': "即時聖經問答測驗"
             }
         };
 
@@ -1659,7 +1650,6 @@
                 badge.classList.remove('hidden');
             }
 
-            // Requirement 3 & 4: Dynamic button state transforms to purple 'Already Scheduled' when schedule is successfully set
             if (isPublished) {
                 if (ctrlPublishBtn) {
                     ctrlPublishBtn.className = "px-5 py-3 rounded-xl font-bold text-sm shadow-lg transition flex items-center gap-2 bg-amber-600 hover:bg-amber-700 text-white";
@@ -1701,7 +1691,6 @@
             lucide.createIcons();
         }
 
-        // Requirement 4: Host/Co-host control handler for opening schedule details modal when already scheduled
         function handlePublishActionClick() {
             if (!isHostOrCoHost()) return;
             if (isPublished) {
@@ -1722,7 +1711,6 @@
             }
         }
 
-        // Requirement 4: Revokes publication schedule and restores original state & button
         async function cancelActiveSchedule() {
             if (!confirm("Are you sure you want to cancel the scheduled quiz publication?")) return;
             scheduledPublishTime = null;
@@ -1995,11 +1983,10 @@
                 
                 if (isPending && scheduledPublishTime) {
                     const diffMins = Math.max(1, Math.ceil((new Date(scheduledPublishTime) - new Date()) / (1000 * 60)));
-                    // Requirement 1: Localized string integration for pending quiz phase locked notice
                     let lockedMsgTmpl = langData['Quiz Phase Locked (Pending): The quiz starts in # minutes. Managing your Question Repository is now disabled.'];
                     lockedNoticeText.innerHTML = `<strong>${lockedMsgTmpl.replace('#', diffMins)}</strong>`;
                 } else {
-                    lockedNoticeText.innerHTML = "<strong>Quiz Phase Locked:</strong> The quiz bank is published and active. Editing and adding questions is disabled.";
+                    lockedNoticeText.innerHTML = `<strong data-i18n="quizLockedPublishedMsg">${langData.quizLockedPublishedMsg}</strong>`;
                 }
                 return;
             } else {
@@ -2075,7 +2062,6 @@
             }
 
             if (pastQuestions.length === 0) {
-                // Requirement 1: Localized strings for empty past paper vault state
                 list.innerHTML = `
                     <div class="bg-white rounded-xl p-8 text-center border border-slate-200">
                         <i data-lucide="archive" class="w-10 h-10 text-slate-300 mx-auto mb-2"></i>
@@ -2152,15 +2138,14 @@
             showToast("Republished Guest Challenge successfully!", "success");
         }
 
-        // Requirement 2: Fixed 'Empty History' action to immediately clear vault, update state, and re-render DOM without refresh
         async function clearPastPaperVault() {
             if (currentUser.role !== 'host') return;
             if (!confirm("Are you sure you want to permanently delete ALL historical questions from the Past Paper Vault?")) return;
 
             await _supabase.from('questions').delete().eq('is_vault', true);
-            pastQuestions = []; // Immediately clear local state
+            pastQuestions = [];
             await fetchCloudState();
-            renderPastPaperVault(); // Immediately re-render vault DOM elements asynchronously/synchronously
+            renderPastPaperVault();
             showToast("Past Paper Vault emptied successfully.", "info");
         }
 
@@ -3104,7 +3089,6 @@
         }
 
         function renderHostControls() {
-            // Requirement 3: Restrict visibility and control of Control Center to Host and Co-host roles only
             if (!isHostOrCoHost()) return;
 
             document.getElementById('hostTotalUploaded').textContent = questions.length;
@@ -3119,7 +3103,6 @@
             const statusTxt = document.getElementById('hostPublishStatusText');
             const langData = i18n[currentLang] || i18n.EN;
 
-            // Requirement 3: Dynamic status state logic in Control Center
             if (isPublished) {
                 statusTxt.textContent = `Published (Quiz #${currentQuizSession} Live)`;
                 statusTxt.className = "text-xl font-bold text-emerald-600 mt-1";
