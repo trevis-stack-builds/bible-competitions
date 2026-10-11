@@ -1777,17 +1777,27 @@
         }
 
         async function editChatMessage(msgId, encodedText) {
-            const currentText = decodeURIComponent(encodedText);
-            const newText = prompt("Edit your message:", currentText);
-            if (newText === null) return;
-            const trimmed = newText.trim();
-            if (!trimmed) return showToast("Message cannot be empty.", "error");
+	    const currentText = decodeURIComponent(encodedText);
+	    const newText = prompt("Edit your message:", currentText);
+	    if (newText === null) return;
+	    const trimmed = newText.trim();
+	    if (!trimmed) return showToast("Message cannot be empty.", "error");
 
-            await _supabase.from('chat_messages').update({ text: trimmed }).eq('id', msgId);
-            await fetchCloudState();
-            renderChatroom();
-            showToast("Message updated successfully.", "success");
-        }
+	    // Capture the response error from Supabase
+	    const { error } = await _supabase
+	        .from('chat_messages')
+	        .update({ text: trimmed })
+	        .eq('id', msgId);
+
+	    if (error) {
+	        console.error("Supabase edit error:", error);
+	        return showToast(`Failed to update message: ${error.message}`, "error");
+	    }
+
+	    await fetchCloudState();
+	    renderChatroom();
+	    showToast("Message updated successfully.", "success");
+	}
 
         async function clearAllChatHistory() {
             if (!currentUser || currentUser.role !== 'host') return;
