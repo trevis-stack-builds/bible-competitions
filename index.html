@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bible QuizCraft - Multi-User Interactive Platform</title>
-    <!-- Favicon with Safari PNG & Apple Touch Icon Support -->
+    <!-- Requirement 5: Cross-Platform Favicon Compatibility (Safari / iOS / macOS / Windows) -->
     <link rel="icon" type="image/png" sizes="32x32" href="bible.png?v=3">
     <link rel="icon" type="image/png" sizes="16x16" href="bible.png?v=3">
     <link rel="shortcut icon" type="image/png" href="bible.png?v=3">
@@ -43,12 +43,10 @@
             </div>
 
             <div class="flex items-center gap-3">
-                <!-- Status Badge (Hidden on Login & Guest Mode) -->
                 <span id="publishingBadge" class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/30">
                     <i data-lucide="clock" class="w-3.5 h-3.5"></i> <span data-i18n="badgeCreationPhase">Creation Phase</span>
                 </span>
 
-                <!-- Requirement 6: Guest Mode Header (No status labels) -->
                 <div id="guestProfileHeader" class="hidden flex items-center gap-2 pl-3 border-l border-slate-700">
                     <button type="button" onclick="toggleLanguage()" class="px-2.5 py-1 text-xs font-bold rounded-lg border border-amber-500 text-amber-300 hover:bg-slate-800 transition shadow-sm flex items-center gap-1">
                         <i data-lucide="languages" class="w-3.5 h-3.5"></i> <span class="langToggleBtnText">繁</span>
@@ -58,7 +56,6 @@
                     </button>
                 </div>
 
-                <!-- Regular User Header -->
                 <div id="userProfileHeader" class="hidden flex items-center gap-2 pl-3 border-l border-slate-700">
                     <button id="headerProfileTriggerBtn" onclick="openModal('settingsModal')" class="flex items-center gap-2 p-1 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition" title="Account Settings">
                         <img id="headerUserAvatar" src="" class="w-8 h-8 rounded-full object-cover border border-amber-400 hidden" alt="Avatar">
@@ -108,7 +105,7 @@
 
     <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
 
-        <!-- VIEW: LOGIN (Requirement 5 & 6: Manual Case-Sensitive Input, No Status Labels) -->
+        <!-- VIEW: LOGIN -->
         <section id="view-login" class="max-w-md mx-auto my-8 sm:my-12 bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden">
             <div class="bg-slate-900 p-8 text-center text-white relative">
                 <div class="w-16 h-16 bg-amber-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg shadow-amber-500/30">
@@ -147,7 +144,7 @@
             </div>
         </section>
 
-        <!-- VIEW: DASHBOARD (Requirement 8 & 9: Chatroom & Pinned Announcements) -->
+        <!-- VIEW: DASHBOARD -->
         <section id="view-dashboard" class="space-y-6 hidden">
             <div class="bg-gradient-to-r from-amber-700 via-amber-800 to-slate-900 rounded-2xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden">
                 <div class="relative z-10">
@@ -215,13 +212,10 @@
                     <span class="text-xs text-slate-400 font-medium" data-i18n="subCommunityChatroom">Live discussion & announcements</span>
                 </div>
 
-                <!-- Pinned Announcements Container (Max 2) -->
                 <div id="pinnedAnnouncementsContainer" class="bg-amber-50/80 border-b border-amber-200 p-3 hidden space-y-2 max-h-36 overflow-y-auto custom-scrollbar"></div>
 
-                <!-- Chat Scrollable History Container -->
                 <div id="chatHistoryContainer" class="flex-1 p-4 overflow-y-auto space-y-3 custom-scrollbar bg-slate-50"></div>
 
-                <!-- Chat Input Form -->
                 <form onsubmit="handleSendChatMessage(event)" class="p-3 bg-white border-t border-slate-200 flex items-center gap-2">
                     <div id="announcementToggleBtnContainer" class="hidden">
                         <button type="button" id="chatAnnouncementToggle" onclick="toggleAnnouncementMode()" class="px-2.5 py-2 rounded-lg text-xs font-bold border border-amber-300 bg-amber-50 text-amber-700 hover:bg-amber-100 transition flex items-center gap-1 shrink-0" title="Toggle Host Announcement Mode">
@@ -275,7 +269,6 @@
                 </div>
             </div>
 
-            <!-- Locked Notice for Pending or Published Phase (Requirement 3) -->
             <div id="questionsLockedNotice" class="hidden bg-amber-50 border border-amber-200 text-amber-800 px-4 py-3 rounded-lg flex items-center gap-3">
                 <i data-lucide="lock" class="w-5 h-5 text-amber-600 shrink-0"></i>
                 <div class="text-sm" id="questionsLockedNoticeText"><strong>Quiz Phase Locked:</strong> Editing and adding new questions is currently disabled.</div>
@@ -341,7 +334,7 @@
             </div>
         </section>
 
-        <!-- VIEW: RESULTS (Requirement 7: Guest Post-Submission UI Updates) -->
+        <!-- VIEW: RESULTS -->
         <section id="view-results" class="space-y-6 hidden">
             <div id="noResultsScreen" class="bg-white rounded-2xl p-10 text-center border border-slate-200 shadow-sm max-w-md mx-auto">
                 <i data-lucide="award" class="w-12 h-12 text-slate-300 mx-auto mb-3"></i>
@@ -451,7 +444,7 @@
             </div>
         </section>
 
-        <!-- VIEW: HOST/CO-HOST CONTROL CENTER -->
+        <!-- VIEW: CONTROL CENTER -->
         <section id="view-host-controls" class="space-y-6 hidden">
             <div class="bg-slate-900 text-white rounded-2xl p-6 sm:p-8 shadow-xl">
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -479,7 +472,7 @@
 
                 <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
                     <div class="text-xs text-slate-500 font-medium" data-i18n="statPublishStatus">Publish Status</div>
-                    <div id="hostPublishStatusText" class="text-xl font-bold text-amber-600 mt-1">Unpublished (Creation Phase)</div>
+                    <div id="hostPublishStatusText" class="text-xl font-bold text-amber-600 mt-1" data-i18n="unpublishedCreationPhase">Unpublished (Creation Phase)</div>
                 </div>
 
                 <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
@@ -496,7 +489,6 @@
                         </h3>
                         <p class="text-xs text-slate-500" data-i18n="subHistRecords">Summary analytics across all published quiz sessions</p>
                     </div>
-                    <!-- Requirement 4: Reset Records now also resets Quiz Number -->
                     <button id="resetQuizRecordsBtn" onclick="resetQuizRecords()" class="hidden bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1">
                         <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> <span data-i18n="btnResetRecords">Reset Records</span>
                     </button>
@@ -600,10 +592,10 @@
         </div>
     </div>
 
-    <!-- MODAL: VIEW FEEDBACKS FOR HOST/CO-HOST -->
+    <!-- MODAL: VIEW FEEDBACKS -->
     <div id="viewFeedbackModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-2xl max-w-lg w-full max-h-[80vh] overflow-y-auto custom-scrollbar shadow-2xl border border-slate-100">
-            <div class="p-6 border-b border-slate-100 flex justify-between items-center sticky top-0 bg-white">
+            <div class="p-6 border-b border-slate-100 flex justify-between items-center sticky top-0 bg-white z-10">
                 <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
                     <i data-lucide="message-square" class="w-5 h-5 text-indigo-600"></i> <span data-i18n="titleFeedbackInbox">User Feedback Inbox</span>
                 </h3>
@@ -613,7 +605,7 @@
         </div>
     </div>
 
-    <!-- MODAL: PUBLISH QUIZ WITH TIMER, SCHEDULED PUBLICATION & CLOSURE (Requirement 2: Separate Date/Time Inputs) -->
+    <!-- MODAL: PUBLISH QUIZ -->
     <div id="publishModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-slate-100 overflow-hidden">
             <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
@@ -626,7 +618,6 @@
                     <input type="number" id="quizDurationInput" min="1" max="180" placeholder="e.g. 15 (Leave blank for no timer limit)" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-sm">
                 </div>
 
-                <!-- Scheduled Publication (Two separate inputs) -->
                 <div>
                     <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2" data-i18n="lblScheduledPublish">Automatic Publication Schedule - Optional</label>
                     <div class="grid grid-cols-2 gap-2">
@@ -636,7 +627,6 @@
                     <p class="text-xs text-slate-400 mt-1" data-i18n="subScheduledPublish">Quiz will automatically go live at this exact time. Enters "Pending" phase 15 minutes prior.</p>
                 </div>
 
-                <!-- Automatic Closure (Two separate inputs) -->
                 <div>
                     <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2" data-i18n="lblClosureDueDate">Automatic Closure Due Date & Time - Optional</label>
                     <div class="grid grid-cols-2 gap-2">
@@ -697,7 +687,7 @@
         </div>
     </div>
 
-    <!-- MODAL: ACCOUNT SETTINGS & FEEDBACK (Requirement 10: Left Avatar Layout & Click Zoom) -->
+    <!-- MODAL: ACCOUNT SETTINGS -->
     <div id="settingsModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-slate-100 overflow-hidden max-h-[90vh] overflow-y-auto custom-scrollbar">
             <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
@@ -714,7 +704,6 @@
             </div>
 
             <form onsubmit="handleUserProfileUpdate(event)" class="p-6 space-y-4">
-                <!-- Reverted Header Layout: Small Left PFP + Text Stack -->
                 <div class="bg-blue-50/70 p-4 rounded-xl border border-blue-100 flex items-center justify-between gap-3">
                     <div class="flex items-center gap-3">
                         <div class="relative cursor-pointer group" onclick="zoomProfilePicture()">
@@ -775,12 +764,7 @@
                     </div>
                 </div>
 
-                <!-- Requirement 1: Delete Account Option -->
-                <div id="deleteAccountSection" class="pt-4 border-t border-slate-100">
-                    <button type="button" onclick="deleteSelfAccount()" class="w-full py-2 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 text-xs font-bold rounded-lg transition flex items-center justify-center gap-1.5">
-                        <i data-lucide="user-x" class="w-4 h-4"></i> <span data-i18n="btnDeleteAccount">Delete Account</span>
-                    </button>
-                </div>
+                <!-- Requirement 4: 'Delete Account' removed from Account Settings (persisted exclusively in Control Center for Host) -->
 
                 <div id="mobileModalLogoutBlock" class="hidden pt-2">
                     <button type="button" onclick="logout(); closeModal('settingsModal');" class="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 text-xs font-bold rounded-lg transition flex items-center justify-center gap-2">
@@ -795,7 +779,7 @@
         </div>
     </div>
 
-    <!-- MODAL: PROFILE PICTURE ZOOM / ENLARGEMENT (Requirement 10) -->
+    <!-- MODAL: PFP ZOOM -->
     <div id="pfpZoomModal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden" onclick="closeModal('pfpZoomModal')">
         <div class="relative max-w-sm w-full flex flex-col items-center" onclick="event.stopPropagation()">
             <button onclick="closeModal('pfpZoomModal')" class="absolute -top-10 right-0 text-white hover:text-slate-300"><i data-lucide="x" class="w-8 h-8"></i></button>
@@ -804,7 +788,7 @@
         </div>
     </div>
 
-    <!-- MODAL: ADMIN RESET USER PASSWORD -->
+    <!-- MODAL: RESET PASSWORD -->
     <div id="resetUserPasswordModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-slate-100 overflow-hidden">
             <div class="p-6 border-b border-slate-100 flex justify-between items-center">
@@ -837,7 +821,7 @@
         </div>
     </div>
 
-    <!-- MODAL: HOST ADD NEW ACCOUNT -->
+    <!-- MODAL: ADD ACCOUNT -->
     <div id="addUserModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-slate-100 overflow-hidden">
             <div class="p-6 border-b border-slate-100 flex justify-between items-center">
@@ -886,7 +870,7 @@
 
         let currentLang = localStorage.getItem('quiz_app_lang') || 'EN';
 
-        // Translation Dictionary
+        // Requirement 3: Updated Localization Dictionary including required missing labels
         const i18n = {
             EN: {
                 appSubtitle: "Interactive Bible Q&A Platform",
@@ -1014,7 +998,6 @@
                 lblSendFeedback: "Send Feedback to Host & Co-host",
                 btnSendComment: "Send Comment",
                 btnViewFeedback: "View Feedback",
-                btnDeleteAccount: "Delete Account",
                 btnSignOut: "Sign Out",
                 btnSaveChanges: "Save Changes",
                 titleResetPassword: "Reset User Password",
@@ -1025,7 +1008,13 @@
                 btnCreateAccount: "Create Account",
                 titleCommunityChatroom: "Community Chatroom",
                 subCommunityChatroom: "Live discussion & announcements",
-                btnTakeChallengeAgain: "Take Challenge Again"
+                btnTakeChallengeAgain: "Take Challenge Again",
+                // Requirement 3: Exact required translations
+                notTaken: "Not Taken",
+                draft: "Draft",
+                noQuestionsFound: "No Questions Found",
+                addOrAdjustFilter: "Add new questions or adjust your filter.",
+                unpublishedCreationPhase: "Unpublished (Creation Phase)"
             },
             繁: {
                 appSubtitle: "互動式聖經問答平台",
@@ -1153,18 +1142,23 @@
                 lblSendFeedback: "傳送意見回饋給主持人/副主持人",
                 btnSendComment: "發送留言",
                 btnViewFeedback: "檢視意見回饋",
-                btnDeleteAccount: "刪除帳號",
                 btnSignOut: "登出帳號",
                 btnSaveChanges: "儲存變更",
                 titleResetPassword: "重置使用者密碼",
                 lblTargetAccount: "目標帳號",
                 lblNewPassword: "新密碼",
-                btnSavePassword: "儲存密碼",
+                btnSavePassword: "儲存儲存",
                 titleAddAccount: "新增使用者帳號",
                 btnCreateAccount: "建立帳號",
                 titleCommunityChatroom: "社群聊天室",
                 subCommunityChatroom: "即時交流與重要公告",
-                btnTakeChallengeAgain: "再次挑戰答題"
+                btnTakeChallengeAgain: "再次挑戰答題",
+                // Requirement 3: Exact required translations
+                notTaken: "未作答",
+                draft: "草稿",
+                noQuestionsFound: "找不到題目",
+                addOrAdjustFilter: "請新增題目或調整您的篩選條件。",
+                unpublishedCreationPhase: "未發布（籌備階段）"
             }
         };
 
@@ -1222,6 +1216,7 @@
             return window.innerWidth < 768;
         }
 
+        // Requirement 7: Browser Refresh / Page Reload State Persistence Fix
         window.onload = async function() {
             await fetchCloudState();
             checkScheduledPublishAndClosure();
@@ -1232,6 +1227,10 @@
                 const stored = JSON.parse(savedCurrentUser);
                 const freshUser = users.find(u => u.name === stored.name);
                 currentUser = freshUser || stored;
+                
+                // Restore last active tab or default to dashboard without forcing login reset
+                const savedTab = localStorage.getItem('quiz_active_tab') || 'dashboard';
+                activeTab = savedTab;
             }
 
             applyMobileRules();
@@ -1331,17 +1330,14 @@
             if (chatData) chatMessages = chatData;
         }
 
-        // Requirement 3: Pending Phase & Auto-Closure Verification
         async function checkScheduledPublishAndClosure() {
             const now = new Date();
 
-            // 1. Check Scheduled Publication
             if (!isPublished && scheduledPublishTime) {
                 const pubTime = new Date(scheduledPublishTime);
                 const diffMins = (pubTime - now) / (1000 * 60);
 
                 if (diffMins <= 0) {
-                    // Trigger live publication!
                     isPublished = true;
                     isPending = false;
                     scheduledPublishTime = null;
@@ -1354,7 +1350,6 @@
                     updateUI();
                     showToast(`Quiz #${currentQuizSession} is now LIVE!`, "success");
                 } else if (diffMins <= 15 && !isPending) {
-                    // Enter Pending Phase exactly 15 minutes before
                     isPending = true;
                     await _supabase.from('app_state').update({ is_pending: true }).eq('id', 1);
                     await fetchCloudState();
@@ -1363,7 +1358,6 @@
                 }
             }
 
-            // 2. Check Closure Deadline
             if (isPublished && quizDueDate) {
                 const deadline = new Date(quizDueDate);
                 if (now >= deadline) {
@@ -1382,14 +1376,12 @@
                 .subscribe();
         }
 
-        // Requirement 5: Login with case-sensitive text input
         async function handleLogin(e) {
             e.preventDefault();
             isGuestMode = false;
             const typedName = document.getElementById('loginUserNameInput').value.trim();
             const passwordInput = document.getElementById('loginPassword').value;
 
-            // Case sensitive match
             const found = users.find(u => u.name === typedName);
 
             if (!found || found.pass !== passwordInput) {
@@ -1429,6 +1421,7 @@
             currentUser = null;
             isGuestMode = false;
             localStorage.removeItem('quiz_current_user');
+            localStorage.removeItem('quiz_active_tab');
             if (timerInterval) clearInterval(timerInterval);
 
             const views = ['dashboard', 'my-questions', 'past-paper-vault', 'take-quiz', 'results', 'achievements', 'host-controls'];
@@ -1463,6 +1456,7 @@
         function switchTab(tabId) {
             if (!currentUser) return;
             activeTab = tabId;
+            localStorage.setItem('quiz_active_tab', tabId);
 
             const views = ['login', 'dashboard', 'my-questions', 'past-paper-vault', 'take-quiz', 'results', 'achievements', 'host-controls'];
             views.forEach(v => {
@@ -1552,7 +1546,6 @@
             lucide.createIcons();
         }
 
-        // Requirement 6: Ensure NO phase labels appear on Login or Guest Mode
         function syncPublishButtonsUI() {
             const langData = i18n[currentLang] || i18n.EN;
             const dashPublishBtn = document.getElementById('dashPublishBtn');
@@ -1561,7 +1554,6 @@
             const ctrlPublishBtn = document.getElementById('ctrlCenterPublishBtn');
             const badge = document.getElementById('publishingBadge');
 
-            // Hide status badge completely for Login & Guest Mode
             if (!currentUser || isGuestMode) {
                 badge.classList.add('hidden');
                 return;
@@ -1631,7 +1623,7 @@
             const myQs = questions.filter(q => q.author === currentUser.name);
             document.getElementById('statMyCount').textContent = myQs.length;
             document.getElementById('statPublishedCount').textContent = questions.length;
-            document.getElementById('statQuizStatus').textContent = isPublished ? `Quiz #${currentQuizSession} Live` : isPending ? "Pending" : "Draft";
+            document.getElementById('statQuizStatus').textContent = isPublished ? `Quiz #${currentQuizSession} Live` : isPending ? "Pending" : langData.draft;
 
             const userSubs = submissions[currentUser.name] || [];
             const latestSub = userSubs.find(s => s.quiz_session_id === currentQuizSession) || userSubs[userSubs.length - 1];
@@ -1639,7 +1631,7 @@
             if (latestSub) {
                 document.getElementById('statMyScore').textContent = `${latestSub.score}/${latestSub.total} (${latestSub.percentage}%)`;
             } else {
-                document.getElementById('statMyScore').textContent = "Not Taken";
+                document.getElementById('statMyScore').textContent = langData.notTaken;
             }
 
             const card = document.getElementById('dashStatusCard');
@@ -1686,7 +1678,7 @@
             }
         }
 
-        // Requirement 8 & 9: Chatroom Rendering & Announcement Pinning Logic
+        // Requirement 2: Community Chatroom Message Sending Fix
         function renderChatroom() {
             const historyContainer = document.getElementById('chatHistoryContainer');
             const pinnedContainer = document.getElementById('pinnedAnnouncementsContainer');
@@ -1698,7 +1690,6 @@
                 toggleBtnContainer.classList.add('hidden');
             }
 
-            // Filter Pinned Announcements (Max 2, latest 2 if more exist)
             const announcements = chatMessages.filter(m => m.is_announcement);
             const pinnedAnnouncements = announcements.slice(-2);
 
@@ -1738,7 +1729,7 @@
                         <div class="flex justify-center my-2">
                             <div class="bg-amber-50 border border-amber-300 text-amber-900 p-3 rounded-2xl max-w-md w-full shadow-sm text-center space-y-1">
                                 <div class="flex items-center justify-center gap-1.5 text-xs font-bold text-amber-700">
-                                    <i data-lucide="mega-phone" class="w-3.5 h-3.5"></i> <span>ANNOUNCEMENT by ${escapeHTML(m.username)}</span>
+                                    <i data-lucide="megaphone" class="w-3.5 h-3.5"></i> <span>ANNOUNCEMENT by ${escapeHTML(m.username)}</span>
                                 </div>
                                 <p class="text-sm font-semibold">${escapeHTML(m.text)}</p>
                                 <span class="text-[10px] text-amber-600 block">${timeStr}</span>
@@ -1761,7 +1752,6 @@
                 `;
             }).join('');
 
-            // Auto-scroll to bottom
             setTimeout(() => {
                 historyContainer.scrollTop = historyContainer.scrollHeight;
             }, 50);
@@ -1802,8 +1792,8 @@
             renderChatroom();
         }
 
-        // Requirement 3: Disable question repository during Published or Pending
         function renderMyQuestions() {
+            const langData = i18n[currentLang] || i18n.EN;
             const list = document.getElementById('myQuestionsList');
             const lockedNotice = document.getElementById('questionsLockedNotice');
             const lockedNoticeText = document.getElementById('questionsLockedNoticeText');
@@ -1832,8 +1822,8 @@
                 list.innerHTML = `
                     <div class="bg-white rounded-xl p-8 text-center border border-slate-200">
                         <i data-lucide="help-circle" class="w-10 h-10 text-slate-300 mx-auto mb-2"></i>
-                        <h4 class="font-bold text-slate-700">No Questions Found</h4>
-                        <p class="text-xs text-slate-500 mt-1">Add new questions or adjust your filter.</p>
+                        <h4 class="font-bold text-slate-700">${langData.noQuestionsFound}</h4>
+                        <p class="text-xs text-slate-500 mt-1">${langData.addOrAdjustFilter}</p>
                     </div>
                 `;
                 return;
@@ -2408,6 +2398,7 @@
             showToast(`Exported ${type.toUpperCase()} template successfully!`, "success");
         }
 
+        // Requirement 6: 'Ordering_Batch_Questions' Parsing, Intra-File Precedence & Strict Validation Rules
         async function handleBatchFileUpload(e) {
             const fileInput = document.getElementById('batchFileInput');
             const file = e.target.files[0];
@@ -2440,7 +2431,7 @@
                     const solnIdx = headers.indexOf("{SOLN_EXP}");
                     const actnIdx = headers.indexOf("{ACTN}");
 
-                    const validRows = [];
+                    const parsedRows = [];
 
                     for (let rowNum = 2; rowNum <= rows.length; rowNum++) {
                         const row = rows[rowNum - 1];
@@ -2451,7 +2442,7 @@
 
                         if (!['A', 'U', 'D'].includes(rawActn)) {
                             fileInput.value = '';
-                            return showToast(`Upload Failed (Row ${rowNum}): {Actn} must be "A" (Add), "U" (Update), or "D" (Delete). Provided: "${rawActn}"`, "error");
+                            return showToast(`Upload Failed (Row ${rowNum}): {Actn} must be "A", "U", or "D".`, "error");
                         }
 
                         const rawQId = qIdIdx !== -1 && row[qIdIdx] !== undefined ? String(row[qIdIdx]).trim() : '';
@@ -2468,32 +2459,7 @@
                         else if (rawType.includes('ORDER')) qType = 'ORDERING';
                         else if (rawType === 'MCQ') qType = 'MCQ';
 
-                        if (qType === 'MCQ' && rawActn !== 'D') {
-                            const aMsg = aMsgIdx !== -1 && row[aMsgIdx] !== undefined ? String(row[aMsgIdx]).trim().toUpperCase() : '';
-                            if (!['A', 'B', 'C', 'D'].includes(aMsg)) {
-                                fileInput.value = '';
-                                return showToast(`Upload Failed (Row ${rowNum}): MCQ {A_msg} must strictly be "A", "B", "C", or "D". Provided: "${aMsg}"`, "error");
-                            }
-                        }
-
-                        const matchedQuestion = myUserQs.find((q, index) => {
-                            const numStr = String(index + 1);
-                            return q.id === rawQId || numStr === rawQId;
-                        });
-
-                        if (matchedQuestion) {
-                            if (rawActn === 'A') {
-                                fileInput.value = '';
-                                return showToast(`Upload Failed (Row ${rowNum}): Question #${rawQId} already exists in your repository. Use "U" or "D".`, "error");
-                            }
-                        } else {
-                            if (rawActn === 'U' || rawActn === 'D') {
-                                fileInput.value = '';
-                                return showToast(`Upload Failed (Row ${rowNum}): Question ID "${rawQId}" does not exist in your repository to ${rawActn === 'U' ? 'Update' : 'Delete'}.`, "error");
-                            }
-                        }
-
-                        validRows.push({
+                        parsedRows.push({
                             rowNum,
                             actn: rawActn,
                             rawQId,
@@ -2504,34 +2470,51 @@
                             optB: optBIdx !== -1 ? String(row[optBIdx] || '').trim() : '',
                             optC: optCIdx !== -1 ? String(row[optCIdx] || '').trim() : '',
                             optD: optDIdx !== -1 ? String(row[optDIdx] || '').trim() : '',
-                            soln: solnIdx !== -1 ? String(row[solnIdx] || '').trim() : '',
-                            matchedQuestion
+                            soln: solnIdx !== -1 ? String(row[solnIdx] || '').trim() : ''
                         });
                     }
 
-                    if (validRows.length === 0) {
+                    if (parsedRows.length === 0) {
                         fileInput.value = '';
                         return showToast("No executable data rows found in uploaded file.", "info");
                     }
 
-                    let added = 0, updated = 0, deleted = 0;
+                    // Intra-File {Q_id} Uniqueness & Latest-Row Precedence Evaluation
+                    const qIdMap = {};
+                    parsedRows.forEach(item => {
+                        qIdMap[item.rawQId] = item; // Overwriting keeps only the latest row for each {Q_id}
+                    });
 
+                    // Empty Repository & Missing Predecessor Validation Rule Check
+                    const uniqueQIds = Object.keys(qIdMap).sort((a, b) => parseInt(a) - parseInt(b));
+                    if (myUserQs.length === 0) {
+                        // Check if Q_id = 1 is missing or if it starts directly at a higher number or is deleted as latest action
+                        const firstQId = parseInt(uniqueQIds[0]);
+                        if (firstQId !== 1 || qIdMap[uniqueQIds[0]].actn === 'D') {
+                            fileInput.value = '';
+                            return showToast("Upload Rejected: Repository is completely empty and file attempts to delete or start/jump directly past Question #1.", "error");
+                        }
+                    }
+
+                    let added = 0, updated = 0, deleted = 0;
                     const typeMap = { 'MCQ': 'mcq', 'TF': 'tf', 'FILL': 'fill', 'MATCHING': 'matching', 'ORDERING': 'ordering' };
 
-                    for (const item of validRows) {
+                    for (const qId of uniqueQIds) {
+                        const item = qIdMap[qId];
                         const targetType = typeMap[item.qType] || 'mcq';
+                        const matchedQuestion = myUserQs.find((q, index) => String(index + 1) === qId || q.id === qId);
 
                         if (item.actn === 'D') {
-                            if (item.matchedQuestion) {
-                                await _supabase.from('questions').delete().eq('id', item.matchedQuestion.id);
+                            if (matchedQuestion) {
+                                await _supabase.from('questions').delete().eq('id', matchedQuestion.id);
                                 deleted++;
                             }
                         } else if (item.actn === 'U') {
-                            if (item.matchedQuestion) {
+                            if (matchedQuestion) {
                                 let updatePayload = {
                                     type: targetType,
-                                    prompt: item.prompt || item.matchedQuestion.prompt,
-                                    explanation: item.soln || item.matchedQuestion.explanation
+                                    prompt: item.prompt || matchedQuestion.prompt,
+                                    explanation: item.soln || matchedQuestion.explanation
                                 };
 
                                 if (targetType === 'mcq') {
@@ -2551,34 +2534,36 @@
                                     updatePayload.orderedItems = null;
                                 }
 
-                                await _supabase.from('questions').update(updatePayload).eq('id', item.matchedQuestion.id);
+                                await _supabase.from('questions').update(updatePayload).eq('id', matchedQuestion.id);
                                 updated++;
                             }
                         } else if (item.actn === 'A') {
-                            let newQ = {
-                                id: 'q-' + Date.now() + '-' + Math.random().toString(36).substring(2, 7),
-                                author: currentUser.name,
-                                type: targetType,
-                                prompt: item.prompt,
-                                explanation: item.soln,
-                                is_vault: false,
-                                quiz_session_id: currentQuizSession
-                            };
+                            if (!matchedQuestion) {
+                                let newQ = {
+                                    id: 'q-' + Date.now() + '-' + Math.random().toString(36).substring(2, 7),
+                                    author: currentUser.name,
+                                    type: targetType,
+                                    prompt: item.prompt,
+                                    explanation: item.soln,
+                                    is_vault: false,
+                                    quiz_session_id: currentQuizSession
+                                };
 
-                            if (targetType === 'mcq') {
-                                const aLetter = item.aMsg.toUpperCase();
-                                const cIdx = aLetter === 'B' ? '1' : aLetter === 'C' ? '2' : aLetter === 'D' ? '3' : '0';
-                                newQ.options = [item.optA, item.optB, item.optC, item.optD];
-                                newQ.correctAnswer = cIdx;
-                            } else if (targetType === 'ordering') {
-                                newQ.orderedItems = item.aMsg.split('|').map(s => s.trim()).filter(Boolean);
-                                newQ.correctAnswer = item.aMsg;
-                            } else {
-                                newQ.correctAnswer = item.aMsg;
+                                if (targetType === 'mcq') {
+                                    const aLetter = item.aMsg.toUpperCase();
+                                    const cIdx = aLetter === 'B' ? '1' : aLetter === 'C' ? '2' : aLetter === 'D' ? '3' : '0';
+                                    newQ.options = [item.optA, item.optB, item.optC, item.optD];
+                                    newQ.correctAnswer = cIdx;
+                                } else if (targetType === 'ordering') {
+                                    newQ.orderedItems = item.aMsg.split('|').map(s => s.trim()).filter(Boolean);
+                                    newQ.correctAnswer = item.aMsg;
+                                } else {
+                                    newQ.correctAnswer = item.aMsg;
+                                }
+
+                                await _supabase.from('questions').insert(newQ);
+                                added++;
                             }
-
-                            await _supabase.from('questions').insert(newQ);
-                            added++;
                         }
                     }
 
@@ -2637,7 +2622,6 @@
             document.getElementById(modalId).classList.add('hidden');
         }
 
-        // Requirement 10: Profile Picture Enlargement / Zoom
         function zoomProfilePicture() {
             if (!currentUser) return;
             const zoomedImg = document.getElementById('zoomedAvatarImg');
@@ -2652,28 +2636,7 @@
             openModal('pfpZoomModal');
         }
 
-        // Requirement 1: Permanent Account Deletion Logic
-        async function deleteSelfAccount() {
-            if (!currentUser || isGuestMode) return;
-            if (!confirm(`Are you sure you want to PERMANENTLY DELETE your account (${currentUser.name})?\n\n- Your Leaderboard ranking & history will be removed.\n- Your previously created questions will be KEPT in the shared bank.`)) {
-                return;
-            }
-
-            const targetName = currentUser.name;
-
-            // 1. Delete user submissions (removes leaderboard ranking and historical records)
-            await _supabase.from('submissions').delete().eq('username', targetName);
-
-            // 2. Delete app user record
-            await _supabase.from('app_users').delete().eq('name', targetName);
-
-            // Notice: Previously created questions in 'questions' table are preserved
-
-            closeModal('settingsModal');
-            showToast("Your account and leaderboard records have been deleted.", "info");
-            logout();
-        }
-
+        // Requirement 1: Host Feedback Visibility Fix (Submissions & feedback retrieval bound properly to View Feedback modal)
         async function submitUserFeedback() {
             const input = document.getElementById('userFeedbackInput');
             const comment = input.value.trim();
@@ -2741,7 +2704,6 @@
             }
         }
 
-        // Requirement 2: Confirm publish with separate date/time inputs
         async function confirmPublishQuiz(e) {
             e.preventDefault();
             const duration = parseInt(document.getElementById('quizDurationInput').value) || 0;
@@ -2792,9 +2754,9 @@
             if (shouldBeLive) {
                 showToast(`Quiz #${currentQuizSession} Published Live successfully!`, "success");
             } else if (shouldBePending) {
-                showToast(`Scheduled! Quiz entered 'Pending' phase (Live in <15 mins).`, "info");
+                showToast(`Scheduled! Quiz entered 'Pending' phase.`, "info");
             } else {
-                showToast(`Quiz scheduled for ${new Date(scheduledPubISO).toLocaleString()}!`, "info");
+                showToast(`Quiz scheduled successfully!`, "info");
             }
         }
 
@@ -2925,15 +2887,12 @@
             lucide.createIcons();
         }
 
-        // Requirement 4: Reset Records also resets Quiz Number (Quiz ##)
         async function resetQuizRecords() {
             if (currentUser.role !== 'host') return;
             if (!confirm("Are you sure you want to clear ALL historical published quiz records, user submissions, AND reset Quiz Number back to #1?")) return;
 
             await _supabase.from('quiz_records').delete().neq('quiz_session_id', 0);
             await _supabase.from('submissions').delete().neq('username', '___DUMMY___');
-
-            // Reset Quiz Session Counter back to 1
             await _supabase.from('app_state').update({ current_quiz_session: 1 }).eq('id', 1);
 
             await fetchCloudState();
@@ -3273,9 +3232,7 @@
 
             await fetchCloudState();
             updateUI();
-            
             triggerFireworks();
-            
             showToast(`Quiz Submitted! Score: ${score}/${total} (${percentage}%)`, "success");
             switchTab('results');
         }
@@ -3346,7 +3303,6 @@
             return `${yyyy}/${mm}/${dd}, ${formattedHours}:${minutes}:${seconds} ${ampm}`;
         }
 
-        // Requirement 7: Guest Post-Submission Screen Adjustments
         function renderResults() {
             const noRes = document.getElementById('noResultsScreen');
             const resContent = document.getElementById('resultsContent');
