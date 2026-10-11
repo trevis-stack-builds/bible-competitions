@@ -319,7 +319,7 @@
             <div id="quizContainer" class="hidden space-y-6 max-w-3xl mx-auto">
                 <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex flex-wrap justify-between items-center gap-4 sticky top-16 z-30">
                     <div>
-                        <h2 class="text-2xl font-bold text-slate-800" data-i18n="Live Bible Quiz Assessment">Live Bible Quiz Assessment</h2>
+                        <h2 id="quizTitleHeader" class="text-2xl font-bold text-slate-800" data-i18n="Live Bible Quiz Assessment">Live Bible Quiz Assessment</h2>
                         <p class="text-slate-500 text-sm" data-i18n="quizAnswerInstructions">Answer all questions below and click submit to receive immediate scoring.</p>
                     </div>
                     <div class="flex items-center gap-3">
@@ -1067,9 +1067,13 @@
                 btnBack: "Back",
                 btnAlreadyScheduled: "Already Scheduled",
                 noFeedbackReceived: "No user feedback comments received yet.",
-                // Added localization mappings for requested terms
                 'quizLockedPublishedMsg': "Quiz Phase Locked: The quiz bank is published and active. Editing and adding questions is disabled.",
-                'Live Bible Quiz Assessment': "Live Bible Quiz Assessment"
+                'Live Bible Quiz Assessment': "Live Bible Quiz Assessment",
+                'Past Paper Vault is Empty': "Past Paper Vault is Empty",
+                'Questions will be automatically archived here whenever the Host/Co-host unpublishes a Quiz Bank.': "Questions will be automatically archived here whenever the Host/Co-host unpublishes a Quiz Bank.",
+                // New Control Center Publish Status translations
+                'unpublishedPendingStatus': "Unpublished (Pending)",
+                'publishQuizLiveStatus': "Publish (Quiz #{k} Live)"
             },
             繁: {
                 appSubtitle: "互動式聖經問答平台",
@@ -1213,7 +1217,7 @@
                 noQuestionsFound: "找不到題目",
                 addOrAdjustFilter: "請新增題目或調整您的篩選條件。",
                 unpublishedCreationPhase: "未發布（籌備階段）",
-                noArchivedQuizRecords: "尚無已存檔的已發布測驗紀錄。",
+                noArchivedQuizRecords: "No published quiz records archived yet.",
                 noMessageYet: "目前尚無訊息。開始對話吧！",
                 placeholderTypeMessage: "輸入訊息",
                 placeholderFeedback: "請在此寫下您的意見或建議...",
@@ -1233,9 +1237,13 @@
                 btnBack: "返回",
                 btnAlreadyScheduled: "已排程發布",
                 noFeedbackReceived: "目前尚未收到任何使用者意見回饋.",
-                // Added Traditional Chinese translations for requested terms
                 'quizLockedPublishedMsg': "測驗階段已鎖定：題庫已發布並處於啟用狀態，目前已停用題目的新增與編輯功能。",
-                'Live Bible Quiz Assessment': "即時聖經問答測驗"
+                'Live Bible Quiz Assessment': "即時聖經問答測驗",
+                'Past Paper Vault is Empty': "歷屆試題庫目前是空的",
+                'Questions will be automatically archived here whenever the Host/Co-host unpublishes a Quiz Bank.': "每當主持人或副主持人取消發布題庫時，題目將會自動封存至此。",
+                // New Control Center Publish Status translations (Traditional Chinese)
+                'unpublishedPendingStatus': "未發布（準備中）",
+                'publishQuizLiveStatus': "已發布（第 #{k} 期測驗進行中）"
             }
         };
 
@@ -1381,6 +1389,7 @@
                 }
             }
 
+            // Note: In Supabase, published questions remain with is_vault = false until unpublished.
             const { data: qData } = await _supabase.from('questions').select('*').eq('is_vault', false);
             if (qData) questions = qData;
 
@@ -3062,13 +3071,17 @@
             if (!isHostOrCoHost() && !isAutoClose) return;
             if (!isAutoClose && !confirm("Unpublish Quiz Bank? Active questions will be archived to Past Paper Vault.")) return;
 
-            for (let q of questions) {
+            // FIX: Capture active questions count *before* updating them to the vault, so the historical record accurately records total questions published for this session.
+            const activeQuestionsToArchive = [...questions];
+            const archivedCount = activeQuestionsToArchive.length;
+
+            for (let q of activeQuestionsToArchive) {
                 await _supabase.from('questions').update({ is_vault: true, quiz_session_id: currentQuizSession }).eq('id', q.id);
             }
 
             await _supabase.from('quiz_records').upsert({
                 quiz_session_id: currentQuizSession,
-                total_questions: questions.length,
+                total_questions: archivedCount,
                 published_at: new Date().toISOString(),
                 due_datetime: quizDueDate
             });
@@ -3104,16 +3117,17 @@
             const langData = i18n[currentLang] || i18n.EN;
 
             if (isPublished) {
-                statusTxt.textContent = `Published (Quiz #${currentQuizSession} Live)`;
+                const liveTextTmpl = langData['publishQuizLiveStatus'];
+                statusTxt.textContent = liveTextTmpl.replace('{k}', currentQuizSession);
                 statusTxt.className = "text-xl font-bold text-emerald-600 mt-1";
             } else if (isPending) {
-                statusTxt.textContent = "Unpublished (Pending)";
+                statusTxt.textContent = langData['unpublishedPendingStatus'];
                 statusTxt.className = "text-xl font-bold text-purple-600 mt-1";
             } else if (scheduledPublishTime) {
-                statusTxt.textContent = `Unpublished (Pending)`;
+                statusTxt.textContent = langData['unpublishedPendingStatus'];
                 statusTxt.className = "text-xl font-bold text-indigo-600 mt-1";
             } else {
-                statusTxt.textContent = "Unpublished (Creation Phase)";
+                statusTxt.textContent = langData.unpublishedCreationPhase;
                 statusTxt.className = "text-xl font-bold text-slate-600 mt-1";
             }
 
