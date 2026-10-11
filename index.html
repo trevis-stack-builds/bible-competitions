@@ -4,21 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bible QuizCraft - Multi-User Interactive Platform</title>
-    <!-- Favicon with Safari PNG & Apple Touch Icon Support[cite: 5] -->
+    <!-- Favicon with Safari PNG & Apple Touch Icon Support[cite: 1] -->
     <link rel="icon" type="image/png" sizes="32x32" href="bible.png?v=3">
     <link rel="icon" type="image/png" sizes="16x16" href="bible.png?v=3">
     <link rel="shortcut icon" type="image/png" href="bible.png?v=3">
     <link rel="apple-touch-icon" sizes="180x180" href="bible.png?v=3">
     <link rel="mask-icon" href="bible.png?v=3" color="#d97706">
-    <!-- Tailwind CSS CDN[cite: 5] -->
+    <!-- Tailwind CSS CDN[cite: 1] -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Lucide Icons[cite: 5] -->
+    <!-- Lucide Icons[cite: 1] -->
     <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- Supabase JS Client Library[cite: 5] -->
+    <!-- Supabase JS Client Library[cite: 1] -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <!-- SheetJS (xlsx) for Excel Batch Processing[cite: 5] -->
+    <!-- SheetJS (xlsx) for Excel Batch Processing[cite: 1] -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-    <!-- JS Confetti / Fireworks Canvas[cite: 5] -->
+    <!-- JS Confetti / Fireworks Canvas[cite: 1] -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -160,7 +160,7 @@
                             <i data-lucide="play" class="w-4 h-4"></i> <span data-i18n="btnTakeQuiz">Take Live Quiz</span>
                         </button>
                         <button id="dashPublishBtn" onclick="openPublishModal()" class="hidden px-4 py-2.5 rounded-lg font-semibold text-sm transition shadow flex items-center gap-2 text-white">
-                            <i data-lucide="upload-cloud" class="w-4 h-4"></i> <span id="dashPublishBtnText">Publish Quiz Bank</span>
+                            <i data-lucide="upload-cloud" class="w-4 h-4"></i> <span id="dashPublishBtnText" data-i18n="btnPublishQuizBank">Publish Quiz Bank</span>
                         </button>
                     </div>
                 </div>
@@ -212,7 +212,7 @@
                     <div class="flex items-center gap-3">
                         <!-- Clear All Chat History Button for Host ONLY -->
                         <button id="clearChatHistoryBtn" onclick="clearAllChatHistory()" class="hidden px-2.5 py-1 bg-red-600 hover:bg-red-700 text-white text-xs font-semibold rounded-lg transition shadow items-center gap-1">
-                            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Clear All Chat History
+                            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> <span data-i18n="btnClearAllChat">Clear All Chat History</span>
                         </button>
                         <span class="text-xs text-slate-400 font-medium" data-i18n="subCommunityChatroom">Live discussion & announcements</span>
                     </div>
@@ -225,10 +225,10 @@
                 <form onsubmit="handleSendChatMessage(event)" class="p-3 bg-white border-t border-slate-200 flex items-center gap-2">
                     <div id="announcementToggleBtnContainer" class="hidden">
                         <button type="button" id="chatAnnouncementToggle" onclick="toggleAnnouncementMode()" class="px-2.5 py-2 rounded-lg text-xs font-bold border border-amber-300 bg-amber-50 text-amber-700 hover:bg-amber-100 transition flex items-center gap-1 shrink-0" title="Toggle Host Announcement Mode">
-                            <i data-lucide="pin" class="w-3.5 h-3.5"></i> <span id="announcementToggleLabel">Normal</span>
+                            <i data-lucide="pin" class="w-3.5 h-3.5"></i> <span id="announcementToggleLabel" data-i18n="badgeNormal">Normal</span>
                         </button>
                     </div>
-                    <input type="text" id="chatMessageInput" required placeholder="Type a message..." class="flex-1 px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-slate-50">
+                    <input type="text" id="chatMessageInput" required data-i18n-placeholder="placeholderTypeMessage" placeholder="Type a message..." class="flex-1 px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-slate-50">
                     <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white p-2.5 rounded-xl transition shadow flex items-center justify-center shrink-0">
                         <i data-lucide="send" class="w-4 h-4"></i>
                     </button>
@@ -255,13 +255,13 @@
 
                     <div class="flex items-center gap-2">
                         <button id="batchDownloadBtn" onclick="downloadUnifiedBatchExcel()" class="bg-slate-800 hover:bg-slate-900 text-white px-3 py-2 rounded-lg font-medium text-xs shadow transition flex items-center gap-1.5" title="Export Questions in Unified Format">
-                            <i data-lucide="download" class="w-3.5 h-3.5"></i> Batch Download
+                            <i data-lucide="download" class="w-3.5 h-3.5"></i> <span data-i18n="btnBatchDownload">Batch Download</span>
                         </button>
                         <button id="downloadTemplateBtn" onclick="downloadUnifiedTemplate()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-lg font-medium text-xs shadow transition flex items-center gap-1.5" title="Download Clean Pre-Formatted Blank Template CSV">
-                            <i data-lucide="file-spreadsheet" class="w-3.5 h-3.5"></i> Download Template
+                            <i data-lucide="file-spreadsheet" class="w-3.5 h-3.5"></i> <span data-i18n="btnDownloadTemplate">Download Template</span>
                         </button>
                         <label id="batchUploadLabel" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg font-medium text-xs shadow transition flex items-center gap-1.5 cursor-pointer" title="Import Unified Spreadsheet">
-                            <i data-lucide="file-up" class="w-3.5 h-3.5"></i> Batch Upload
+                            <i data-lucide="file-up" class="w-3.5 h-3.5"></i> <span data-i18n="btnBatchUpload">Batch Upload</span>
                             <input type="file" id="batchFileInput" accept=".xlsx, .xls, .csv, .txt, .numbers, .gsheet" onchange="handleBatchFileUpload(event)" class="hidden">
                         </label>
                     </div>
@@ -317,7 +317,7 @@
                     </div>
                     <div class="flex items-center gap-3">
                         <div id="quizTimerBox" class="hidden bg-red-50 text-red-700 border border-red-200 px-4 py-2 rounded-lg font-bold text-sm flex items-center gap-2">
-                            <i data-lucide="timer" class="w-4 h-4 animate-pulse"></i> Time Left: <span id="quizTimerDisplay">--:--</span>
+                            <i data-lucide="timer" class="w-4 h-4 animate-pulse"></i> <span data-i18n="lblTimeLeft">Time Left</span>: <span id="quizTimerDisplay">--:--</span>
                         </div>
                         <div class="bg-blue-50 text-blue-700 px-4 py-2 rounded-lg font-semibold text-sm flex items-center gap-2">
                             <i data-lucide="list-checks" class="w-4 h-4"></i> <span id="quizTotalQuestionsCount">0</span> <span data-i18n="questions">Questions</span>
@@ -390,7 +390,7 @@
                             <i data-lucide="instagram" class="w-3.5 h-3.5"></i> Instagram
                         </button>
                         <button onclick="openModal('emailShareModal')" class="bg-slate-800 hover:bg-slate-900 text-white text-xs px-3 py-2 rounded-lg font-semibold transition flex items-center gap-1.5">
-                            <i data-lucide="mail" class="w-3.5 h-3.5"></i> Email
+                            <i data-lucide="mail" class="w-3.5 h-3.5"></i> <span data-i18n="btnEmailShare">Email</span>
                         </button>
                     </div>
                 </div>
@@ -460,8 +460,8 @@
                     </div>
 
                     <div class="flex flex-wrap gap-3">
-                        <button id="ctrlCenterPublishBtn" onclick="openPublishModal()" class="px-5 py-3 rounded-xl font-bold text-sm shadow-lg transition flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white">
-                            <i data-lucide="upload-cloud" class="w-5 h-5"></i> <span id="ctrlCenterPublishBtnText">Publish All Questions</span>
+                        <button id="ctrlCenterPublishBtn" onclick="handlePublishActionClick()" class="px-5 py-3 rounded-xl font-bold text-sm shadow-lg transition flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white">
+                            <i data-lucide="upload-cloud" class="w-5 h-5"></i> <span id="ctrlCenterPublishBtnText" data-i18n="btnPublishAllQuestions">Publish All Questions</span>
                         </button>
                     </div>
                 </div>
@@ -475,7 +475,7 @@
 
                 <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
                     <div class="text-xs text-slate-500 font-medium" data-i18n="statPublishStatus">Publish Status</div>
-                    <div id="hostPublishStatusText" class="text-xl font-bold text-amber-600 mt-1">Unpublished (Creation Phase)</div>
+                    <div id="hostPublishStatusText" class="text-xl font-bold text-amber-600 mt-1" data-i18n="unpublishedCreationPhase">Unpublished (Creation Phase)</div>
                 </div>
 
                 <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
@@ -508,7 +508,9 @@
                                 <th class="px-6 py-3" data-i18n="colChampion">Champion</th>
                             </tr>
                         </thead>
-                        <tbody id="quizRecordsTableBody" class="divide-y divide-slate-100"></tbody>
+                        <tbody id="quizRecordsTableBody" class="divide-y divide-slate-100">
+                            <tr><td colspan="6" class="px-6 py-6 text-center text-slate-400" data-i18n="noArchivedQuizRecords">No published quiz records archived yet.</td></tr>
+                        </tbody>
                     </table>
                 </div>
             </div>
@@ -542,6 +544,27 @@
         </section>
 
     </main>
+
+    <!-- MODAL: SCHEDULE DETAILS / ALREADY SCHEDULED -->
+    <div id="scheduleDetailsModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-slate-100 overflow-hidden">
+            <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+                <h3 class="text-lg font-bold text-slate-800" data-i18n="titleScheduleDetails">Quiz Bank Already Scheduled</h3>
+                <button onclick="closeModal('scheduleDetailsModal')" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-6 h-6"></i></button>
+            </div>
+            <div class="p-6 space-y-4">
+                <p class="text-sm text-slate-600" data-i18n="subScheduleDetailsActive">A future publication schedule has already been configured for this Quiz Bank:</p>
+                <div class="bg-amber-50 border border-amber-200 p-4 rounded-xl text-center">
+                    <span class="text-xs font-bold text-amber-700 uppercase block" data-i18n="lblScheduledPublishTime">Scheduled Publication Time</span>
+                    <span id="modalScheduleTimeDisplay" class="text-base font-extrabold text-amber-900 mt-1 block">-</span>
+                </div>
+                <div class="pt-2 flex justify-between gap-2">
+                    <button type="button" onclick="cancelActiveSchedule()" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-medium shadow" data-i18n="btnCancelSchedule">Cancel Schedule</button>
+                    <button type="button" onclick="closeModal('scheduleDetailsModal')" class="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg text-sm" data-i18n="btnBack">Back</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- MODAL: EMAIL SHARE -->
     <div id="emailShareModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
@@ -1013,7 +1036,25 @@
                 draft: "Draft",
                 noQuestionsFound: "No Questions Found",
                 addOrAdjustFilter: "Add new questions or adjust your filter.",
-                unpublishedCreationPhase: "Unpublished (Creation Phase)"
+                unpublishedCreationPhase: "Unpublished (Creation Phase)",
+                noArchivedQuizRecords: "No published quiz records archived yet.",
+                noMessageYet: "No message yet. Start the conversation!",
+                placeholderTypeMessage: "Type a message",
+                badgeNormal: "Normal",
+                badgePinned: "Pinned",
+                noSubmissionsForFilter: "No submissions found for selected filter.",
+                btnClearAllChat: "Clear All Chat History",
+                btnBatchDownload: "Batch Download",
+                btnDownloadTemplate: "Download Template",
+                btnBatchUpload: "Batch Upload",
+                lblTimeLeft: "Time Left",
+                btnEmailShare: "Email",
+                titleScheduleDetails: "Quiz Bank Already Scheduled",
+                subScheduleDetailsActive: "A future publication schedule has already been configured for this Quiz Bank:",
+                lblScheduledPublishTime: "Scheduled Publication Time",
+                btnCancelSchedule: "Cancel Schedule",
+                btnBack: "Back",
+                btnAlreadyScheduled: "Already Scheduled"
             },
             繁: {
                 appSubtitle: "互動式聖經問答平台",
@@ -1156,7 +1197,25 @@
                 draft: "草稿",
                 noQuestionsFound: "找不到題目",
                 addOrAdjustFilter: "請新增題目或調整您的篩選條件。",
-                unpublishedCreationPhase: "未發布（籌備階段）"
+                unpublishedCreationPhase: "未發布（籌備階段）",
+                noArchivedQuizRecords: "尚無已存檔的已發布測驗紀錄。",
+                noMessageYet: "目前尚無訊息。開始對話吧！",
+                placeholderTypeMessage: "輸入訊息",
+                badgeNormal: "一般",
+                badgePinned: "置頂",
+                noSubmissionsForFilter: "找不到符合所選篩選條件的提交紀錄。",
+                btnClearAllChat: "清除所有聊天紀錄",
+                btnBatchDownload: "批次下載",
+                btnDownloadTemplate: "下載範本",
+                btnBatchUpload: "批次上傳",
+                lblTimeLeft: "剩餘時間",
+                btnEmailShare: "電子郵件",
+                titleScheduleDetails: "測驗題庫已排程",
+                subScheduleDetailsActive: "此測驗題庫已設定未來的發布排程：",
+                lblScheduledPublishTime: "預定發布時間",
+                btnCancelSchedule: "取消排程",
+                btnBack: "返回",
+                btnAlreadyScheduled: "已排程發布"
             }
         };
 
@@ -1172,6 +1231,10 @@
             document.querySelectorAll('[data-i18n]').forEach(el => {
                 const key = el.getAttribute('data-i18n');
                 if (langData[key]) el.textContent = langData[key];
+            });
+            document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+                const key = el.getAttribute('data-i18n-placeholder');
+                if (langData[key]) el.placeholder = langData[key];
             });
             document.querySelectorAll('.langToggleBtnText').forEach(el => {
                 el.textContent = currentLang === 'EN' ? '繁' : 'EN';
@@ -1341,6 +1404,7 @@
 
             if (!isPublished && scheduledPublishTime) {
                 const pubTime = new Date(scheduledPublishTime);
+                if (isNaN(pubTime.getTime())) return;
                 const diffMins = (pubTime - now) / (1000 * 60);
 
                 if (diffMins <= 0) {
@@ -1366,7 +1430,7 @@
 
             if (isPublished && quizDueDate) {
                 const deadline = new Date(quizDueDate);
-                if (now >= deadline) {
+                if (!isNaN(deadline.getTime()) && now >= deadline) {
                     unpublishQuiz(true);
                 }
             }
@@ -1574,34 +1638,61 @@
             }
 
             if (isPublished) {
-                if (dashPublishBtn) dashPublishBtn.className = "bg-amber-600 hover:bg-amber-700 text-white px-4 py-2.5 rounded-lg font-semibold text-sm transition shadow flex items-center gap-2";
+                if (dashPublishBtn) {
+                    dashPublishBtn.className = "bg-amber-600 hover:bg-amber-700 text-white px-4 py-2.5 rounded-lg font-semibold text-sm transition shadow flex items-center gap-2";
+                    dashPublishBtn.setAttribute('data-i18n', 'btnUnpublishQuizBank');
+                }
                 if (dashPublishText) dashPublishText.textContent = langData.btnUnpublishQuizBank;
 
                 if (ctrlPublishBtn) {
                     ctrlPublishBtn.className = "px-5 py-3 rounded-xl font-bold text-sm shadow-lg transition flex items-center gap-2 bg-amber-600 hover:bg-amber-700 text-white";
+                    ctrlPublishBtn.setAttribute('data-i18n', 'btnUnpublishQuizBank');
                     ctrlPublishText.textContent = langData.btnUnpublishQuizBank;
                 }
 
                 let dueText = quizDueDate ? ` | Due: ${new Date(quizDueDate).toLocaleString()}` : '';
                 badge.className = "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30";
                 badge.innerHTML = `<i data-lucide="check-circle" class="w-3.5 h-3.5"></i> Quiz #${currentQuizSession} Live${dueText}`;
+            } else if (scheduledPublishTime) {
+                if (dashPublishBtn) {
+                    dashPublishBtn.className = "bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2.5 rounded-lg font-semibold text-sm transition shadow flex items-center gap-2";
+                    dashPublishBtn.removeAttribute('data-i18n');
+                }
+                if (dashPublishText) dashPublishText.textContent = langData.btnAlreadyScheduled;
+
+                if (ctrlPublishBtn) {
+                    ctrlPublishBtn.className = "px-5 py-3 rounded-xl font-bold text-sm shadow-lg transition flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white";
+                    ctrlPublishBtn.removeAttribute('data-i18n');
+                    ctrlPublishText.textContent = langData.btnAlreadyScheduled;
+                }
+
+                badge.className = "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/30 text-amber-300 border border-amber-500/40";
+                badge.innerHTML = `<i data-lucide="clock" class="w-3.5 h-3.5"></i> <span data-i18n="badgePendingPhase">${langData.badgePendingPhase}</span>`;
             } else if (isPending) {
-                if (dashPublishBtn) dashPublishBtn.className = "bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-lg font-semibold text-sm transition shadow flex items-center gap-2";
+                if (dashPublishBtn) {
+                    dashPublishBtn.className = "bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-lg font-semibold text-sm transition shadow flex items-center gap-2";
+                    dashPublishBtn.setAttribute('data-i18n', 'btnPublishQuizBank');
+                }
                 if (dashPublishText) dashPublishText.textContent = langData.btnPublishQuizBank;
 
                 if (ctrlPublishBtn) {
                     ctrlPublishBtn.className = "px-5 py-3 rounded-xl font-bold text-sm shadow-lg transition flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white";
+                    ctrlPublishBtn.setAttribute('data-i18n', 'btnPublishAllQuestions');
                     ctrlPublishText.textContent = langData.btnPublishAllQuestions;
                 }
 
                 badge.className = "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/30 text-amber-300 border border-amber-500/40";
                 badge.innerHTML = `<i data-lucide="clock" class="w-3.5 h-3.5"></i> <span data-i18n="badgePendingPhase">${langData.badgePendingPhase}</span>`;
             } else {
-                if (dashPublishBtn) dashPublishBtn.className = "bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-lg font-semibold text-sm transition shadow flex items-center gap-2";
+                if (dashPublishBtn) {
+                    dashPublishBtn.className = "bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-lg font-semibold text-sm transition shadow flex items-center gap-2";
+                    dashPublishBtn.setAttribute('data-i18n', 'btnPublishQuizBank');
+                }
                 if (dashPublishText) dashPublishText.textContent = langData.btnPublishQuizBank;
 
                 if (ctrlPublishBtn) {
                     ctrlPublishBtn.className = "px-5 py-3 rounded-xl font-bold text-sm shadow-lg transition flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white";
+                    ctrlPublishBtn.setAttribute('data-i18n', 'btnPublishAllQuestions');
                     ctrlPublishText.textContent = langData.btnPublishAllQuestions;
                 }
 
@@ -1609,6 +1700,31 @@
                 badge.innerHTML = `<i data-lucide="clock" class="w-3.5 h-3.5"></i> <span data-i18n="badgeCreationPhase">${langData.badgeCreationPhase}</span>`;
             }
             lucide.createIcons();
+        }
+
+        function handlePublishActionClick() {
+            if (isPublished) {
+                unpublishQuiz(false);
+            } else if (scheduledPublishTime) {
+                document.getElementById('modalScheduleTimeDisplay').textContent = new Date(scheduledPublishTime).toLocaleString();
+                openModal('scheduleDetailsModal');
+            } else {
+                openPublishModal();
+            }
+        }
+
+        async function cancelActiveSchedule() {
+            if (!confirm("Are you sure you want to cancel the scheduled quiz publication?")) return;
+            scheduledPublishTime = null;
+            isPending = false;
+            await _supabase.from('app_state').update({
+                scheduled_publish_time: null,
+                is_pending: false
+            }).eq('id', 1);
+            await fetchCloudState();
+            closeModal('scheduleDetailsModal');
+            updateUI();
+            showToast("Quiz publication schedule cancelled successfully.", "info");
         }
 
         function renderCurrentView() {
@@ -1629,7 +1745,7 @@
             const myQs = questions.filter(q => q.author === currentUser.name);
             document.getElementById('statMyCount').textContent = myQs.length;
             document.getElementById('statPublishedCount').textContent = questions.length;
-            document.getElementById('statQuizStatus').textContent = isPublished ? `Quiz #${currentQuizSession} Live` : isPending ? "Pending" : langData.draft;
+            document.getElementById('statQuizStatus').textContent = isPublished ? `Quiz #${currentQuizSession} Live` : scheduledPublishTime ? "Already Scheduled" : isPending ? "Pending" : langData.draft;
 
             const userSubs = submissions[currentUser.name] || [];
             const latestSub = userSubs.find(s => s.quiz_session_id === currentQuizSession) || userSubs[userSubs.length - 1];
@@ -1655,6 +1771,16 @@
                             <button onclick="switchTab('take-quiz')" class="mt-3 inline-flex items-center gap-2 text-sm font-semibold text-blue-600 hover:text-blue-800">
                                 ${langData.btnTakeQuiz} <i data-lucide="arrow-right" class="w-4 h-4"></i>
                             </button>
+                        </div>
+                    </div>
+                `;
+            } else if (scheduledPublishTime) {
+                card.innerHTML = `
+                    <div class="flex items-start gap-4">
+                        <div class="p-3 bg-indigo-100 text-indigo-700 rounded-xl shrink-0"><i data-lucide="clock" class="w-6 h-6 animate-pulse"></i></div>
+                        <div class="space-y-1">
+                            <h4 class="font-bold text-slate-800">Quiz Already Scheduled</h4>
+                            <p class="text-sm text-slate-600">Scheduled to go live on: <strong>${new Date(scheduledPublishTime).toLocaleString()}</strong></p>
                         </div>
                     </div>
                 `;
@@ -1685,6 +1811,7 @@
         }
 
         function renderChatroom() {
+            const langData = i18n[currentLang] || i18n.EN;
             const historyContainer = document.getElementById('chatHistoryContainer');
             const pinnedContainer = document.getElementById('pinnedAnnouncementsContainer');
             const toggleBtnContainer = document.getElementById('announcementToggleBtnContainer');
@@ -1716,7 +1843,7 @@
                             <div>
                                 <div class="flex items-center gap-2 text-xs">
                                     <span class="font-bold text-amber-900">${escapeHTML(a.username)}</span>
-                                    <span class="px-1.5 py-0.2 bg-amber-200 text-amber-800 text-[10px] font-bold rounded uppercase">ANNOUNCEMENT</span>
+                                    <span class="px-1.5 py-0.2 bg-amber-200 text-amber-800 text-[10px] font-bold rounded uppercase" data-i18n="badgePinned">PINNED</span>
                                     <span class="text-slate-400 text-[10px]">${new Date(a.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
                                 </div>
                                 <p class="text-xs font-semibold text-slate-800 mt-0.5">${escapeHTML(a.text)}</p>
@@ -1729,7 +1856,7 @@
             }
 
             if (chatMessages.length === 0) {
-                historyContainer.innerHTML = `<div class="text-center text-slate-400 text-xs py-10">No messages yet. Start the conversation!</div>`;
+                historyContainer.innerHTML = `<div class="text-center text-slate-400 text-xs py-10" data-i18n="noMessageYet">${langData.noMessageYet}</div>`;
                 return;
             }
 
@@ -1777,33 +1904,22 @@
         }
 
         async function editChatMessage(msgId, encodedText) {
-	    const currentText = decodeURIComponent(encodedText);
-	    const newText = prompt("Edit your message:", currentText);
-	    if (newText === null) return;
-	    const trimmed = newText.trim();
-	    if (!trimmed) return showToast("Message cannot be empty.", "error");
+            const currentText = decodeURIComponent(encodedText);
+            const newText = prompt("Edit your message:", currentText);
+            if (newText === null) return;
+            const trimmed = newText.trim();
+            if (!trimmed) return showToast("Message cannot be empty.", "error");
 
-	    // Capture the response error from Supabase
-	    const { error } = await _supabase
-	        .from('chat_messages')
-	        .update({ text: trimmed })
-	        .eq('id', msgId);
-
-	    if (error) {
-	        console.error("Supabase edit error:", error);
-	        return showToast(`Failed to update message: ${error.message}`, "error");
-	    }
-
-	    await fetchCloudState();
-	    renderChatroom();
-	    showToast("Message updated successfully.", "success");
-	}
+            await _supabase.from('chat_messages').update({ text: trimmed }).eq('id', msgId);
+            await fetchCloudState();
+            renderChatroom();
+            showToast("Message updated successfully.", "success");
+        }
 
         async function clearAllChatHistory() {
             if (!currentUser || currentUser.role !== 'host') return;
             if (!confirm("Are you sure you want to clear ALL chat messages and announcements from the chatroom board?")) return;
 
-            // Replace .neq('id', 0) with a universal condition compatible with UUID/Int IDs
             await _supabase.from('chat_messages').delete().not('id', 'is', null);
             await fetchCloudState();
             renderChatroom();
@@ -1812,13 +1928,14 @@
 
         function toggleAnnouncementMode() {
             isAnnouncementMode = !isAnnouncementMode;
+            const langData = i18n[currentLang] || i18n.EN;
             const lbl = document.getElementById('announcementToggleLabel');
             const btn = document.getElementById('chatAnnouncementToggle');
             if (isAnnouncementMode) {
-                lbl.textContent = "Pinned";
+                lbl.textContent = langData.badgePinned;
                 btn.className = "px-2.5 py-2 rounded-lg text-xs font-bold border border-amber-500 bg-amber-500 text-white transition flex items-center gap-1 shrink-0";
             } else {
-                lbl.textContent = "Normal";
+                lbl.textContent = langData.badgeNormal;
                 btn.className = "px-2.5 py-2 rounded-lg text-xs font-bold border border-amber-300 bg-amber-50 text-amber-700 hover:bg-amber-100 transition flex items-center gap-1 shrink-0";
             }
         }
@@ -2016,7 +2133,6 @@
         }
 
         function renderAchievements() {
-            const langData = i18n[currentLang] || i18n.EN;
             const locked = document.getElementById('achievementsLockedScreen');
             const content = document.getElementById('achievementsContent');
             const filterSelect = document.getElementById('achievementFilterSelect');
@@ -2030,6 +2146,7 @@
             locked.classList.add('hidden');
             content.classList.remove('hidden');
 
+            const langData = i18n[currentLang] || i18n.EN;
             const currentSelected = filterSelect.value || "COMPOSITE_JOINED";
 
             let optionsHTML = `
@@ -2159,7 +2276,7 @@
             }
 
             if (leaderboardData.length === 0) {
-                table.innerHTML = `<tr><td colspan="5" class="px-6 py-8 text-center text-slate-400">No submissions found for selected filter.</td></tr>`;
+                table.innerHTML = `<tr><td colspan="5" class="px-6 py-8 text-center text-slate-400">${langData.noSubmissionsForFilter}</td></tr>`;
                 return;
             }
 
@@ -2903,21 +3020,25 @@
             document.getElementById('resetQuizRecordsBtn').style.display = isHost ? 'flex' : 'none';
 
             const statusTxt = document.getElementById('hostPublishStatusText');
+            const langData = i18n[currentLang] || i18n.EN;
 
             if (isPublished) {
                 statusTxt.textContent = `Published & Live (Quiz #${currentQuizSession})`;
                 statusTxt.className = "text-xl font-bold text-emerald-600 mt-1";
+            } else if (scheduledPublishTime) {
+                statusTxt.textContent = `Already Scheduled (${new Date(scheduledPublishTime).toLocaleString()})`;
+                statusTxt.className = "text-xl font-bold text-indigo-600 mt-1";
             } else if (isPending) {
                 statusTxt.textContent = "Pending Phase (Locked)";
                 statusTxt.className = "text-xl font-bold text-amber-600 mt-1";
             } else {
-                statusTxt.textContent = "Unpublished (Creation Phase)";
+                statusTxt.textContent = langData.unpublishedCreationPhase;
                 statusTxt.className = "text-xl font-bold text-slate-600 mt-1";
             }
 
             const recordsTable = document.getElementById('quizRecordsTableBody');
             if (quizRecords.length === 0) {
-                recordsTable.innerHTML = `<tr><td colspan="6" class="px-6 py-6 text-center text-slate-400">No published quiz records archived yet.</td></tr>`;
+                recordsTable.innerHTML = `<tr><td colspan="6" class="px-6 py-6 text-center text-slate-400" data-i18n="noArchivedQuizRecords">${langData.noArchivedQuizRecords}</td></tr>`;
             } else {
                 recordsTable.innerHTML = quizRecords.map(r => {
                     const sessSubs = Object.values(submissions).flat().filter(s => s.quiz_session_id === r.quiz_session_id);
