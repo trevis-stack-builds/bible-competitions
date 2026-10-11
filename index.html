@@ -2950,75 +2950,83 @@
             document.getElementById('quizDueDateTimeInput').value = '';
         }
 
-        async function confirmPublishQuiz(e) {
-            e.preventDefault();
-            const duration = parseInt(document.getElementById('quizDurationInput').value) || 0;
+	async function confirmPublishQuiz(e) {
+	    e.preventDefault();
+	    try {
+	        const duration = parseInt(document.getElementById('quizDurationInput').value) || 0;
+	
+	        const pubDate = document.getElementById('quizPublishDateInput').value;
+	        const pubTime = document.getElementById('quizPublishTimeInput').value;
+	        const dueDate = document.getElementById('quizDueDateDateInput').value;
+	        const dueTime = document.getElementById('quizDueDateTimeInput').value;
 
-            const pubDate = document.getElementById('quizPublishDateInput').value;
-            const pubTime = document.getElementById('quizPublishTimeInput').value;
-            const dueDate = document.getElementById('quizDueDateDateInput').value;
-            const dueTime = document.getElementById('quizDueDateTimeInput').value;
+	        const now = new Date();
 
-            const now = new Date();
+	        let scheduledPubISO = null;
+	        if (pubDate && pubTime) {
+	            scheduledPubISO = new Date(`${pubDate}T${pubTime}`).toISOString();
+	            
+	            // Requirement 3 (Rule C): Publication Schedule in Past
+	            const pubDateObj = new Date(scheduledPubISO);
+	            if (pubDateObj <= now) {
+	                showToast("Publication schedule is in the past. Prompting immediate publication 	instead.", "info");
+	                scheduledPubISO = null;
+	            }
+	        }
 
-            let scheduledPubISO = null;
-            if (pubDate && pubTime) {
-                scheduledPubISO = new Date(`${pubDate}T${pubTime}`).toISOString();
-                
-                // Requirement 3 (Rule C): Publication Schedule in Past
-                const pubDateObj = new Date(scheduledPubISO);
-                if (pubDateObj <= now) {
-                    showToast("Publication schedule is in the past. Prompting immediate publication instead.", "info");
-                    scheduledPubISO = null;
-                }
-            }
+	        let quizDueISO = null;
+	        if (dueDate && dueTime) {
+	            quizDueISO = new Date(`${dueDate}T${dueTime}`).toISOString();
+	            const dueDateObj = new Date(quizDueISO);
 
-            let quizDueISO = null;
-            if (dueDate && dueTime) {
-                quizDueISO = new Date(`${dueDate}T${dueTime}`).toISOString();
-                const dueDateObj = new Date(quizDueISO);
+	            // Requirement 3 (Rule B): Closure Time in Past
+	            if (dueDateObj <= now) {
+	                return showToast("Validation Error: Automatic closure date & time cannot fall in the past relative to current timestamp.", "error");
+	            }
+	
+	            // Requirement 3 (Rule A): Chronological Order (Pub strictly before Closure)
+	            const effectivePubObj = scheduledPubISO ? new Date(scheduledPubISO) : now;
+	            if (dueDateObj <= effectivePubObj) {
+	                return showToast("Validation Error: Automatic publication schedule must be strictly before automatic closure due date & time.", "error");
+	            }
+	        }
+	
+	        let shouldBeLive = !scheduledPubISO;
+	        let shouldBePending = false;
+	
+	        if (scheduledPubISO) {
+	            const pTime = new Date(scheduledPubISO);
+	            const diffMins = (pTime - now) / (1000 * 60);
+	            if (diffMins <= 15) {
+	                shouldBePending = true;
+	            }
+	        }
 
-                // Requirement 3 (Rule B): Closure Time in Past
-                if (dueDateObj <= now) {
-                    return showToast("Validation Error: Automatic closure date & time cannot fall in the past relative to current timestamp.", "error");
-                }
-
-                // Requirement 3 (Rule A): Chronological Order (Pub strictly before Closure)
-                const effectivePubObj = scheduledPubISO ? new Date(scheduledPubISO) : now;
-                if (dueDateObj <= effectivePubObj) {
-                    return showToast("Validation Error: Automatic publication schedule must be strictly before automatic closure due date & time.", "error");
-                }
-            }
-
-            let shouldBeLive = !scheduledPubISO;
-            let shouldBePending = false;
-
-            if (scheduledPubISO) {
-                const pTime = new Date(scheduledPubISO);
-                const diffMins = (pTime - now) / (1000 * 60);
-                if (diffMins <= 15) {
-                    shouldBePending = true;
-                }
-            }
-
-            await _supabase.from('app_state').update({
-                is_published: shouldBeLive,
-                is_pending: shouldBePending,
-                scheduled_publish_time: scheduledPubISO,
-                duration_mins: duration,
-                due_datetime: quizDueISO
-            }).eq('id', 1);
-
-            await fetchCloudState();
-            closeModal('publishModal');
-            updateUI();
-
-            if (shouldBeLive) {
-                showToast(`Quiz #${currentQuizSession} Published Live successfully!`, "success");
-            } else {
-                showToast(`Quiz scheduled successfully!`, "info");
-            }
-        }
+	        // Capture Supabase update response error if any
+	        const { error } = await _supabase.from('app_state').update({
+	            is_published: shouldBeLive,
+	            is_pending: shouldBePending,
+	            scheduled_publish_time: scheduledPubISO,
+	            duration_mins: duration,
+	            due_datetime: quizDueISO
+	        }).eq('id', 1);
+	
+	        if (error) throw error;
+	
+	        await fetchCloudState();
+	        closeModal('publishModal');
+	        updateUI();
+	
+	        if (shouldBeLive) {
+	            showToast(`Quiz #${currentQuizSession} Published Live successfully!`, "success");
+	        } else {
+	            showToast(`Quiz scheduled successfully!`, "info");
+	        }
+	    } catch (err) {
+	        console.error("Failed to publish quiz:", err);
+	        showToast("Failed to publish quiz. Check your Supabase configuration, keys, or network connection.", "error");
+	    }
+	}
 
         async function unpublishQuiz(isAutoClose = false) {
             if (!isHostOrCoHost() && !isAutoClose) return;
