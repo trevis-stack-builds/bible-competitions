@@ -4,21 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bible QuizCraft - Multi-User Interactive Platform</title>
-    <!-- Requirement 5: Cross-Platform Favicon Compatibility (Safari / iOS / macOS / Windows) -->
+    <!-- Favicon with Safari PNG & Apple Touch Icon Support[cite: 5] -->
     <link rel="icon" type="image/png" sizes="32x32" href="bible.png?v=3">
     <link rel="icon" type="image/png" sizes="16x16" href="bible.png?v=3">
     <link rel="shortcut icon" type="image/png" href="bible.png?v=3">
     <link rel="apple-touch-icon" sizes="180x180" href="bible.png?v=3">
     <link rel="mask-icon" href="bible.png?v=3" color="#d97706">
-    <!-- Tailwind CSS CDN -->
+    <!-- Tailwind CSS CDN[cite: 5] -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Lucide Icons -->
+    <!-- Lucide Icons[cite: 5] -->
     <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- Supabase JS Client Library -->
+    <!-- Supabase JS Client Library[cite: 5] -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <!-- SheetJS (xlsx) for Excel Batch Processing -->
+    <!-- SheetJS (xlsx) for Excel Batch Processing[cite: 5] -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-    <!-- JS Confetti / Fireworks Canvas -->
+    <!-- JS Confetti / Fireworks Canvas[cite: 5] -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -105,8 +105,8 @@
 
     <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
 
-        <!-- VIEW: LOGIN -->
-	<section id="view-login" class="max-w-md mx-auto my-8 sm:my-12 bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden hidden">
+        <!-- HTML 1: VIEW: LOGIN -->
+        <section id="view-login" class="max-w-md mx-auto my-8 sm:my-12 bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden hidden">
             <div class="bg-slate-900 p-8 text-center text-white relative">
                 <div class="w-16 h-16 bg-amber-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg shadow-amber-500/30">
                     <i data-lucide="book-open" class="w-8 h-8 text-white"></i>
@@ -209,7 +209,13 @@
                         <i data-lucide="message-square" class="w-5 h-5 text-amber-400"></i>
                         <h3 class="font-bold text-base" data-i18n="titleCommunityChatroom">Community Chatroom</h3>
                     </div>
-                    <span class="text-xs text-slate-400 font-medium" data-i18n="subCommunityChatroom">Live discussion & announcements</span>
+                    <div class="flex items-center gap-3">
+                        <!-- Clear All Chat History Button for Host ONLY -->
+                        <button id="clearChatHistoryBtn" onclick="clearAllChatHistory()" class="hidden px-2.5 py-1 bg-red-600 hover:bg-red-700 text-white text-xs font-semibold rounded-lg transition shadow items-center gap-1">
+                            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Clear All Chat History
+                        </button>
+                        <span class="text-xs text-slate-400 font-medium" data-i18n="subCommunityChatroom">Live discussion & announcements</span>
+                    </div>
                 </div>
 
                 <div id="pinnedAnnouncementsContainer" class="bg-amber-50/80 border-b border-amber-200 p-3 hidden space-y-2 max-h-36 overflow-y-auto custom-scrollbar"></div>
@@ -472,7 +478,7 @@
 
                 <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
                     <div class="text-xs text-slate-500 font-medium" data-i18n="statPublishStatus">Publish Status</div>
-                    <div id="hostPublishStatusText" class="text-xl font-bold text-amber-600 mt-1" data-i18n="unpublishedCreationPhase">Unpublished (Creation Phase)</div>
+                    <div id="hostPublishStatusText" class="text-xl font-bold text-amber-600 mt-1">Unpublished (Creation Phase)</div>
                 </div>
 
                 <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
@@ -764,8 +770,6 @@
                     </div>
                 </div>
 
-                <!-- Requirement 4: 'Delete Account' removed from Account Settings (persisted exclusively in Control Center for Host) -->
-
                 <div id="mobileModalLogoutBlock" class="hidden pt-2">
                     <button type="button" onclick="logout(); closeModal('settingsModal');" class="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 text-xs font-bold rounded-lg transition flex items-center justify-center gap-2">
                         <i data-lucide="log-out" class="w-4 h-4"></i> <span data-i18n="btnSignOut">Sign Out</span>
@@ -870,7 +874,6 @@
 
         let currentLang = localStorage.getItem('quiz_app_lang') || 'EN';
 
-        // Requirement 3: Updated Localization Dictionary including required missing labels
         const i18n = {
             EN: {
                 appSubtitle: "Interactive Bible Q&A Platform",
@@ -1009,7 +1012,6 @@
                 titleCommunityChatroom: "Community Chatroom",
                 subCommunityChatroom: "Live discussion & announcements",
                 btnTakeChallengeAgain: "Take Challenge Again",
-                // Requirement 3: Exact required translations
                 notTaken: "Not Taken",
                 draft: "Draft",
                 noQuestionsFound: "No Questions Found",
@@ -1147,13 +1149,12 @@
                 titleResetPassword: "重置使用者密碼",
                 lblTargetAccount: "目標帳號",
                 lblNewPassword: "新密碼",
-                btnSavePassword: "儲存儲存",
+                btnSavePassword: "儲存密碼",
                 titleAddAccount: "新增使用者帳號",
                 btnCreateAccount: "建立帳號",
                 titleCommunityChatroom: "社群聊天室",
                 subCommunityChatroom: "即時交流與重要公告",
                 btnTakeChallengeAgain: "再次挑戰答題",
-                // Requirement 3: Exact required translations
                 notTaken: "未作答",
                 draft: "草稿",
                 noQuestionsFound: "找不到題目",
@@ -1216,19 +1217,14 @@
             return window.innerWidth < 768;
         }
 
-        // Requirement 7: Browser Refresh / Page Reload State Persistence Fix
+        // JavaScript 2
         window.onload = async function() {
-            // Restore session immediately to prevent login flash
-            const savedCurrentUser = localStorage.getItem('quiz_current_user');
-            if (savedCurrentUser) {
-                currentUser = JSON.parse(savedCurrentUser);
-                activeTab = localStorage.getItem('quiz_active_tab') || 'dashboard';
-            }
-
+            // Restore session immediately to prevent login flash const savedCurrentUser = localStorage.getItem('quiz_current_user'); if (savedCurrentUser) { currentUser = JSON.parse(savedCurrentUser); activeTab = localStorage.getItem('quiz_active_tab') || 'dashboard'; }
+            
             await fetchCloudState();
             checkScheduledPublishAndClosure();
             setupRealtimeSubscriptions();
-            
+
             applyMobileRules();
             applyLanguage();
             updateUI();
@@ -1279,6 +1275,7 @@
             }
         }
 
+        // JavaScript 3
         async function fetchCloudState() {
             const { data: userData } = await _supabase.from('app_users').select('*').order('sort_order', { ascending: true, nullsFirst: false });
             if (userData) {
@@ -1320,8 +1317,10 @@
             const { data: recData } = await _supabase.from('quiz_records').select('*').order('quiz_session_id', { ascending: false });
             if (recData) quizRecords = recData;
 
+            // --- ADD THIS BLOCK TO FETCH FEEDBACK FROM SUPABASE ---
             const { data: fbData } = await _supabase.from('feedback').select('*').order('created_at', { ascending: false });
             if (fbData) feedbackComments = fbData;
+            // -----------------------------------------------------
 
             const { data: chatData } = await _supabase.from('chat_messages').select('*').order('created_at', { ascending: true });
             if (chatData) chatMessages = chatData;
@@ -1363,15 +1362,16 @@
             }
         }
 
-	function setupRealtimeSubscriptions() {
-	    _supabase.channel('public-db-changes')
-	        .on('postgres_changes', { event: '*', schema: 'public' }, async (payload) => {
-	            await fetchCloudState();
-	            updateUI();
-		            if (activeTab === 'dashboard') renderChatroom();
-	        })
-	        .subscribe();
-	}
+        // JavaScript 1
+        function setupRealtimeSubscriptions() {
+            _supabase.channel('public-db-changes')
+                .on('postgres_changes', { event: '*', schema: 'public' }, async (payload) => {
+                    await fetchCloudState();
+                    updateUI();
+                    if (activeTab === 'dashboard') renderChatroom();
+                })
+                .subscribe();
+        }
 
         async function handleLogin(e) {
             e.preventDefault();
@@ -1675,11 +1675,19 @@
             }
         }
 
-        // Requirement 2: Community Chatroom Message Sending Fix
         function renderChatroom() {
             const historyContainer = document.getElementById('chatHistoryContainer');
             const pinnedContainer = document.getElementById('pinnedAnnouncementsContainer');
             const toggleBtnContainer = document.getElementById('announcementToggleBtnContainer');
+            const clearChatBtn = document.getElementById('clearChatHistoryBtn');
+
+            if (currentUser && currentUser.role === 'host') {
+                clearChatBtn.classList.remove('hidden');
+                clearChatBtn.classList.add('flex');
+            } else {
+                clearChatBtn.classList.add('hidden');
+                clearChatBtn.classList.remove('flex');
+            }
 
             if (isHostOrCoHost()) {
                 toggleBtnContainer.classList.remove('hidden');
@@ -1754,6 +1762,16 @@
             }, 50);
 
             lucide.createIcons();
+        }
+
+        async function clearAllChatHistory() {
+            if (!currentUser || currentUser.role !== 'host') return;
+            if (!confirm("Are you sure you want to clear ALL chat messages and announcements from the chatroom board?")) return;
+
+            await _supabase.from('chat_messages').delete().neq('id', 0);
+            await fetchCloudState();
+            renderChatroom();
+            showToast("All chat history cleared successfully.", "info");
         }
 
         function toggleAnnouncementMode() {
@@ -2395,7 +2413,6 @@
             showToast(`Exported ${type.toUpperCase()} template successfully!`, "success");
         }
 
-        // Requirement 6: 'Ordering_Batch_Questions' Parsing, Intra-File Precedence & Strict Validation Rules
         async function handleBatchFileUpload(e) {
             const fileInput = document.getElementById('batchFileInput');
             const file = e.target.files[0];
@@ -2476,16 +2493,13 @@
                         return showToast("No executable data rows found in uploaded file.", "info");
                     }
 
-                    // Intra-File {Q_id} Uniqueness & Latest-Row Precedence Evaluation
                     const qIdMap = {};
                     parsedRows.forEach(item => {
-                        qIdMap[item.rawQId] = item; // Overwriting keeps only the latest row for each {Q_id}
+                        qIdMap[item.rawQId] = item;
                     });
 
-                    // Empty Repository & Missing Predecessor Validation Rule Check
                     const uniqueQIds = Object.keys(qIdMap).sort((a, b) => parseInt(a) - parseInt(b));
                     if (myUserQs.length === 0) {
-                        // Check if Q_id = 1 is missing or if it starts directly at a higher number or is deleted as latest action
                         const firstQId = parseInt(uniqueQIds[0]);
                         if (firstQId !== 1 || qIdMap[uniqueQIds[0]].actn === 'D') {
                             fileInput.value = '';
@@ -2633,7 +2647,6 @@
             openModal('pfpZoomModal');
         }
 
-        // Requirement 1: Host Feedback Visibility Fix (Submissions & feedback retrieval bound properly to View Feedback modal)
         async function submitUserFeedback() {
             const input = document.getElementById('userFeedbackInput');
             const comment = input.value.trim();
