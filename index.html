@@ -1236,6 +1236,7 @@
             applyMobileRules();
             applyLanguage();
             updateUI();
+            renderChatroom(); // Ensure chat messages are rendered immediately
             lucide.createIcons();
 
             setInterval(checkScheduledPublishAndClosure, 5000);
