@@ -864,8 +864,8 @@
 
     <script>
         // --- CONFIGURE YOUR SUPABASE PROJECT HERE ---
-        const SUPABASE_URL = 'https://jevyqvtgljhfwqltrbgu.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpldnlxdnRnbGpoZndxbHRyYmd1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTExMjc1MzAsImV4cCI6MjEwNjcwMzUzMH0.O6IifPUuHuBdqdwEXTUypsJZN-GHaBh4iGLOFseKyZ8';
+        const SUPABASE_URL = 'YOUR_SUPABASE_URL';
+        const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         let currentLang = localStorage.getItem('quiz_app_lang') || 'EN';
@@ -1220,7 +1220,7 @@
         window.onload = async function() {
             await fetchCloudState();
             checkScheduledPublishAndClosure();
-            ();
+            setupRealtimeSubscriptions();
             
             const savedCurrentUser = localStorage.getItem('quiz_current_user');
             if (savedCurrentUser) {
@@ -1368,7 +1368,7 @@
 
         function setupRealtimeSubscriptions() {
             _supabase.channel('public-db-changes')
-                .on('postgres_changes', { event: '*', schema: 'public' }, async (payload) => {
+                .on('postgres_changes', { event: '*', schema: 'public' }, async () => {
                     await fetchCloudState();
                     updateUI();
                     if (activeTab === 'dashboard') renderChatroom();
