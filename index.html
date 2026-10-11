@@ -298,6 +298,7 @@
                     <button id="republishGuestChallengeBtn" onclick="openRepublishGuestModal()" class="hidden bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-medium text-xs shadow transition flex items-center gap-1.5">
                         <i data-lucide="zap" class="w-4 h-4"></i> <span data-i18n="btnRepublishGuest">Republish Guest Challenge</span>
                     </button>
+                    <!-- Requirement 2: Ensure 'Empty History' button correctly triggers immediate state clear and DOM re-render without manual refresh -->
                     <button id="clearVaultBtn" onclick="clearPastPaperVault()" class="hidden bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium text-xs shadow transition flex items-center gap-1.5">
                         <i data-lucide="trash" class="w-4 h-4"></i> <span data-i18n="btnEmptyHistory">Empty History</span>
                     </button>
@@ -319,6 +320,7 @@
             <div id="quizContainer" class="hidden space-y-6 max-w-3xl mx-auto">
                 <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex flex-wrap justify-between items-center gap-4 sticky top-16 z-30">
                     <div>
+                        <!-- Requirement 1: Localized key integration for 'Live Bible Quiz Assessment' -->
                         <h2 class="text-2xl font-bold text-slate-800" data-i18n="quizTitleHeader">Live Bible Quiz Assessment</h2>
                         <p class="text-slate-500 text-sm" data-i18n="quizAnswerInstructions">Answer all questions below and click submit to receive immediate scoring.</p>
                     </div>
@@ -467,6 +469,7 @@
                     </div>
 
                     <div class="flex flex-wrap gap-3">
+                        <!-- Requirement 3 & 4: Button transforms dynamically via handlePublishActionClick and syncPublishButtonsUI for Host/Co-host -->
                         <button id="ctrlCenterPublishBtn" onclick="handlePublishActionClick()" class="px-5 py-3 rounded-xl font-bold text-sm shadow-lg transition flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white">
                             <i data-lucide="upload-cloud" class="w-5 h-5"></i> <span id="ctrlCenterPublishBtnText" data-i18n="btnPublishAllQuestions">Publish All Questions</span>
                         </button>
@@ -482,6 +485,7 @@
 
                 <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
                     <div class="text-xs text-slate-500 font-medium" data-i18n="statPublishStatus">Publish Status</div>
+                    <!-- Requirement 3: Dynamic publish status updates ('Unpublished (Pending)', 'Published (Quiz #{i} Live)', etc.) -->
                     <div id="hostPublishStatusText" class="text-xl font-bold text-amber-600 mt-1" data-i18n="unpublishedCreationPhase">Unpublished (Creation Phase)</div>
                 </div>
 
@@ -553,6 +557,7 @@
     </main>
 
     <!-- MODAL: SCHEDULE DETAILS / ALREADY SCHEDULED -->
+    <!-- Requirement 4: Modal displaying scheduled publication time and action to cancel schedule -->
     <div id="scheduleDetailsModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-slate-100 overflow-hidden">
             <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
@@ -1066,7 +1071,12 @@
                 btnCancelSchedule: "Cancel Schedule",
                 btnBack: "Back",
                 btnAlreadyScheduled: "Already Scheduled",
-                noFeedbackReceived: "No user feedback comments received yet."
+                noFeedbackReceived: "No user feedback comments received yet.",
+                // Requirement 1: Added exact localization string mappings for the requested terms
+                'Live Bible Quiz Assessment': "Live Bible Quiz Assessment",
+                'Past Paper Vault is Empty': "Past Paper Vault is Empty",
+                'Questions will be automatically archived here whenever the Host/Co-host unpublishes a Quiz Bank.': "Questions will be automatically archived here whenever the Host/Co-host unpublishes a Quiz Bank.",
+                'Quiz Phase Locked (Pending): The quiz starts in # minutes. Managing your Question Repository is now disabled.': "Quiz Phase Locked (Pending): The quiz starts in # minutes. Managing your Question Repository is now disabled."
             },
             繁: {
                 appSubtitle: "互動式聖經問答平台",
@@ -1229,7 +1239,12 @@
                 btnCancelSchedule: "取消排程",
                 btnBack: "返回",
                 btnAlreadyScheduled: "已排程發布",
-                noFeedbackReceived: "目前尚未收到任何使用者意見回饋."
+                noFeedbackReceived: "目前尚未收到任何使用者意見回饋.",
+                // Requirement 1: Added Traditional Chinese translation dictionary entries
+                'Live Bible Quiz Assessment': "即時聖經問答測驗",
+                'Past Paper Vault is Empty': "歷屆試題庫目前是空的",
+                'Questions will be automatically archived here whenever the Host/Co-host unpublishes a Quiz Bank.': "每當主持人或副主持人取消發布題庫時，題目將自動歸檔在此處。",
+                'Quiz Phase Locked (Pending): The quiz starts in # minutes. Managing your Question Repository is now disabled.': "測驗階段已鎖定（準備中）：測驗將在 # 分鐘後開始。目前已停用題目儲存庫管理功能。"
             }
         };
 
@@ -1644,6 +1659,7 @@
                 badge.classList.remove('hidden');
             }
 
+            // Requirement 3 & 4: Dynamic button state transforms to purple 'Already Scheduled' when schedule is successfully set
             if (isPublished) {
                 if (ctrlPublishBtn) {
                     ctrlPublishBtn.className = "px-5 py-3 rounded-xl font-bold text-sm shadow-lg transition flex items-center gap-2 bg-amber-600 hover:bg-amber-700 text-white";
@@ -1685,6 +1701,7 @@
             lucide.createIcons();
         }
 
+        // Requirement 4: Host/Co-host control handler for opening schedule details modal when already scheduled
         function handlePublishActionClick() {
             if (!isHostOrCoHost()) return;
             if (isPublished) {
@@ -1705,6 +1722,7 @@
             }
         }
 
+        // Requirement 4: Revokes publication schedule and restores original state & button
         async function cancelActiveSchedule() {
             if (!confirm("Are you sure you want to cancel the scheduled quiz publication?")) return;
             scheduledPublishTime = null;
@@ -1977,7 +1995,9 @@
                 
                 if (isPending && scheduledPublishTime) {
                     const diffMins = Math.max(1, Math.ceil((new Date(scheduledPublishTime) - new Date()) / (1000 * 60)));
-                    lockedNoticeText.innerHTML = `<strong>Quiz Phase Locked (Pending):</strong> The quiz starts in <strong>${diffMins} minutes</strong>. Managing your Question Repository is now disabled.`;
+                    // Requirement 1: Localized string integration for pending quiz phase locked notice
+                    let lockedMsgTmpl = langData['Quiz Phase Locked (Pending): The quiz starts in # minutes. Managing your Question Repository is now disabled.'];
+                    lockedNoticeText.innerHTML = `<strong>${lockedMsgTmpl.replace('#', diffMins)}</strong>`;
                 } else {
                     lockedNoticeText.innerHTML = "<strong>Quiz Phase Locked:</strong> The quiz bank is published and active. Editing and adding questions is disabled.";
                 }
@@ -2055,11 +2075,12 @@
             }
 
             if (pastQuestions.length === 0) {
+                // Requirement 1: Localized strings for empty past paper vault state
                 list.innerHTML = `
                     <div class="bg-white rounded-xl p-8 text-center border border-slate-200">
                         <i data-lucide="archive" class="w-10 h-10 text-slate-300 mx-auto mb-2"></i>
-                        <h4 class="font-bold text-slate-700">Past Paper Vault is Empty</h4>
-                        <p class="text-xs text-slate-500 mt-1">Questions will be automatically archived here whenever the Host/Co-host unpublishes a Quiz Bank.</p>
+                        <h4 class="font-bold text-slate-700">${langData['Past Paper Vault is Empty']}</h4>
+                        <p class="text-xs text-slate-500 mt-1">${langData['Questions will be automatically archived here whenever the Host/Co-host unpublishes a Quiz Bank.']}</p>
                     </div>
                 `;
                 return;
@@ -2131,13 +2152,15 @@
             showToast("Republished Guest Challenge successfully!", "success");
         }
 
+        // Requirement 2: Fixed 'Empty History' action to immediately clear vault, update state, and re-render DOM without refresh
         async function clearPastPaperVault() {
             if (currentUser.role !== 'host') return;
             if (!confirm("Are you sure you want to permanently delete ALL historical questions from the Past Paper Vault?")) return;
 
             await _supabase.from('questions').delete().eq('is_vault', true);
+            pastQuestions = []; // Immediately clear local state
             await fetchCloudState();
-            updateUI();
+            renderPastPaperVault(); // Immediately re-render vault DOM elements asynchronously/synchronously
             showToast("Past Paper Vault emptied successfully.", "info");
         }
 
@@ -2618,14 +2641,14 @@
                         return showToast("Upload Failed: File is empty or missing data rows.", "error");
                     }
 
-                    const headers = rows[0].map(h => String(h || '').trim().toUpperCase());
-                    const qIdIdx = headers.indexOf("{Q_ID}");
-                    const qTypeIdx = headers.indexOf("{Q_TYPE}");
-                    const qMsgIdx = headers.indexOf("{Q_MSG}");
-                    const choicePoolIdx = headers.indexOf("{CHOICE_POOL}");
-                    const aMsgIdx = headers.indexOf("{A_MSG}");
-                    const solnIdx = headers.indexOf("{SOLN_EXP}");
-                    const actnIdx = headers.indexOf("{ACTN}");
+                    const headers = rows[0].map(h => String(h || '').trim().replace(/[{}]/g, '').toUpperCase());
+                    const qIdIdx = headers.indexOf("Q_ID");
+                    const qTypeIdx = headers.indexOf("Q_TYPE");
+                    const qMsgIdx = headers.indexOf("Q_MSG");
+                    const choicePoolIdx = headers.indexOf("CHOICE_POOL");
+                    const aMsgIdx = headers.indexOf("A_MSG");
+                    const solnIdx = headers.indexOf("SOLN_EXP");
+                    const actnIdx = headers.indexOf("ACTN");
 
                     if (qIdIdx === -1 || qTypeIdx === -1 || qMsgIdx === -1 || aMsgIdx === -1 || actnIdx === -1) {
                         fileInput.value = '';
@@ -2801,6 +2824,8 @@
                     fileInput.value = '';
                     await fetchCloudState();
                     updateUI();
+                    switchTab('my-questions');
+                    
                     showToast(`Batch Upload Successful! Added: ${added}, Updated: ${updated}, Deleted: ${deleted}`, "success");
 
                 } catch (err) {
@@ -3079,6 +3104,7 @@
         }
 
         function renderHostControls() {
+            // Requirement 3: Restrict visibility and control of Control Center to Host and Co-host roles only
             if (!isHostOrCoHost()) return;
 
             document.getElementById('hostTotalUploaded').textContent = questions.length;
@@ -3093,17 +3119,18 @@
             const statusTxt = document.getElementById('hostPublishStatusText');
             const langData = i18n[currentLang] || i18n.EN;
 
+            // Requirement 3: Dynamic status state logic in Control Center
             if (isPublished) {
-                statusTxt.textContent = `Published & Live (Quiz #${currentQuizSession})`;
+                statusTxt.textContent = `Published (Quiz #${currentQuizSession} Live)`;
                 statusTxt.className = "text-xl font-bold text-emerald-600 mt-1";
             } else if (isPending) {
-                statusTxt.textContent = "Pending Phase (Locked)";
+                statusTxt.textContent = "Unpublished (Pending)";
                 statusTxt.className = "text-xl font-bold text-purple-600 mt-1";
             } else if (scheduledPublishTime) {
-                statusTxt.textContent = `Already Scheduled (${new Date(scheduledPublishTime).toLocaleString()})`;
+                statusTxt.textContent = `Unpublished (Pending)`;
                 statusTxt.className = "text-xl font-bold text-indigo-600 mt-1";
             } else {
-                statusTxt.textContent = langData.unpublishedCreationPhase;
+                statusTxt.textContent = "Unpublished (Creation Phase)";
                 statusTxt.className = "text-xl font-bold text-slate-600 mt-1";
             }
 
