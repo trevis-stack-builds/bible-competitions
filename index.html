@@ -26,6 +26,18 @@
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
         .drag-over { border: 2px dashed #3b82f6 !important; background-color: #eff6ff !important; }
+        
+        /* Mobile Specific Layout Adjustments for Requirement 6 */
+        @media (max-width: 768px) {
+            .mobile-datetime-box {
+                display: flex;
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            .mobile-datetime-box input {
+                width: 100% !important;
+            }
+        }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col font-sans antialiased selection:bg-blue-500 selection:text-white">
@@ -158,9 +170,6 @@
                         </button>
                         <button onclick="switchTab('take-quiz')" class="bg-amber-900/60 hover:bg-amber-900/80 border border-amber-400/30 text-white px-4 py-2.5 rounded-lg font-semibold text-sm transition flex items-center gap-2">
                             <i data-lucide="play" class="w-4 h-4"></i> <span data-i18n="btnTakeQuiz">Take Live Quiz</span>
-                        </button>
-                        <button id="dashPublishBtn" onclick="openPublishModal()" class="hidden px-4 py-2.5 rounded-lg font-semibold text-sm transition shadow flex items-center gap-2 text-white">
-                            <i data-lucide="upload-cloud" class="w-4 h-4"></i> <span id="dashPublishBtnText" data-i18n="btnPublishQuizBank">Publish Quiz Bank</span>
                         </button>
                     </div>
                 </div>
@@ -631,22 +640,22 @@
         </div>
     </div>
 
-    <!-- MODAL: PUBLISH QUIZ -->
+    <!-- MODAL: PUBLISH QUIZ / OPTIONAL SETUPS -->
     <div id="publishModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-slate-100 overflow-hidden">
             <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
-                <h3 class="text-lg font-bold text-slate-800" data-i18n="titlePublishBank">Publish Quiz Bank</h3>
+                <h3 id="publishModalTitle" class="text-lg font-bold text-slate-800" data-i18n="titlePublishBank">Publish Quiz Bank</h3>
                 <button onclick="closeModal('publishModal')" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-6 h-6"></i></button>
             </div>
             <form onsubmit="confirmPublishQuiz(event)" class="p-6 space-y-4">
                 <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2" data-i18n="lblCountdownDuration">Countdown Duration (Minutes) - Optional</label>
+                    <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2" data-i18n="lblCountdownDuration">Countdown Duration (Minutes)</label>
                     <input type="number" id="quizDurationInput" min="1" max="180" placeholder="e.g. 15 (Leave blank for no timer limit)" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-sm">
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2" data-i18n="lblScheduledPublish">Automatic Publication Schedule - Optional</label>
-                    <div class="grid grid-cols-2 gap-2">
+                    <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2" data-i18n="lblScheduledPublish">Automatic Publication Schedule</label>
+                    <div class="grid grid-cols-2 gap-2 mobile-datetime-box">
                         <input type="date" id="quizPublishDateInput" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm">
                         <input type="time" id="quizPublishTimeInput" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm">
                     </div>
@@ -654,17 +663,20 @@
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2" data-i18n="lblClosureDueDate">Automatic Closure Due Date & Time - Optional</label>
-                    <div class="grid grid-cols-2 gap-2">
+                    <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2" data-i18n="lblClosureDueDate">Automatic Closure Due Date & Time</label>
+                    <div class="grid grid-cols-2 gap-2 mobile-datetime-box">
                         <input type="date" id="quizDueDateDateInput" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm">
                         <input type="time" id="quizDueDateTimeInput" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm">
                     </div>
                     <p class="text-xs text-slate-400 mt-1" data-i18n="subClosureDueDate">The quiz will automatically close and unpublish when this deadline passes.</p>
                 </div>
 
-                <div class="pt-4 flex justify-end gap-2">
-                    <button type="button" onclick="closeModal('publishModal')" class="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg text-sm" data-i18n="btnCancel">Cancel</button>
-                    <button type="submit" class="px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm font-medium hover:bg-emerald-700 shadow" data-i18n="btnPublishNow">Save & Publish</button>
+                <div class="pt-4 flex justify-between items-center gap-2">
+                    <button type="button" onclick="resetPublishModalForm()" class="px-3 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg text-xs font-bold transition">Reset Fields</button>
+                    <div class="flex gap-2">
+                        <button type="button" onclick="closeModal('publishModal')" class="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg text-sm" data-i18n="btnCancel">Cancel</button>
+                        <button type="submit" id="publishModalSubmitBtn" class="px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm font-medium hover:bg-emerald-700 shadow" data-i18n="btnPublishNow">Save & Publish</button>
+                    </div>
                 </div>
             </form>
         </div>
@@ -916,7 +928,6 @@
                 dashWelcomeText: "Welcome to Bible QuizCraft. Upload your questions confidentially during the Creation Phase. Once Host/Co-host publishes the quiz bank, test your Bible knowledge!",
                 btnManageQuestions: "Manage My Questions",
                 btnTakeQuiz: "Take Live Quiz",
-                btnPublishQuizBank: "Publish Quiz Bank",
                 btnUnpublishQuizBank: "Unpublish Quiz Bank",
                 btnPublishAllQuestions: "Publish All Questions",
                 dashBankIsLive: "Quiz Bank #{session} is Live",
@@ -1002,10 +1013,10 @@
                 btnPubGuestChallenge: "Publish Guest Challenge",
                 titleFeedbackInbox: "User Feedback Inbox",
                 titlePublishBank: "Publish Quiz Bank",
-                lblCountdownDuration: "Countdown Duration (Minutes) - Optional",
-                lblScheduledPublish: "Automatic Publication Schedule - Optional",
+                lblCountdownDuration: "Countdown Duration (Minutes)",
+                lblScheduledPublish: "Automatic Publication Schedule",
                 subScheduledPublish: "Quiz will automatically go live at this exact time. Enters 'Pending' phase 15 minutes prior.",
-                lblClosureDueDate: "Automatic Closure Due Date & Time - Optional",
+                lblClosureDueDate: "Automatic Closure Due Date & Time",
                 subClosureDueDate: "The quiz will automatically close and unpublish when this deadline passes.",
                 btnPublishNow: "Save & Publish",
                 lblQType: "Question Type",
@@ -1079,7 +1090,6 @@
                 dashWelcomeText: "歡迎來到 Bible QuizCraft！在題目籌備階段，您上傳的題目將保持保密。待主持人發布測驗後即可開始測試聖經知識！",
                 btnManageQuestions: "管理我的題目",
                 btnTakeQuiz: "進行即時測驗",
-                btnPublishQuizBank: "發布測驗題庫",
                 btnUnpublishQuizBank: "取消發布題庫",
                 btnPublishAllQuestions: "發布所有題目",
                 dashBankIsLive: "第 #{session} 期測驗題庫已發布",
@@ -1165,10 +1175,10 @@
                 btnPubGuestChallenge: "發布訪客挑戰",
                 titleFeedbackInbox: "使用者意見回饋收件匣",
                 titlePublishBank: "發布測驗題庫",
-                lblCountdownDuration: "倒數計時限時 (分鐘) - 可選",
-                lblScheduledPublish: "預定自動發布時間 - 可選",
+                lblCountdownDuration: "倒數計時限時 (分鐘)",
+                lblScheduledPublish: "預定自動發布時間",
                 subScheduledPublish: "測驗將在此時間自動開放。發布前15分鐘自動進入「準備發布」鎖定狀態。",
-                lblClosureDueDate: "自動截止關閉時間 - 可選",
+                lblClosureDueDate: "自動截止關閉時間",
                 subClosureDueDate: "當到達此截止時間，測驗將自動結束並取消發布。",
                 btnPublishNow: "儲存並設定發布",
                 lblQType: "題目類型",
@@ -1622,8 +1632,6 @@
 
         function syncPublishButtonsUI() {
             const langData = i18n[currentLang] || i18n.EN;
-            const dashPublishBtn = document.getElementById('dashPublishBtn');
-            const dashPublishText = document.getElementById('dashPublishBtnText');
             const ctrlPublishText = document.getElementById('ctrlCenterPublishBtnText');
             const ctrlPublishBtn = document.getElementById('ctrlCenterPublishBtn');
             const badge = document.getElementById('publishingBadge');
@@ -1635,19 +1643,7 @@
                 badge.classList.remove('hidden');
             }
 
-            if (!isHostOrCoHost()) {
-                if (dashPublishBtn) dashPublishBtn.classList.add('hidden');
-            } else {
-                if (dashPublishBtn) dashPublishBtn.classList.remove('hidden');
-            }
-
             if (isPublished) {
-                if (dashPublishBtn) {
-                    dashPublishBtn.className = "bg-amber-600 hover:bg-amber-700 text-white px-4 py-2.5 rounded-lg font-semibold text-sm transition shadow flex items-center gap-2";
-                    dashPublishBtn.setAttribute('data-i18n', 'btnUnpublishQuizBank');
-                }
-                if (dashPublishText) dashPublishText.textContent = langData.btnUnpublishQuizBank;
-
                 if (ctrlPublishBtn) {
                     ctrlPublishBtn.className = "px-5 py-3 rounded-xl font-bold text-sm shadow-lg transition flex items-center gap-2 bg-amber-600 hover:bg-amber-700 text-white";
                     ctrlPublishBtn.setAttribute('data-i18n', 'btnUnpublishQuizBank');
@@ -1658,12 +1654,6 @@
                 badge.className = "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30";
                 badge.innerHTML = `<i data-lucide="check-circle" class="w-3.5 h-3.5"></i> Quiz #${currentQuizSession} Live${dueText}`;
             } else if (scheduledPublishTime) {
-                if (dashPublishBtn) {
-                    dashPublishBtn.className = "bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2.5 rounded-lg font-semibold text-sm transition shadow flex items-center gap-2";
-                    dashPublishBtn.removeAttribute('data-i18n');
-                }
-                if (dashPublishText) dashPublishText.textContent = langData.btnAlreadyScheduled;
-
                 if (ctrlPublishBtn) {
                     ctrlPublishBtn.className = "px-5 py-3 rounded-xl font-bold text-sm shadow-lg transition flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white";
                     ctrlPublishBtn.removeAttribute('data-i18n');
@@ -1673,12 +1663,6 @@
                 badge.className = "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/30 text-amber-300 border border-amber-500/40";
                 badge.innerHTML = `<i data-lucide="clock" class="w-3.5 h-3.5"></i> <span data-i18n="badgePendingPhase">${langData.badgePendingPhase}</span>`;
             } else if (isPending) {
-                if (dashPublishBtn) {
-                    dashPublishBtn.className = "bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-lg font-semibold text-sm transition shadow flex items-center gap-2";
-                    dashPublishBtn.setAttribute('data-i18n', 'btnPublishQuizBank');
-                }
-                if (dashPublishText) dashPublishText.textContent = langData.btnPublishQuizBank;
-
                 if (ctrlPublishBtn) {
                     ctrlPublishBtn.className = "px-5 py-3 rounded-xl font-bold text-sm shadow-lg transition flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white";
                     ctrlPublishBtn.setAttribute('data-i18n', 'btnPublishAllQuestions');
@@ -1688,12 +1672,6 @@
                 badge.className = "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/30 text-amber-300 border border-amber-500/40";
                 badge.innerHTML = `<i data-lucide="clock" class="w-3.5 h-3.5"></i> <span data-i18n="badgePendingPhase">${langData.badgePendingPhase}</span>`;
             } else {
-                if (dashPublishBtn) {
-                    dashPublishBtn.className = "bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-lg font-semibold text-sm transition shadow flex items-center gap-2";
-                    dashPublishBtn.setAttribute('data-i18n', 'btnPublishQuizBank');
-                }
-                if (dashPublishText) dashPublishText.textContent = langData.btnPublishQuizBank;
-
                 if (ctrlPublishBtn) {
                     ctrlPublishBtn.className = "px-5 py-3 rounded-xl font-bold text-sm shadow-lg transition flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white";
                     ctrlPublishBtn.setAttribute('data-i18n', 'btnPublishAllQuestions');
@@ -1707,10 +1685,13 @@
         }
 
         function handlePublishActionClick() {
+            if (!isHostOrCoHost()) return;
             if (isPublished) {
                 unpublishQuiz(false);
+            } else if (scheduledPublishTime) {
+                openModal('scheduleDetailsModal');
+                document.getElementById('modalScheduleTimeDisplay').textContent = new Date(scheduledPublishTime).toLocaleString();
             } else {
-                // FIXED: Direct call to openPublishModal() or handle scheduled state properly
                 openPublishModal();
             }
         }
@@ -1987,9 +1968,14 @@
                 lockedNotice.classList.remove('hidden');
                 addBtn.disabled = true;
                 addBtn.classList.add('opacity-50', 'cursor-not-allowed');
-                lockedNoticeText.innerHTML = isPending ? 
-                    "<strong>Quiz Phase Locked (Pending):</strong> The quiz is scheduled to be published shortly. Adding or editing questions is disabled." : 
-                    "<strong>Quiz Phase Locked:</strong> The quiz bank is published and active. Editing and adding questions is disabled.";
+                
+                // Requirement 5: Specific notice during Pending stage showing minutes calculation
+                if (isPending && scheduledPublishTime) {
+                    const diffMins = Math.max(1, Math.ceil((new Date(scheduledPublishTime) - new Date()) / (1000 * 60)));
+                    lockedNoticeText.innerHTML = `<strong>Quiz Phase Locked (Pending):</strong> The quiz starts in <strong>${diffMins} minutes</strong>. Managing your Question Repository is now disabled.`;
+                } else {
+                    lockedNoticeText.innerHTML = "<strong>Quiz Phase Locked:</strong> The quiz bank is published and active. Editing and adding questions is disabled.";
+                }
             } else {
                 lockedNotice.classList.add('hidden');
                 addBtn.disabled = false;
@@ -2618,7 +2604,7 @@
 
                     if (qIdIdx === -1 || qTypeIdx === -1 || qMsgIdx === -1 || aMsgIdx === -1 || actnIdx === -1) {
                         fileInput.value = '';
-                        return showToast("Upload Failed: Spreadsheet headers do not match the exact 7-field structure ({Q_id}; {Q_type}; {Q_msg}; {Choice_Pool}; {A_msg}; {Soln_exp}; {Actn}).", "error");
+                        return showToast("Upload Failed: Spreadsheet headers do not match the exact 7-field structure.", "error");
                     }
 
                     const rawRows = [];
@@ -2917,11 +2903,51 @@
 
         function openPublishModal() {
             if (!isHostOrCoHost()) return;
-            if (isPublished) {
-                unpublishQuiz(false);
+            
+            // Requirement 4 & 2: If already scheduled, render uneditable/disabled fields
+            const durationInput = document.getElementById('quizDurationInput');
+            const pubDateInput = document.getElementById('quizPublishDateInput');
+            const pubTimeInput = document.getElementById('quizPublishTimeInput');
+            const dueDateInput = document.getElementById('quizDueDateDateInput');
+            const dueTimeInput = document.getElementById('quizDueDateTimeInput');
+            const submitBtn = document.getElementById('publishModalSubmitBtn');
+
+            if (scheduledPublishTime) {
+                const pubDT = new Date(scheduledPublishTime);
+                pubDateInput.value = pubDT.toISOString().split('T')[0];
+                pubTimeInput.value = pubDT.toTimeString().substring(0, 5);
+                durationInput.value = quizDurationMins || '';
+                
+                if (quizDueDate) {
+                    const dueDT = new Date(quizDueDate);
+                    dueDateInput.value = dueDT.toISOString().split('T')[0];
+                    dueTimeInput.value = dueDT.toTimeString().substring(0, 5);
+                }
+
+                durationInput.disabled = true;
+                pubDateInput.disabled = true;
+                pubTimeInput.disabled = true;
+                dueDateInput.disabled = true;
+                dueTimeInput.disabled = true;
+                submitBtn.style.display = 'none';
             } else {
-                openModal('publishModal');
+                durationInput.disabled = false;
+                pubDateInput.disabled = false;
+                pubTimeInput.disabled = false;
+                dueDateInput.disabled = false;
+                dueTimeInput.disabled = false;
+                submitBtn.style.display = 'inline-block';
             }
+
+            openModal('publishModal');
+        }
+
+        function resetPublishModalForm() {
+            document.getElementById('quizDurationInput').value = '';
+            document.getElementById('quizPublishDateInput').value = '';
+            document.getElementById('quizPublishTimeInput').value = '';
+            document.getElementById('quizDueDateDateInput').value = '';
+            document.getElementById('quizDueDateTimeInput').value = '';
         }
 
         async function confirmPublishQuiz(e) {
@@ -2933,29 +2959,45 @@
             const dueDate = document.getElementById('quizDueDateDateInput').value;
             const dueTime = document.getElementById('quizDueDateTimeInput').value;
 
+            const now = new Date();
+
             let scheduledPubISO = null;
             if (pubDate && pubTime) {
                 scheduledPubISO = new Date(`${pubDate}T${pubTime}`).toISOString();
+                
+                // Requirement 3 (Rule C): Publication Schedule in Past
+                const pubDateObj = new Date(scheduledPubISO);
+                if (pubDateObj <= now) {
+                    showToast("Publication schedule is in the past. Prompting immediate publication instead.", "info");
+                    scheduledPubISO = null;
+                }
             }
 
             let quizDueISO = null;
             if (dueDate && dueTime) {
                 quizDueISO = new Date(`${dueDate}T${dueTime}`).toISOString();
+                const dueDateObj = new Date(quizDueISO);
+
+                // Requirement 3 (Rule B): Closure Time in Past
+                if (dueDateObj <= now) {
+                    return showToast("Validation Error: Automatic closure date & time cannot fall in the past relative to current timestamp.", "error");
+                }
+
+                // Requirement 3 (Rule A): Chronological Order (Pub strictly before Closure)
+                const effectivePubObj = scheduledPubISO ? new Date(scheduledPubISO) : now;
+                if (dueDateObj <= effectivePubObj) {
+                    return showToast("Validation Error: Automatic publication schedule must be strictly before automatic closure due date & time.", "error");
+                }
             }
 
-            const now = new Date();
-            let shouldBeLive = true;
+            let shouldBeLive = !scheduledPubISO;
             let shouldBePending = false;
 
             if (scheduledPubISO) {
                 const pTime = new Date(scheduledPubISO);
                 const diffMins = (pTime - now) / (1000 * 60);
-
-                if (diffMins > 0) {
-                    shouldBeLive = false;
-                    if (diffMins <= 15) {
-                        shouldBePending = true;
-                    }
+                if (diffMins <= 15) {
+                    shouldBePending = true;
                 }
             }
 
@@ -2973,8 +3015,6 @@
 
             if (shouldBeLive) {
                 showToast(`Quiz #${currentQuizSession} Published Live successfully!`, "success");
-            } else if (shouldBePending) {
-                showToast(`Scheduled! Quiz entered 'Pending' phase.`, "info");
             } else {
                 showToast(`Quiz scheduled successfully!`, "info");
             }
