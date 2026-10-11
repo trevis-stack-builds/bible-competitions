@@ -1366,15 +1366,15 @@
             }
         }
 
-        function setupRealtimeSubscriptions() {
-            _supabase.channel('public-db-changes')
-                .on('postgres_changes', { event: '*', schema: 'public' }, async () => {
-                    await fetchCloudState();
-                    updateUI();
-                    if (activeTab === 'dashboard') renderChatroom();
-                })
-                .subscribe();
-        }
+	function setupRealtimeSubscriptions() {
+	    _supabase.channel('public-db-changes')
+	        .on('postgres_changes', { event: '*', schema: 'public' }, async (payload) => {
+	            await fetchCloudState();
+	            updateUI();
+		            if (activeTab === 'dashboard') renderChatroom();
+	        })
+	        .subscribe();
+	}
 
         async function handleLogin(e) {
             e.preventDefault();
