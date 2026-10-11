@@ -1220,7 +1220,7 @@
         window.onload = async function() {
             await fetchCloudState();
             checkScheduledPublishAndClosure();
-            setupRealtimeSubscriptions();
+            ();
             
             const savedCurrentUser = localStorage.getItem('quiz_current_user');
             if (savedCurrentUser) {
@@ -1368,7 +1368,7 @@
 
         function setupRealtimeSubscriptions() {
             _supabase.channel('public-db-changes')
-                .on('postgres_changes', { event: '*', schema: 'public' }, async () => {
+                .on('postgres_changes', { event: '*', schema: 'public' }, async (payload) => {
                     await fetchCloudState();
                     updateUI();
                     if (activeTab === 'dashboard') renderChatroom();
