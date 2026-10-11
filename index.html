@@ -254,14 +254,14 @@
                     </select>
 
                     <div class="flex items-center gap-2">
-                        <button onclick="downloadUnifiedBatchExcel()" class="bg-slate-800 hover:bg-slate-900 text-white px-3 py-2 rounded-lg font-medium text-xs shadow transition flex items-center gap-1.5" title="Export Questions in Unified Format">
-                            <i data-lucide="download" class="w-3.5 h-3.5"></i> Single Batch Download
+                        <button id="batchDownloadBtn" onclick="downloadUnifiedBatchExcel()" class="bg-slate-800 hover:bg-slate-900 text-white px-3 py-2 rounded-lg font-medium text-xs shadow transition flex items-center gap-1.5" title="Export Questions in Unified Format">
+                            <i data-lucide="download" class="w-3.5 h-3.5"></i> Batch Download
                         </button>
-                        <button onclick="downloadUnifiedTemplate()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-lg font-medium text-xs shadow transition flex items-center gap-1.5" title="Download Clean Pre-Formatted Blank Template CSV">
+                        <button id="downloadTemplateBtn" onclick="downloadUnifiedTemplate()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-lg font-medium text-xs shadow transition flex items-center gap-1.5" title="Download Clean Pre-Formatted Blank Template CSV">
                             <i data-lucide="file-spreadsheet" class="w-3.5 h-3.5"></i> Download Template
                         </button>
-                        <label class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg font-medium text-xs shadow transition flex items-center gap-1.5 cursor-pointer" title="Import Unified Spreadsheet">
-                            <i data-lucide="file-up" class="w-3.5 h-3.5"></i> Single Batch Upload
+                        <label id="batchUploadLabel" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg font-medium text-xs shadow transition flex items-center gap-1.5 cursor-pointer" title="Import Unified Spreadsheet">
+                            <i data-lucide="file-up" class="w-3.5 h-3.5"></i> Batch Upload
                             <input type="file" id="batchFileInput" accept=".xlsx, .xls, .csv, .txt, .numbers, .gsheet" onchange="handleBatchFileUpload(event)" class="hidden">
                         </label>
                     </div>
@@ -1214,7 +1214,6 @@
             return window.innerWidth < 768;
         }
 
-        // JavaScript 2
         window.onload = async function() {
             const savedCurrentUser = localStorage.getItem('quiz_current_user'); 
             if (savedCurrentUser) { 
@@ -1245,6 +1244,22 @@
             const desktopCols = document.querySelectorAll('.desktop-leaderboard-col');
             desktopCols.forEach(col => col.style.display = isMobile ? 'none' : 'table-cell');
 
+            const batchDownloadBtn = document.getElementById('batchDownloadBtn');
+            const downloadTemplateBtn = document.getElementById('downloadTemplateBtn');
+            const batchUploadLabel = document.getElementById('batchUploadLabel');
+
+            if (batchDownloadBtn && downloadTemplateBtn && batchUploadLabel) {
+                if (isMobile) {
+                    batchDownloadBtn.classList.add('hidden');
+                    downloadTemplateBtn.classList.add('hidden');
+                    batchUploadLabel.classList.add('hidden');
+                } else {
+                    batchDownloadBtn.classList.remove('hidden');
+                    downloadTemplateBtn.classList.remove('hidden');
+                    batchUploadLabel.classList.remove('hidden');
+                }
+            }
+
             const headerLogoutBtn = document.getElementById('headerLogoutBtn');
             const mobileModalLogoutBlock = document.getElementById('mobileModalLogoutBlock');
             if (headerLogoutBtn && mobileModalLogoutBlock) {
@@ -1273,7 +1288,6 @@
             }
         }
 
-        // JavaScript 3
         async function fetchCloudState() {
             const { data: userData } = await _supabase.from('app_users').select('*').order('sort_order', { ascending: true, nullsFirst: false });
             if (userData) {
@@ -1358,7 +1372,6 @@
             }
         }
 
-        // JavaScript 1
         function setupRealtimeSubscriptions() {
             _supabase.channel('public-db-changes')
                 .on('postgres_changes', { event: '*', schema: 'public' }, async (payload) => {
@@ -1743,7 +1756,10 @@
                     <div class="flex gap-2.5 ${isMe ? 'flex-row-reverse' : 'flex-row'} items-end">
                         ${avatarTag}
                         <div class="max-w-[75%] space-y-1">
-                            <div class="text-[10px] text-slate-400 font-medium ${isMe ? 'text-right' : 'text-left'} px-1">${escapeHTML(m.username)}</div>
+                            <div class="flex items-center gap-2 ${isMe ? 'justify-end' : 'justify-start'} px-1">
+                                <span class="text-[10px] text-slate-400 font-medium">${escapeHTML(m.username)}</span>
+                                ${isMe ? `<button onclick="editChatMessage('${m.id}', '${encodeURIComponent(m.text)}')" class="text-[10px] text-blue-500 hover:underline">Edit</button>` : ''}
+                            </div>
                             <div class="p-3 rounded-2xl text-sm ${isMe ? 'bg-blue-600 text-white rounded-br-none shadow' : 'bg-white text-slate-800 rounded-bl-none border border-slate-200 shadow-sm'}">
                                 ${escapeHTML(m.text)}
                             </div>
@@ -1760,16 +1776,29 @@
             lucide.createIcons();
         }
 
-        async function clearAllChatHistory() {
-	    if (!currentUser || currentUser.role !== 'host') return;
-	    if (!confirm("Are you sure you want to clear ALL chat messages and announcements from the chatroom board?")) return;
+        async function editChatMessage(msgId, encodedText) {
+            const currentText = decodeURIComponent(encodedText);
+            const newText = prompt("Edit your message:", currentText);
+            if (newText === null) return;
+            const trimmed = newText.trim();
+            if (!trimmed) return showToast("Message cannot be empty.", "error");
 
-	    // Replace .neq('id', 0) with a universal condition compatible with UUID/Int IDs
-	    await _supabase.from('chat_messages').delete().not('id', 'is', null);
-	    await fetchCloudState();
-	    renderChatroom();
-	    showToast("All chat history cleared successfully.", "info");
-	}
+            await _supabase.from('chat_messages').update({ text: trimmed }).eq('id', msgId);
+            await fetchCloudState();
+            renderChatroom();
+            showToast("Message updated successfully.", "success");
+        }
+
+        async function clearAllChatHistory() {
+            if (!currentUser || currentUser.role !== 'host') return;
+            if (!confirm("Are you sure you want to clear ALL chat messages and announcements from the chatroom board?")) return;
+
+            // Replace .neq('id', 0) with a universal condition compatible with UUID/Int IDs
+            await _supabase.from('chat_messages').delete().not('id', 'is', null);
+            await fetchCloudState();
+            renderChatroom();
+            showToast("All chat history cleared successfully.", "info");
+        }
 
         function toggleAnnouncementMode() {
             isAnnouncementMode = !isAnnouncementMode;
@@ -2368,10 +2397,6 @@
             return '';
         }
 
-        // ==========================================
-        // REFACTORED BATCH UPLOAD/DOWNLOAD & TEMPLATE GENERATOR
-        // ==========================================
-
         function downloadUnifiedTemplate() {
             const data = [
                 ["{Q_id}", "{Q_type}", "{Q_msg}", "{Choice_Pool}", "{A_msg}", "{Soln_exp}", "{Actn}"],
@@ -2512,7 +2537,6 @@
                         return showToast("No executable data rows found in uploaded file.", "info");
                     }
 
-                    // Intra-file Precedence & Latest-Row Resolution Map
                     const resolvedMap = {};
                     rawRows.forEach(item => {
                         resolvedMap[item.rawQId] = item;
@@ -2520,7 +2544,6 @@
 
                     const evaluatedQIds = Object.keys(resolvedMap).sort((a, b) => parseInt(a) - parseInt(b));
 
-                    // Empty Repository & Missing Predecessor Validation Rule
                     if (myUserQs.length === 0) {
                         const firstQIdNum = parseInt(evaluatedQIds[0]);
                         const firstItem = resolvedMap[evaluatedQIds[0]];
@@ -2648,8 +2671,6 @@
             };
             reader.readAsArrayBuffer(file);
         }
-
-        // ==========================================
 
         function openModal(modalId) {
             if (modalId === 'settingsModal' && currentUser) {
