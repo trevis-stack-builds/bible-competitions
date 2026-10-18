@@ -1,15 +1,3 @@
-以下是針對您所提到的三個 Bug（詳細說明如下）所寫的單元測試（Unit Test）與重現驗證碼，以及經修復後的完整 bible-quizcraft HTML 程式碼。
-
-一、 Bug 重現與測試說明（Unit Test）
-我們使用一個獨立的測試頁面或測試區塊來重現並驗證以下 3 個問題：
-
-Bug 1（「儲存題目」後 Modal 未關閉且畫面未即時更新）：測試呼叫 handleSaveQuestion() 後，檢驗 #questionModal 是否確實被加上 hidden 類別（已關閉），且 #myQuestionsList 是否立刻出現新建立的題目。 
-Bug 2 (ORDERING 排序題型無法在題目儲存庫中顯示)：測試新增一個 type='ordering' 的題目並將篩選器設為 ORDERING 時，檢查題庫清單是否能正確檢索並呈現該題。 
-Bug 3（語言切換未翻譯 Modal 中的專有名詞）：切換至繁體中文（繁）時，檢查 Modal 內的標題（如「新增題目」、「題目類型」等）是否正確轉換為繁體中文。 
-以下是完整的修復後單體程式碼，其中已內含修正邏輯與通過驗證：
-二、 經修復錯誤後的完整 HTML Code (bible-quizcraft_v3.html)
-HTML
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
