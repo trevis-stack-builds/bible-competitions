@@ -898,7 +898,7 @@
 
     <script>
         // --- CONFIGURE YOUR SUPABASE PROJECT HERE ---
-       const SUPABASE_URL = 'https://jevyqvtgljhfwqltrbgu.supabase.co';
+        const SUPABASE_URL = 'https://jevyqvtgljhfwqltrbgu.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpldnlxdnRnbGpoZndxbHRyYmd1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTExMjc1MzAsImV4cCI6MjEwNjcwMzUzMH0.O6IifPUuHuBdqdwEXTUypsJZN-GHaBh4iGLOFseKyZ8';
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -3430,12 +3430,46 @@
             openQuestionModal(id);
         }
 
+        /**
+         * 【已修復】即時從本地與資料庫刪除題目
+         */
         async function deleteQuestion(id) {
             if (confirm("Are you sure you want to delete this question?")) {
-                await _supabase.from('questions').delete().eq('id', id);
-                await fetchCloudState();
-                updateUI();
-                showToast("Question deleted.", "info");
+                try {
+                    // 1. 【即時本地優化更新】先從本地陣列中移除該題目，讓 UI 瞬間反應
+                    if (typeof questions !== 'undefined' && Array.isArray(questions)) {
+                        questions = questions.filter(q => q.id !== id);
+                    }
+                    if (typeof pastQuestions !== 'undefined' && Array.isArray(pastQuestions)) {
+                        pastQuestions = pastQuestions.filter(q => q.id !== id);
+                    }
+
+                    // 2. 立即重新渲染當前畫面的題目列表與統計數據
+                    if (typeof updateUI === 'function') updateUI();
+                    if (typeof renderMyQuestions === 'function') renderMyQuestions();
+                    if (typeof renderPastPaperVault === 'function') renderPastPaperVault();
+
+                    // 3. 非同步向 Supabase 發送刪除請求
+                    const { error } = await _supabase.from('questions').delete().eq('id', id);
+                    if (error) throw error;
+
+                    // 4. 背景同步遠端最新狀態
+                    if (typeof fetchCloudState === 'function') {
+                        await fetchCloudState();
+                        if (typeof updateUI === 'function') updateUI();
+                    }
+
+                    showToast("Question deleted successfully.", "info");
+
+                } catch (err) {
+                    console.error("Delete question error:", err);
+                    showToast("刪除題目失敗，請檢查網路連線。", "error");
+                    // 若發生錯誤則重新抓取雲端狀態以回復正確畫面
+                    if (typeof fetchCloudState === 'function') {
+                        await fetchCloudState();
+                        if (typeof updateUI === 'function') updateUI();
+                    }
+                }
             }
         }
 
