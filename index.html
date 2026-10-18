@@ -3299,60 +3299,70 @@
             showToast(`Role updated for ${username} to ${newRole}`, "success");
         }
 
+        /**
+         * 【修復後】儲存題目函式 (handleSaveQuestion)
+         * - 加入完整的 try...catch 錯誤攔，確保在網路或資料庫異常時能安全捕捉並跳出提示，避免畫面無反應。
+         */
         async function handleSaveQuestion(e) {
             e.preventDefault();
             if (isPending || isPublished) return showToast("Question repository is locked during pending/published phase.", "error");
 
-            const id = document.getElementById('qId').value;
-            const type = document.getElementById('qType').value;
-            const prompt = document.getElementById('qPrompt').value.trim();
-            const explanation = document.getElementById('qExplanation').value.trim();
-            const isVault = document.getElementById('qIsVault').value === 'true';
+            try {
+                const id = document.getElementById('qId').value;
+                const type = document.getElementById('qType').value;
+                const prompt = document.getElementById('qPrompt').value.trim();
+                const explanation = document.getElementById('qExplanation').value.trim();
+                const isVault = document.getElementById('qIsVault').value === 'true';
 
-            let qData = {
-                id: id || 'q-' + Date.now(),
-                author: currentUser.name,
-                type,
-                prompt,
-                explanation,
-                is_vault: isVault,
-                quiz_session_id: currentQuizSession
-            };
+                let qData = {
+                    id: id || 'q-' + Date.now(),
+                    author: currentUser.name,
+                    type,
+                    prompt,
+                    explanation,
+                    is_vault: isVault,
+                    quiz_session_id: currentQuizSession
+                };
 
-            if (type === 'mcq') {
-                const optInputs = document.querySelectorAll('.mcq-option-input');
-                qData.options = Array.from(optInputs).map(i => i.value.trim());
-                const correct = document.querySelector('input[name="mcqCorrect"]:checked');
-                if (!correct) return showToast("Please select a correct option.", "error");
-                qData.correctAnswer = correct.value;
-            } else if (type === 'tf') {
-                const correct = document.querySelector('input[name="tfCorrect"]:checked');
-                if (!correct) return showToast("Please select True, False, or Not Given.", "error");
-                qData.correctAnswer = correct.value;
-            } else if (type === 'fill') {
-                qData.correctAnswer = document.getElementById('fillCorrectAnswer').value.trim();
-            } else if (type === 'matching') {
-                const rows = document.querySelectorAll('.pair-row');
-                const pairs = [];
-                rows.forEach(r => {
-                    const item = r.querySelector('.pair-item').value.trim();
-                    const match = r.querySelector('.pair-match').value.trim();
-                    if (item && match) pairs.push({ item, match });
-                });
-                if (pairs.length < 2) return showToast("Matching questions require at least 2 pairs.", "error");
-                qData.pairs = pairs;
-            } else if (type === 'ordering') {
-                const items = Array.from(document.querySelectorAll('.ordering-item-input')).map(i => i.value.trim()).filter(Boolean);
-                if (items.length < 2) return showToast("Ordering questions require at least 2 items.", "error");
-                qData.orderedItems = items;
-                qData.correctAnswer = items.join('|');
+                if (type === 'mcq') {
+                    const optInputs = document.querySelectorAll('.mcq-option-input');
+                    qData.options = Array.from(optInputs).map(i => i.value.trim());
+                    const correct = document.querySelector('input[name="mcqCorrect"]:checked');
+                    if (!correct) return showToast("Please select a correct option.", "error");
+                    qData.correctAnswer = correct.value;
+                } else if (type === 'tf') {
+                    const correct = document.querySelector('input[name="tfCorrect"]:checked');
+                    if (!correct) return showToast("Please select True, False, or Not Given.", "error");
+                    qData.correctAnswer = correct.value;
+                } else if (type === 'fill') {
+                    qData.correctAnswer = document.getElementById('fillCorrectAnswer').value.trim();
+                } else if (type === 'matching') {
+                    const rows = document.querySelectorAll('.pair-row');
+                    const pairs = [];
+                    rows.forEach(r => {
+                        const item = r.querySelector('.pair-item').value.trim();
+                        const match = r.querySelector('.pair-match').value.trim();
+                        if (item && match) pairs.push({ item, match });
+                    });
+                    if (pairs.length < 2) return showToast("Matching questions require at least 2 pairs.", "error");
+                    qData.pairs = pairs;
+                } else if (type === 'ordering') {
+                    const items = Array.from(document.querySelectorAll('.ordering-item-input')).map(i => i.value.trim()).filter(Boolean);
+                    if (items.length < 2) return showToast("Ordering questions require at least 2 items.", "error");
+                    qData.orderedItems = items;
+                    qData.correctAnswer = items.join('|');
+                }
+
+                await _supabase.from('questions').upsert(qData);
+                await fetchCloudState();
+                updateUI();
+                closeModal('questionModal');
+                showToast("Question saved successfully!", "success");
+
+            } catch (err) {
+                console.error("Save question error:", err);
+                showToast("儲存題目失敗，請檢查網路連線或 Supabase 專案設定。", "error");
             }
-
-            await _supabase.from('questions').upsert(qData);
-            await fetchCloudState();
-            updateUI();
-            closeModal('questionModal');
-            showToast("Question saved successfully!", "success");
         }
 
         function editQuestion(id, isVault = false) {
