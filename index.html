@@ -3431,17 +3431,17 @@
         }
 
         /**
-         * 【已完美修復】強固版 deleteQuestion 函式
-         * 包含：先暫時優化更新本地畫面 -> 呼叫後端刪除 -> 失敗時自動回滾狀態並跳出明確的「刪除題目失敗，請檢查網路連線。」提示。
+         * 【全面強固修復後的 deleteQuestion 函式】
+         * 完整支援：錯誤攔截、明確跳出「刪除題目失敗，請檢查網路連線。」錯誤提示、本地與伺服器狀態完美回滾同步。
          */
         async function deleteQuestion(id) {
             if (confirm("Are you sure you want to delete this question?")) {
-                // 1. 備份當前狀態，供失敗時回滾
+                // 1. 備份當前本地狀態，供刪除失敗時回滾使用
                 const previousQuestions = [...questions];
                 const previousPastQuestions = [...pastQuestions];
 
                 try {
-                    // 2. 樂觀更新（Optimistic Update）：先從本地陣列移除
+                    // 2. 樂觀更新（Optimistic Update）：先從本地陣列移除以提升互動流暢度
                     if (typeof questions !== 'undefined' && Array.isArray(questions)) {
                         questions = questions.filter(q => q.id !== id);
                     }
@@ -3453,11 +3453,11 @@
                     if (typeof renderMyQuestions === 'function') renderMyQuestions();
                     if (typeof renderPastPaperVault === 'function') renderPastPaperVault();
 
-                    // 3. 向 Supabase 發送刪除請求
+                    // 3. 向 Supabase 發送刪除請求並主動檢查回傳的 error 物件
                     const { error } = await _supabase.from('questions').delete().eq('id', id);
-                    if (error) throw error;
+                    if (error) throw error; // 關鍵：若 Supabase 回傳錯誤則主動拋出例外
 
-                    // 4. 背景同步遠端狀態
+                    // 4. 遠端同步成功後重新整理雲端狀態
                     if (typeof fetchCloudState === 'function') {
                         await fetchCloudState();
                         if (typeof updateUI === 'function') updateUI();
@@ -3468,7 +3468,7 @@
                 } catch (err) {
                     console.error("Delete question error:", err);
                     
-                    // 【關鍵修復】刪除失敗時，立即將本地狀態回滾，確保 Reload Page 後題目依然存在，並彈出指定錯誤提示
+                    // 5. 【關鍵修復】刪除失敗（或網路異常）時，立即回滾本地狀態，確保資料一致性，並顯示精確錯誤提示
                     questions = previousQuestions;
                     pastQuestions = previousPastQuestions;
                     
@@ -3481,9 +3481,6 @@
             }
         }
 
-        /**
-         * 【全面強固修復後的 openQuestionModal 函數】
-         */
         function openQuestionModal(editId = null) {
             if (typeof isPending !== 'undefined' && isPending || typeof isPublished !== 'undefined' && isPublished) {
                 showToast("Question repository is locked during pending/published phase.", "error");
@@ -3550,9 +3547,6 @@
             }
         }
 
-        /**
-         * 【全面強固修復後的 renderQuestionTypeInputs 函數】
-         */
         function renderQuestionTypeInputs(existingQ = null) {
             try {
                 const qTypeSelect = document.getElementById('qType');
