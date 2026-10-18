@@ -1073,7 +1073,6 @@
                 'Questions will be automatically archived here whenever the Host/Co-host unpublishes a Quiz Bank.': "Questions will be automatically archived here whenever the Host/Co-host unpublishes a Quiz Bank.",
                 'unpublishedPendingStatus': "Unpublished (Pending)",
                 'publishQuizLiveStatus': "Publish (Quiz #{k} Live)",
-                // Bug 3 Traditional Chinese Translations mapping added for English fallback
                 titleAddQuestion: "Add New Question",
                 titleEditQuestion: "Edit Question",
                 lblOptionsAndCorrect: "OPTIONS & CORRECT ANSWER",
@@ -1254,7 +1253,6 @@
                 'Questions will be automatically archived here whenever the Host/Co-host unpublishes a Quiz Bank.': "每當主持人或副主持人取消發布題庫時，題目將會自動封存至此。",
                 'unpublishedPendingStatus': "未發布（準備中）",
                 'publishQuizLiveStatus': "已發布（第 #{k} 期測驗進行中）",
-                // Bug 3 繁體中文翻譯對應
                 titleAddQuestion: "新增題目",
                 titleEditQuestion: "編輯題目",
                 lblOptionsAndCorrect: "選項與正確答案",
@@ -2031,7 +2029,6 @@
 
             let myQs = questions.filter(q => q.author === currentUser.name);
             
-            // Bug Fix 2: 修正篩選邏輯，確保 ORDERING 題型能被正確比對並過濾顯示
             if (filterVal !== 'ALL') {
                 myQs = myQs.filter(q => {
                     const qt = (q.type || '').toUpperCase();
@@ -2785,7 +2782,6 @@
                     }
 
                     const myUserQs = questions.filter(q => q.author === currentUser.name);
-                    // Bug 2 修正：將 ORDERING 對應至正確的資料庫字串 'ordering'
                     const typeMap = { 'MCQ': 'mcq', 'TFNGQ': 'tf', 'FILL_BLANK': 'fill', 'MATCHING': 'matching', 'ORDERING': 'ordering' };
 
                     let added = 0, updated = 0, deleted = 0;
@@ -3321,9 +3317,6 @@
             showToast(`Role updated for ${username} to ${newRole}`, "success");
         }
 
-        /**
-         * 【Bug 1 修復】：儲存題目後主動關閉 Modal 並重新渲染題目儲存庫介面
-         */
         async function handleSaveQuestion(e) {
             e.preventDefault();
             if (isPending || isPublished) return showToast("Question repository is locked during pending/published phase.", "error");
@@ -3377,7 +3370,6 @@
                 await _supabase.from('questions').upsert(qData);
                 await fetchCloudState();
                 
-                // Bug 1 修正核心：呼叫 closeModal 關閉視窗，並重新整理 My Questions 畫面
                 closeModal('questionModal');
                 updateUI();
                 renderMyQuestions();
@@ -3404,33 +3396,59 @@
             }
         }
 
+        /**
+         * 【修復後的 openQuestionModal 函數】
+         * 增加狀態防護與防禦性 DOM 檢查，確保點擊時必定能正確回應並開啟 Modal
+         */
         function openQuestionModal(editId = null) {
-            document.getElementById('questionForm').reset();
-            document.getElementById('qId').value = '';
-
-            const isVault = document.getElementById('qIsVault').value === 'true';
-            const pool = isVault ? pastQuestions : questions;
-
-            if (editId) {
-                const q = pool.find(item => item.id === editId);
-                if (!q) return;
-                document.getElementById('modalQTitle').textContent = "Edit Question";
-                document.getElementById('qId').value = q.id;
-                document.getElementById('qType').value = q.type;
-                document.getElementById('qPrompt').value = q.prompt;
-                document.getElementById('qExplanation').value = q.explanation || '';
-                renderQuestionTypeInputs(q);
-            } else {
-                document.getElementById('modalQTitle').textContent = "Add New Question";
-                renderQuestionTypeInputs();
+            if (isPending || isPublished) {
+                showToast("Question repository is locked during pending/published phase.", "error");
+                return;
             }
 
-            openModal('questionModal');
+            try {
+                const form = document.getElementById('questionForm');
+                if (form) form.reset();
+
+                const qIdInput = document.getElementById('qId');
+                if (qIdInput) qIdInput.value = '';
+
+                const qIsVaultInput = document.getElementById('qIsVault');
+                if (qIsVaultInput) qIsVaultInput.value = 'false';
+
+                const pool = questions;
+
+                if (editId) {
+                    const q = pool.find(item => item.id === editId);
+                    if (!q) return;
+                    const modalTitle = document.getElementById('modalQTitle');
+                    if (modalTitle) modalTitle.textContent = "Edit Question";
+                    if (qIdInput) qIdInput.value = q.id;
+                    
+                    const qTypeSelect = document.getElementById('qType');
+                    if (qTypeSelect) qTypeSelect.value = q.type;
+                    
+                    const qPromptArea = document.getElementById('qPrompt');
+                    if (qPromptArea) qPromptArea.value = q.prompt;
+                    
+                    const qExpInput = document.getElementById('qExplanation');
+                    if (qExpInput) qExpInput.value = q.explanation || '';
+                    
+                    renderQuestionTypeInputs(q);
+                } else {
+                    const modalTitle = document.getElementById('modalQTitle');
+                    if (modalTitle) modalTitle.textContent = "Add New Question";
+                    renderQuestionTypeInputs();
+                }
+
+                openModal('questionModal');
+
+            } catch (err) {
+                console.error("Error opening question modal:", err);
+                showToast("無法開啟新增題目視窗，請重新整理頁面後再試。", "error");
+            }
         }
 
-        /**
-         * 【Bug 3 修復】：擴充 Modal 內部介面元件與對應的 data-i18n 標籤，確保語系切換正常
-         */
         function renderQuestionTypeInputs(existingQ = null) {
             const type = document.getElementById('qType').value;
             const container = document.getElementById('typeSpecificInputs');
