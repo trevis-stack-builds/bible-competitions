@@ -3398,7 +3398,7 @@
 
         /**
          * 【修復後的 openQuestionModal 函數】
-         * 增加狀態防護與防禦性 DOM 檢查，確保點擊時必定能正確回應並開啟 Modal
+         * 增加完整的防禦性檢查，避免因 DOM 元素不存在或未就緒而引發異常錯誤
          */
         function openQuestionModal(editId = null) {
             if (isPending || isPublished) {
@@ -3408,7 +3408,9 @@
 
             try {
                 const form = document.getElementById('questionForm');
-                if (form) form.reset();
+                if (form && typeof form.reset === 'function') {
+                    form.reset();
+                }
 
                 const qIdInput = document.getElementById('qId');
                 if (qIdInput) qIdInput.value = '';
@@ -3421,8 +3423,10 @@
                 if (editId) {
                     const q = pool.find(item => item.id === editId);
                     if (!q) return;
+                    
                     const modalTitle = document.getElementById('modalQTitle');
                     if (modalTitle) modalTitle.textContent = "Edit Question";
+                    
                     if (qIdInput) qIdInput.value = q.id;
                     
                     const qTypeSelect = document.getElementById('qType');
@@ -3434,14 +3438,21 @@
                     const qExpInput = document.getElementById('qExplanation');
                     if (qExpInput) qExpInput.value = q.explanation || '';
                     
-                    renderQuestionTypeInputs(q);
+                    if (typeof renderQuestionTypeInputs === 'function') {
+                        renderQuestionTypeInputs(q);
+                    }
                 } else {
                     const modalTitle = document.getElementById('modalQTitle');
                     if (modalTitle) modalTitle.textContent = "Add New Question";
-                    renderQuestionTypeInputs();
+                    
+                    if (typeof renderQuestionTypeInputs === 'function') {
+                        renderQuestionTypeInputs();
+                    }
                 }
 
-                openModal('questionModal');
+                if (typeof openModal === 'function') {
+                    openModal('questionModal');
+                }
 
             } catch (err) {
                 console.error("Error opening question modal:", err);
