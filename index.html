@@ -898,7 +898,7 @@
 
     <script>
         // --- CONFIGURE YOUR SUPABASE PROJECT HERE ---
-        const SUPABASE_URL = 'https://jevyqvtgljhfwqltrbgu.supabase.co';
+       const SUPABASE_URL = 'https://jevyqvtgljhfwqltrbgu.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpldnlxdnRnbGpoZndxbHRyYmd1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTExMjc1MzAsImV4cCI6MjEwNjcwMzUzMH0.O6IifPUuHuBdqdwEXTUypsJZN-GHaBh4iGLOFseKyZ8';
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -2011,7 +2011,7 @@
                 
                 if (isPending && scheduledPublishTime) {
                     const diffMins = Math.max(1, Math.ceil((new Date(scheduledPublishTime) - new Date()) / (1000 * 60)));
-                    let lockedMsgTmpl = langData['Quiz Phase Locked (Pending): The quiz starts in # minutes. Managing your Question Repository is now disabled.'];
+                    let lockedMsgTmpl = langData['Quiz Phase Locked (Pending): The quiz starts in # minutes. Managing your Question Repository is now disabled.'] || 'Quiz Phase Locked (Pending): The quiz starts in # minutes.';
                     lockedNoticeText.innerHTML = `<strong>${lockedMsgTmpl.replace('#', diffMins)}</strong>`;
                 } else {
                     lockedNoticeText.innerHTML = `<strong data-i18n="quizLockedPublishedMsg">${langData.quizLockedPublishedMsg}</strong>`;
@@ -3224,14 +3224,14 @@
 
             if (statusTxt) {
                 if (isPublished) {
-                    const liveTextTmpl = langData['publishQuizLiveStatus'];
+                    const liveTextTmpl = langData['publishQuizLiveStatus'] || 'Published (Quiz #{k} Live)';
                     statusTxt.textContent = liveTextTmpl.replace('{k}', currentQuizSession);
                     statusTxt.className = "text-xl font-bold text-emerald-600 mt-1";
                 } else if (isPending) {
-                    statusTxt.textContent = langData['unpublishedPendingStatus'];
+                    statusTxt.textContent = langData['unpublishedPendingStatus'] || 'Unpublished (Pending)';
                     statusTxt.className = "text-xl font-bold text-purple-600 mt-1";
                 } else if (scheduledPublishTime) {
-                    statusTxt.textContent = langData['unpublishedPendingStatus'];
+                    statusTxt.textContent = langData['unpublishedPendingStatus'] || 'Unpublished (Pending)';
                     statusTxt.className = "text-xl font-bold text-indigo-600 mt-1";
                 } else {
                     statusTxt.textContent = langData.unpublishedCreationPhase;
@@ -3440,10 +3440,10 @@
         }
 
         /**
-         * 【強力防禦修復後的 openQuestionModal 函數】
+         * 【全面強固修復後的 openQuestionModal 函數】
          */
         function openQuestionModal(editId = null) {
-            if (isPending || isPublished) {
+            if (typeof isPending !== 'undefined' && isPending || typeof isPublished !== 'undefined' && isPublished) {
                 showToast("Question repository is locked during pending/published phase.", "error");
                 return;
             }
@@ -3460,22 +3460,25 @@
                 const qIsVaultInput = document.getElementById('qIsVault');
                 if (qIsVaultInput) qIsVaultInput.value = 'false';
 
-                const pool = questions || [];
+                const pool = (typeof questions !== 'undefined' && Array.isArray(questions)) ? questions : [];
 
                 if (editId) {
                     const q = pool.find(item => item.id === editId);
-                    if (!q) return;
+                    if (!q) {
+                        showToast("找不到指定的題目資料。", "error");
+                        return;
+                    }
                     
                     const modalTitle = document.getElementById('modalQTitle');
                     if (modalTitle) modalTitle.textContent = "Edit Question";
                     
-                    if (qIdInput) qIdInput.value = q.id;
+                    if (qIdInput) qIdInput.value = q.id || '';
                     
                     const qTypeSelect = document.getElementById('qType');
-                    if (qTypeSelect) qTypeSelect.value = q.type;
+                    if (qTypeSelect) qTypeSelect.value = q.type || 'mcq';
                     
                     const qPromptArea = document.getElementById('qPrompt');
-                    if (qPromptArea) qPromptArea.value = q.prompt;
+                    if (qPromptArea) qPromptArea.value = q.prompt || '';
                     
                     const qExpInput = document.getElementById('qExplanation');
                     if (qExpInput) qExpInput.value = q.explanation || '';
@@ -3492,7 +3495,12 @@
                     }
                 }
 
-                openModal('questionModal');
+                if (typeof openModal === 'function') {
+                    openModal('questionModal');
+                } else {
+                    const modal = document.getElementById('questionModal');
+                    if (modal) modal.classList.remove('hidden');
+                }
 
             } catch (err) {
                 console.error("Error opening question modal:", err);
@@ -3501,94 +3509,100 @@
         }
 
         /**
-         * 【強力防禦修復後的 renderQuestionTypeInputs 函數】
+         * 【全面強固修復後的 renderQuestionTypeInputs 函數】
          */
         function renderQuestionTypeInputs(existingQ = null) {
-            const qTypeSelect = document.getElementById('qType');
-            if (!qTypeSelect) return;
-            
-            const type = qTypeSelect.value;
-            const container = document.getElementById('typeSpecificInputs');
-            if (!container) return;
-            
-            const langData = i18n[currentLang] || i18n.EN;
+            try {
+                const qTypeSelect = document.getElementById('qType');
+                if (!qTypeSelect) return;
+                
+                const type = qTypeSelect.value || 'mcq';
+                const container = document.getElementById('typeSpecificInputs');
+                if (!container) return;
+                
+                const safeLang = (typeof currentLang !== 'undefined') ? currentLang : 'EN';
+                const langData = (typeof i18n !== 'undefined' && i18n[safeLang]) ? i18n[safeLang] : (i18n && i18n.EN ? i18n.EN : {});
 
-            if (type === 'mcq') {
-                const opts = existingQ && existingQ.type === 'mcq' ? existingQ.options : ['', '', '', ''];
-                const correctIdx = existingQ && existingQ.type === 'mcq' ? parseInt(existingQ.correctAnswer) : 0;
+                if (type === 'mcq') {
+                    const opts = (existingQ && existingQ.type === 'mcq' && Array.isArray(existingQ.options)) ? existingQ.options : ['', '', '', ''];
+                    const correctIdx = (existingQ && existingQ.type === 'mcq') ? parseInt(existingQ.correctAnswer) || 0 : 0;
 
-                container.innerHTML = `
-                    <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2">${langData.lblOptionsAndCorrect || 'OPTIONS & CORRECT ANSWER'}</label>
-                    <div class="space-y-2">
-                        ${opts.map((opt, i) => `
-                            <div class="flex items-center gap-2">
-                                <input type="radio" name="mcqCorrect" value="${i}" ${correctIdx === i ? 'checked' : ''} class="w-4 h-4 text-blue-600">
-                                <input type="text" class="mcq-option-input w-full px-3 py-2 rounded border border-slate-300 text-sm" placeholder="Option ${String.fromCharCode(65 + i)}" value="${escapeHTML(opt)}" required>
-                            </div>
-                        `).join('')}
-                    </div>
-                `;
-            } else if (type === 'tf') {
-                const currentAns = existingQ && existingQ.type === 'tf' ? existingQ.correctAnswer : 'true';
-                container.innerHTML = `
-                    <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2">${langData.lblSelectCorrectAns || 'SELECT CORRECT ANSWER'}</label>
-                    <div class="grid grid-cols-3 gap-3">
-                        <label class="flex items-center gap-2 text-sm font-bold text-emerald-700">
-                            <input type="radio" name="tfCorrect" value="true" ${currentAns === 'true' ? 'checked' : ''} class="w-4 h-4"> True
-                        </label>
-                        <label class="flex items-center gap-2 text-sm font-bold text-red-700">
-                            <input type="radio" name="tfCorrect" value="false" ${currentAns === 'false' ? 'checked' : ''} class="w-4 h-4"> False
-                        </label>
-                        <label class="flex items-center gap-2 text-sm font-bold text-amber-700">
-                            <input type="radio" name="tfCorrect" value="not_given" ${currentAns === 'not_given' ? 'checked' : ''} class="w-4 h-4"> Not Given
-                        </label>
-                    </div>
-                `;
-            } else if (type === 'fill') {
-                const answer = existingQ && existingQ.type === 'fill' ? existingQ.correctAnswer : '';
-                container.innerHTML = `
-                    <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-1">${langData.lblExpectedCorrectText || 'EXPECTED CORRECT TEXT ANSWER'}</label>
-                    <input type="text" id="fillCorrectAnswer" required value="${escapeHTML(answer)}" placeholder="e.g. truth" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-sm">
-                `;
-            } else if (type === 'matching') {
-                const pairs = existingQ && existingQ.type === 'matching' ? existingQ.pairs : [
-                    { item: '', match: '' }, { item: '', match: '' }
-                ];
+                    container.innerHTML = `
+                        <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2">${escapeHTML(langData.lblOptionsAndCorrect || 'OPTIONS & CORRECT ANSWER')}</label>
+                        <div class="space-y-2">
+                            ${opts.map((opt, i) => `
+                                <div class="flex items-center gap-2">
+                                    <input type="radio" name="mcqCorrect" value="${i}" ${correctIdx === i ? 'checked' : ''} class="w-4 h-4 text-blue-600">
+                                    <input type="text" class="mcq-option-input w-full px-3 py-2 rounded border border-slate-300 text-sm" placeholder="Option ${String.fromCharCode(65 + i)}" value="${escapeHTML(opt)}" required>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                } else if (type === 'tf') {
+                    const currentAns = (existingQ && existingQ.type === 'tf') ? existingQ.correctAnswer : 'true';
+                    container.innerHTML = `
+                        <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2">${escapeHTML(langData.lblSelectCorrectAns || 'SELECT CORRECT ANSWER')}</label>
+                        <div class="grid grid-cols-3 gap-3">
+                            <label class="flex items-center gap-2 text-sm font-bold text-emerald-700">
+                                <input type="radio" name="tfCorrect" value="true" ${currentAns === 'true' ? 'checked' : ''} class="w-4 h-4"> True
+                            </label>
+                            <label class="flex items-center gap-2 text-sm font-bold text-red-700">
+                                <input type="radio" name="tfCorrect" value="false" ${currentAns === 'false' ? 'checked' : ''} class="w-4 h-4"> False
+                            </label>
+                            <label class="flex items-center gap-2 text-sm font-bold text-amber-700">
+                                <input type="radio" name="tfCorrect" value="not_given" ${currentAns === 'not_given' ? 'checked' : ''} class="w-4 h-4"> Not Given
+                            </label>
+                        </div>
+                    `;
+                } else if (type === 'fill') {
+                    const answer = (existingQ && existingQ.type === 'fill') ? existingQ.correctAnswer : '';
+                    container.innerHTML = `
+                        <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-1">${escapeHTML(langData.lblExpectedCorrectText || 'EXPECTED CORRECT TEXT ANSWER')}</label>
+                        <input type="text" id="fillCorrectAnswer" required value="${escapeHTML(answer)}" placeholder="e.g. truth" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-sm">
+                    `;
+                } else if (type === 'matching') {
+                    const pairs = (existingQ && existingQ.type === 'matching' && Array.isArray(existingQ.pairs)) ? existingQ.pairs : [
+                        { item: '', match: '' }, { item: '', match: '' }
+                    ];
 
-                container.innerHTML = `
-                    <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-1">${langData.lblMatchingPairs || 'MATCHING PAIRS'}</label>
-                    <div id="matchingPairsContainer" class="space-y-2">
-                        ${pairs.map(p => `
-                            <div class="flex items-center gap-2 pair-row">
-                                <input type="text" class="pair-item w-1/2 px-3 py-2 rounded border border-slate-300 text-sm" placeholder="Item" value="${escapeHTML(p.item)}" required>
-                                <span class="text-slate-400 font-bold">→</span>
-                                <input type="text" class="pair-match w-1/2 px-3 py-2 rounded border border-slate-300 text-sm" placeholder="Matches With" value="${escapeHTML(p.match)}" required>
-                            </div>
-                        `).join('')}
-                    </div>
-                    <button type="button" onclick="addMatchingPairRow()" class="mt-2 text-xs font-semibold text-blue-600 hover:text-blue-800 flex items-center gap-1">
-                        <i data-lucide="plus" class="w-3.5 h-3.5"></i> <span>${langData.btnAddPair || 'Add Pair'}</span>
-                    </button>
-                `;
-            } else if (type === 'ordering') {
-                const items = existingQ && (existingQ.type === 'ordering' || existingQ.type === 'order') ? (existingQ.orderedItems || existingQ.correctAnswer.split('|')) : ['', '', ''];
+                    container.innerHTML = `
+                        <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-1">${escapeHTML(langData.lblMatchingPairs || 'MATCHING PAIRS')}</label>
+                        <div id="matchingPairsContainer" class="space-y-2">
+                            ${pairs.map(p => `
+                                <div class="flex items-center gap-2 pair-row">
+                                    <input type="text" class="pair-item w-1/2 px-3 py-2 rounded border border-slate-300 text-sm" placeholder="Item" value="${escapeHTML(p.item)}" required>
+                                    <span class="text-slate-400 font-bold">→</span>
+                                    <input type="text" class="pair-match w-1/2 px-3 py-2 rounded border border-slate-300 text-sm" placeholder="Matches With" value="${escapeHTML(p.match)}" required>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <button type="button" onclick="addMatchingPairRow()" class="mt-2 text-xs font-semibold text-blue-600 hover:text-blue-800 flex items-center gap-1">
+                            <span>${escapeHTML(langData.btnAddPair || 'Add Pair')}</span>
+                        </button>
+                    `;
+                } else if (type === 'ordering') {
+                    const items = (existingQ && (existingQ.type === 'ordering' || existingQ.type === 'order')) ? 
+                        (existingQ.orderedItems || (existingQ.correctAnswer ? existingQ.correctAnswer.split('|' ) : ['', '', ''])) : ['', '', ''];
 
-                container.innerHTML = `
-                    <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-1">${langData.lblOrderedSequenceItems || 'ORDERED SEQUENCE ITEMS'}</label>
-                    <div id="orderingItemsContainer" class="space-y-2">
-                        ${items.map((item, idx) => `
-                            <div class="flex items-center gap-2 ordering-item-row">
-                                <span class="w-6 text-center font-bold text-slate-400 text-xs">${idx + 1}.</span>
-                                <input type="text" class="ordering-item-input w-full px-3 py-2 rounded border border-slate-300 text-sm" placeholder="Sequence Item #${idx + 1}" value="${escapeHTML(item)}" required>
-                            </div>
-                        `).join('')}
-                    </div>
-                    <button type="button" onclick="addOrderingItemRow()" class="mt-2 text-xs font-semibold text-blue-600 hover:text-blue-800 flex items-center gap-1">
-                        <i data-lucide="plus" class="w-3.5 h-3.5"></i> <span>${langData.btnAddSequenceStep || 'Add Sequence Step'}</span>
-                    </button>
-                `;
+                    container.innerHTML = `
+                        <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-1">${escapeHTML(langData.lblOrderedSequenceItems || 'ORDERED SEQUENCE ITEMS')}</label>
+                        <div id="orderingItemsContainer" class="space-y-2">
+                            ${items.map((item, idx) => `
+                                <div class="flex items-center gap-2 ordering-item-row">
+                                    <span class="w-6 text-center font-bold text-slate-400 text-xs">${idx + 1}.</span>
+                                    <input type="text" class="ordering-item-input w-full px-3 py-2 rounded border border-slate-300 text-sm" placeholder="Sequence Item #${idx + 1}" value="${escapeHTML(item)}" required>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <button type="button" onclick="addOrderingItemRow()" class="mt-2 text-xs font-semibold text-blue-600 hover:text-blue-800 flex items-center gap-1">
+                            <span>${escapeHTML(langData.btnAddSequenceStep || 'Add Sequence Step')}</span>
+                        </button>
+                    `;
+                }
+                if (typeof applyLanguage === 'function') applyLanguage();
+            } catch (err) {
+                console.error("Error in renderQuestionTypeInputs:", err);
             }
-            if (typeof applyLanguage === 'function') applyLanguage();
         }
 
         function addMatchingPairRow() {
@@ -4018,8 +4032,8 @@
         }
 
         function escapeHTML(str) {
-            if (!str) return '';
-            return str.replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag));
+            if (str === null || str === undefined) return '';
+            return String(str).replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag));
         }
 
         function showToast(message, type = "info") {
