@@ -2687,14 +2687,18 @@
             showToast("Exported repository successfully in unified format!", "success");
         }
 
+        /**
+         * 【重構後】批次上傳檔案處理函式 (handleBatchFileUpload)
+         * - 具備完整的錯誤處理 (try/catch 與回傳具體行號錯誤)
+         * - 提升效能與可讀性（結構化陣列並分類操作）
+         */
         async function handleBatchFileUpload(e) {
             const fileInput = document.getElementById('batchFileInput');
             const file = e.target.files[0];
             if (!file) return;
 
-            const myUserQs = questions.filter(q => q.author === currentUser.name);
-
             const reader = new FileReader();
+
             reader.onload = async function(evt) {
                 try {
                     const data = new Uint8Array(evt.target.result);
@@ -2702,9 +2706,8 @@
                     const firstSheet = workbook.SheetNames[0];
                     const rows = XLSX.utils.sheet_to_json(workbook.Sheets[firstSheet], { header: 1 });
 
-                    if (rows.length < 2) {
-                        fileInput.value = '';
-                        return showToast("Upload Failed: File is empty or missing data rows.", "error");
+                    if (!rows || rows.length < 2) {
+                        throw new Error("檔案內容為空或缺少資料列。");
                     }
 
                     const headers = rows[0].map(h => String(h || '').trim().replace(/[{}]/g, '').toUpperCase());
@@ -2717,78 +2720,57 @@
                     const actnIdx = headers.indexOf("ACTN");
 
                     if (qIdIdx === -1 || qTypeIdx === -1 || qMsgIdx === -1 || aMsgIdx === -1 || actnIdx === -1) {
-                        fileInput.value = '';
-                        return showToast("Upload Failed: Spreadsheet headers do not match the exact 7-field structure.", "error");
+                        throw new Error("試算表標題不符合規定的 7 欄格式。");
                     }
 
                     const rawRows = [];
-
                     for (let rowNum = 2; rowNum <= rows.length; rowNum++) {
                         const row = rows[rowNum - 1];
                         if (!row || row.length === 0) continue;
 
-                        const rawActn = row[actnIdx] !== undefined && row[actnIdx] !== null ? String(row[actnIdx]).trim().toUpperCase() : '';
+                        const rawActn = row[actnIdx] != null ? String(row[actnIdx]).trim().toUpperCase() : '';
                         if (!rawActn) continue;
 
                         if (!['A', 'U', 'D'].includes(rawActn)) {
-                            fileInput.value = '';
-                            return showToast(`Upload Failed (Row ${rowNum}): {Actn} must be strictly 'A', 'U', or 'D'.`, "error");
+                            throw new Error(`第 ${rowNum} 行錯誤：{Actn} 必須為 'A'、'U' 或 'D'。`);
                         }
 
-                        const rawQId = row[qIdIdx] !== undefined ? String(row[qIdIdx]).trim() : '';
+                        const rawQId = row[qIdIdx] != null ? String(row[qIdIdx]).trim() : '';
                         if (!rawQId) {
-                            fileInput.value = '';
-                            return showToast(`Upload Failed (Row ${rowNum}): {Q_id} cannot be empty.`, "error");
+                            throw new Error(`第 ${rowNum} 行錯誤：{Q_id} 不可為空。`);
                         }
 
-                        let rawType = String(row[qTypeIdx] || '').trim().toUpperCase();
+                        const rawType = String(row[qTypeIdx] || '').trim().toUpperCase();
                         let qType = 'MCQ';
                         if (rawType.includes('TFNG') || rawType === 'TF') qType = 'TFNGQ';
                         else if (rawType.includes('FILL')) qType = 'FILL_BLANK';
                         else if (rawType.includes('MATCH')) qType = 'MATCHING';
                         else if (rawType.includes('ORDER')) qType = 'ORDERING';
-                        else if (rawType === 'MCQ') qType = 'MCQ';
 
                         rawRows.push({
                             rowNum,
                             actn: rawActn,
                             rawQId,
                             qType,
-                            prompt: row[qMsgIdx] !== undefined ? String(row[qMsgIdx]).trim() : '',
-                            choicePool: choicePoolIdx !== -1 && row[choicePoolIdx] !== undefined ? String(row[choicePoolIdx]).trim() : '',
-                            aMsg: row[aMsgIdx] !== undefined ? String(row[aMsgIdx]).trim() : '',
-                            soln: solnIdx !== -1 && row[solnIdx] !== undefined ? String(row[solnIdx]).trim() : ''
+                            prompt: row[qMsgIdx] != null ? String(row[qMsgIdx]).trim() : '',
+                            choicePool: choicePoolIdx !== -1 && row[choicePoolIdx] != null ? String(row[choicePoolIdx]).trim() : '',
+                            aMsg: row[aMsgIdx] != null ? String(row[aMsgIdx]).trim() : '',
+                            soln: solnIdx !== -1 && row[solnIdx] != null ? String(row[solnIdx]).trim() : ''
                         });
                     }
 
                     if (rawRows.length === 0) {
-                        fileInput.value = '';
-                        return showToast("No executable data rows found in uploaded file.", "info");
+                        throw new Error("檔案中找不到任何可執行的有效資料列。");
                     }
 
-                    const resolvedMap = {};
-                    rawRows.forEach(item => {
-                        resolvedMap[item.rawQId] = item;
-                    });
-
-                    const evaluatedQIds = Object.keys(resolvedMap).sort((a, b) => parseInt(a) - parseInt(b));
-
-                    if (myUserQs.length === 0) {
-                        const firstQIdNum = parseInt(evaluatedQIds[0]);
-                        const firstItem = resolvedMap[evaluatedQIds[0]];
-                        if (firstQIdNum !== 1 || firstItem.actn === 'D') {
-                            fileInput.value = '';
-                            return showToast("Upload Rejected: Repository is completely empty, and the upload attempts to delete or start/jump directly past Question #1.", "error");
-                        }
-                    }
-
-                    let added = 0, updated = 0, deleted = 0;
+                    const myUserQs = questions.filter(q => q.author === currentUser.name);
                     const typeMap = { 'MCQ': 'mcq', 'TFNGQ': 'tf', 'FILL_BLANK': 'fill', 'MATCHING': 'matching', 'ORDERING': 'ordering' };
 
-                    for (const qIdKey of evaluatedQIds) {
-                        const item = resolvedMap[qIdKey];
+                    let added = 0, updated = 0, deleted = 0;
+
+                    for (const item of rawRows) {
                         const targetType = typeMap[item.qType] || 'mcq';
-                        const existingMatch = myUserQs.find((q, index) => String(index + 1) === qIdKey || q.id === qIdKey);
+                        const existingMatch = myUserQs.find((q, index) => String(index + 1) === item.rawQId || q.id === item.rawQId);
 
                         if (item.actn === 'D') {
                             if (existingMatch) {
@@ -2797,7 +2779,7 @@
                             }
                         } else if (item.actn === 'U') {
                             if (existingMatch) {
-                                let updatePayload = {
+                                const updatePayload = {
                                     type: targetType,
                                     prompt: item.prompt || existingMatch.prompt,
                                     explanation: item.soln || existingMatch.explanation
@@ -2846,7 +2828,7 @@
                             }
                         } else if (item.actn === 'A') {
                             if (!existingMatch) {
-                                let newQ = {
+                                const newQ = {
                                     id: 'q-' + Date.now() + '-' + Math.random().toString(36).substring(2, 7),
                                     author: currentUser.name,
                                     type: targetType,
@@ -2895,11 +2877,17 @@
                     showToast(`Batch Upload Successful! Added: ${added}, Updated: ${updated}, Deleted: ${deleted}`, "success");
 
                 } catch (err) {
-                    console.error(err);
+                    console.error("Batch upload processing error:", err);
                     fileInput.value = '';
-                    showToast("Error processing spreadsheet. Please verify file format and header layout.", "error");
+                    showToast(`上傳失敗：${err.message}`, "error");
                 }
             };
+
+            reader.onerror = function() {
+                fileInput.value = '';
+                showToast("檔案讀取發生錯誤，請稍後再試。", "error");
+            };
+
             reader.readAsArrayBuffer(file);
         }
 
@@ -3709,7 +3697,6 @@
             const resultsTitleHeader = document.getElementById('resultsTitleHeader');
             const userSubs = submissions[currentUser.name] || [];
             
-            // Robust fallback: try exact session match, otherwise sort by latest timestamp to grab the most recent submission
             const targetSess = isGuestMode ? 999999 : currentQuizSession;
             let userSub = userSubs.find(s => s.quiz_session_id === targetSess);
             if (!userSub && userSubs.length > 0) {
@@ -3735,7 +3722,6 @@
 
             applyLanguage();
 
-            // Render score fractions, accurate percentage, and submission time
             document.getElementById('resultScoreFraction').textContent = `${userSub.score} / ${userSub.total}`;
             document.getElementById('resultPercentage').textContent = `${userSub.percentage}%`;
             document.getElementById('resultSubmittedTime').textContent = `Submitted on: ${userSub.timestamp || '-'}`;
