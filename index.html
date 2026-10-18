@@ -3431,16 +3431,17 @@
         }
 
         /**
-         * 【已修復】強固版 deleteQuestion 函式（具備即時前端更新、失敗自動狀態回滾與詳細錯誤診斷）
+         * 【已完美修復】強固版 deleteQuestion 函式
+         * 包含：先暫時優化更新本地畫面 -> 呼叫後端刪除 -> 失敗時自動回滾狀態並跳出明確的「刪除題目失敗，請檢查網路連線。」提示。
          */
         async function deleteQuestion(id) {
             if (confirm("Are you sure you want to delete this question?")) {
-                // 先備份本地狀態以供發生錯誤時回滾
+                // 1. 備份當前狀態，供失敗時回滾
                 const previousQuestions = [...questions];
                 const previousPastQuestions = [...pastQuestions];
 
                 try {
-                    // 1. 【即時本地優化更新】先從本地陣列中移除該題目，讓 UI 瞬間反應
+                    // 2. 樂觀更新（Optimistic Update）：先從本地陣列移除
                     if (typeof questions !== 'undefined' && Array.isArray(questions)) {
                         questions = questions.filter(q => q.id !== id);
                     }
@@ -3448,16 +3449,15 @@
                         pastQuestions = pastQuestions.filter(q => q.id !== id);
                     }
 
-                    // 2. 立即重新渲染當前畫面的題目列表與統計數據
                     if (typeof updateUI === 'function') updateUI();
                     if (typeof renderMyQuestions === 'function') renderMyQuestions();
                     if (typeof renderPastPaperVault === 'function') renderPastPaperVault();
 
-                    // 3. 非同步向 Supabase 發送刪除請求
+                    // 3. 向 Supabase 發送刪除請求
                     const { error } = await _supabase.from('questions').delete().eq('id', id);
                     if (error) throw error;
 
-                    // 4. 背景同步遠端最新狀態
+                    // 4. 背景同步遠端狀態
                     if (typeof fetchCloudState === 'function') {
                         await fetchCloudState();
                         if (typeof updateUI === 'function') updateUI();
@@ -3468,20 +3468,15 @@
                 } catch (err) {
                     console.error("Delete question error:", err);
                     
-                    // 發生錯誤（如 RLS 權限阻擋或網路異常）時，立即回滾本地狀態
+                    // 【關鍵修復】刪除失敗時，立即將本地狀態回滾，確保 Reload Page 後題目依然存在，並彈出指定錯誤提示
                     questions = previousQuestions;
                     pastQuestions = previousPastQuestions;
+                    
                     if (typeof updateUI === 'function') updateUI();
                     if (typeof renderMyQuestions === 'function') renderMyQuestions();
                     if (typeof renderPastPaperVault === 'function') renderPastPaperVault();
 
-                    // 根據錯誤類型給予精確提示
-                    const errDetail = err.message || '';
-                    if (errDetail.includes('policy') || errDetail.includes('permission') || errDetail.includes('row-level security')) {
-                        showToast("刪除失敗：資料庫權限不足 (RLS Policy 阻擋)，請檢查 Supabase 設定。", "error");
-                    } else {
-                        showToast("刪除題目失敗，請檢查網路連線或資料庫設定。", "error");
-                    }
+                    showToast("刪除題目失敗，請檢查網路連線。", "error");
                 }
             }
         }
