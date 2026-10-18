@@ -2911,43 +2911,55 @@
 
         function openModal(modalId) {
             if (modalId === 'settingsModal' && currentUser) {
-                document.getElementById('settingsCurrentUserName').textContent = currentUser.name;
-                document.getElementById('editUserNameInput').value = currentUser.name;
-                document.getElementById('newPasswordInput').value = currentUser.pass || 'guest';
+                const sName = document.getElementById('settingsCurrentUserName');
+                if (sName) sName.textContent = currentUser.name;
+                const eName = document.getElementById('editUserNameInput');
+                if (eName) eName.value = currentUser.name;
+                const nPass = document.getElementById('newPasswordInput');
+                if (nPass) nPass.value = currentUser.pass || 'guest';
                 
                 const roleBadge = document.getElementById('settingsCurrentUserRole');
-                roleBadge.textContent = currentUser.role;
+                if (roleBadge) roleBadge.textContent = currentUser.role;
 
                 const avatarPrev = document.getElementById('settingsAvatarPreview');
                 const fallbackIcon = document.getElementById('settingsAvatarFallbackIcon');
                 
                 if (currentUser.avatar_url) {
-                    avatarPrev.src = currentUser.avatar_url;
-                    avatarPrev.classList.remove('hidden');
-                    fallbackIcon.classList.add('hidden');
+                    if (avatarPrev) {
+                        avatarPrev.src = currentUser.avatar_url;
+                        avatarPrev.classList.remove('hidden');
+                    }
+                    if (fallbackIcon) fallbackIcon.classList.add('hidden');
                 } else {
-                    avatarPrev.classList.add('hidden');
-                    fallbackIcon.classList.remove('hidden');
+                    if (avatarPrev) avatarPrev.classList.add('hidden');
+                    if (fallbackIcon) fallbackIcon.classList.remove('hidden');
                 }
                 tempAvatarBase64 = currentUser.avatar_url || null;
 
                 const partBlock = document.getElementById('participantFeedbackBlock');
                 const hostBlock = document.getElementById('hostFeedbackBlock');
                 if (isHostOrCoHost()) {
-                    partBlock.classList.add('hidden');
-                    hostBlock.classList.remove('hidden');
+                    if (partBlock) partBlock.classList.add('hidden');
+                    if (hostBlock) hostBlock.classList.remove('hidden');
                 } else {
-                    partBlock.classList.remove('hidden');
-                    hostBlock.classList.add('hidden');
+                    if (partBlock) partBlock.classList.remove('hidden');
+                    if (hostBlock) hostBlock.classList.add('hidden');
                 }
             }
-            document.getElementById(modalId).classList.remove('hidden');
-            applyLanguage();
-            applyMobileRules();
+            
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.remove('hidden');
+            }
+            if (typeof applyLanguage === 'function') applyLanguage();
+            if (typeof applyMobileRules === 'function') applyMobileRules();
         }
 
         function closeModal(modalId) {
-            document.getElementById(modalId).classList.add('hidden');
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.add('hidden');
+            }
         }
 
         function zoomProfilePicture() {
@@ -2956,16 +2968,17 @@
             const zoomedName = document.getElementById('zoomedAvatarName');
             
             if (currentUser.avatar_url) {
-                zoomedImg.src = currentUser.avatar_url;
+                if (zoomedImg) zoomedImg.src = currentUser.avatar_url;
             } else {
-                zoomedImg.src = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 24 24' fill='none' stroke='%23cbd5e1' stroke-width='2'><path d='M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2'/><circle cx='12' cy='7' r='4'/></svg>";
+                if (zoomedImg) zoomedImg.src = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 24 24' fill='none' stroke='%23cbd5e1' stroke-width='2'><path d='M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2'/><circle cx='12' cy='7' r='4'/></svg>";
             }
-            zoomedName.textContent = currentUser.name;
+            if (zoomedName) zoomedName.textContent = currentUser.name;
             openModal('pfpZoomModal');
         }
 
         async function submitUserFeedback() {
             const input = document.getElementById('userFeedbackInput');
+            if (!input) return;
             const comment = input.value.trim();
             if (!comment) return showToast("Please enter a comment.", "error");
 
@@ -2991,6 +3004,7 @@
         function renderFeedbackCommentsList() {
             const langData = i18n[currentLang] || i18n.EN;
             const container = document.getElementById('feedbackListContainer');
+            if (!container) return;
 
             if (!feedbackComments || feedbackComments.length === 0) {
                 container.innerHTML = `<div class="text-center text-slate-400 text-sm py-6">${langData.noFeedbackReceived}</div>`;
@@ -3035,51 +3049,62 @@
 
             if (scheduledPublishTime && !isPending) {
                 const pubDT = new Date(scheduledPublishTime);
-                pubDateInput.value = pubDT.toISOString().split('T')[0];
-                pubTimeInput.value = pubDT.toTimeString().substring(0, 5);
-                durationInput.value = quizDurationMins || '';
+                if (pubDateInput) pubDateInput.value = pubDT.toISOString().split('T')[0];
+                if (pubTimeInput) pubTimeInput.value = pubDT.toTimeString().substring(0, 5);
+                if (durationInput) durationInput.value = quizDurationMins || '';
                 
                 if (quizDueDate) {
                     const dueDT = new Date(quizDueDate);
-                    dueDateInput.value = dueDT.toISOString().split('T')[0];
-                    dueTimeInput.value = dueDT.toTimeString().substring(0, 5);
+                    if (dueDateInput) dueDateInput.value = dueDT.toISOString().split('T')[0];
+                    if (dueTimeInput) dueTimeInput.value = dueDT.toTimeString().substring(0, 5);
                 }
 
-                durationInput.disabled = true;
-                pubDateInput.disabled = true;
-                pubTimeInput.disabled = true;
-                dueDateInput.disabled = true;
-                dueTimeInput.disabled = true;
-                submitBtn.style.display = 'none';
+                if (durationInput) durationInput.disabled = true;
+                if (pubDateInput) pubDateInput.disabled = true;
+                if (pubTimeInput) pubTimeInput.disabled = true;
+                if (dueDateInput) dueDateInput.disabled = true;
+                if (dueTimeInput) dueTimeInput.disabled = true;
+                if (submitBtn) submitBtn.style.display = 'none';
             } else {
-                durationInput.disabled = false;
-                pubDateInput.disabled = false;
-                pubTimeInput.disabled = false;
-                dueDateInput.disabled = false;
-                dueTimeInput.disabled = false;
-                submitBtn.style.display = 'inline-block';
+                if (durationInput) durationInput.disabled = false;
+                if (pubDateInput) pubDateInput.disabled = false;
+                if (pubTimeInput) pubTimeInput.disabled = false;
+                if (dueDateInput) dueDateInput.disabled = false;
+                if (dueTimeInput) dueTimeInput.disabled = false;
+                if (submitBtn) submitBtn.style.display = 'inline-block';
             }
 
             openModal('publishModal');
         }
 
         function resetPublishModalForm() {
-            document.getElementById('quizDurationInput').value = '';
-            document.getElementById('quizPublishDateInput').value = '';
-            document.getElementById('quizPublishTimeInput').value = '';
-            document.getElementById('quizDueDateDateInput').value = '';
-            document.getElementById('quizDueDateTimeInput').value = '';
+            const el1 = document.getElementById('quizDurationInput');
+            const el2 = document.getElementById('quizPublishDateInput');
+            const el3 = document.getElementById('quizPublishTimeInput');
+            const el4 = document.getElementById('quizDueDateDateInput');
+            const el5 = document.getElementById('quizDueDateTimeInput');
+            if (el1) el1.value = '';
+            if (el2) el2.value = '';
+            if (el3) el3.value = '';
+            if (el4) el4.value = '';
+            if (el5) el5.value = '';
         }
 
         async function confirmPublishQuiz(e) {
             e.preventDefault();
             try {
-                const duration = parseInt(document.getElementById('quizDurationInput').value) || 0;
+                const durationInput = document.getElementById('quizDurationInput');
+                const duration = durationInput ? (parseInt(durationInput.value) || 0) : 0;
 
-                const pubDate = document.getElementById('quizPublishDateInput').value;
-                const pubTime = document.getElementById('quizPublishTimeInput').value;
-                const dueDate = document.getElementById('quizDueDateDateInput').value;
-                const dueTime = document.getElementById('quizDueDateTimeInput').value;
+                const pubDateInput = document.getElementById('quizPublishDateInput');
+                const pubTimeInput = document.getElementById('quizPublishTimeInput');
+                const dueDateInput = document.getElementById('quizDueDateDateInput');
+                const dueTimeInput = document.getElementById('quizDueDateTimeInput');
+
+                const pubDate = pubDateInput ? pubDateInput.value : '';
+                const pubTime = pubTimeInput ? pubTimeInput.value : '';
+                const dueDate = dueDateInput ? dueDateInput.value : '';
+                const dueTime = dueTimeInput ? dueTimeInput.value : '';
 
                 const now = new Date();
 
@@ -3181,100 +3206,110 @@
         function renderHostControls() {
             if (!isHostOrCoHost()) return;
 
-            document.getElementById('hostTotalUploaded').textContent = questions.length;
-            document.getElementById('hostUserCount').textContent = users.length;
+            const hTotal = document.getElementById('hostTotalUploaded');
+            const hUsers = document.getElementById('hostUserCount');
+            if (hTotal) hTotal.textContent = questions.length;
+            if (hUsers) hUsers.textContent = users.length;
 
             const isHost = currentUser.role === 'host';
             const isMobile = isMobileView();
             
-            document.getElementById('hostAddAccountBtn').style.display = (isHost && !isMobile) ? 'flex' : 'none';
-            document.getElementById('resetQuizRecordsBtn').style.display = isHost ? 'flex' : 'none';
+            const addAccBtn = document.getElementById('hostAddAccountBtn');
+            const resetRecBtn = document.getElementById('resetQuizRecordsBtn');
+            if (addAccBtn) addAccBtn.style.display = (isHost && !isMobile) ? 'flex' : 'none';
+            if (resetRecBtn) resetRecBtn.style.display = isHost ? 'flex' : 'none';
 
             const statusTxt = document.getElementById('hostPublishStatusText');
             const langData = i18n[currentLang] || i18n.EN;
 
-            if (isPublished) {
-                const liveTextTmpl = langData['publishQuizLiveStatus'];
-                statusTxt.textContent = liveTextTmpl.replace('{k}', currentQuizSession);
-                statusTxt.className = "text-xl font-bold text-emerald-600 mt-1";
-            } else if (isPending) {
-                statusTxt.textContent = langData['unpublishedPendingStatus'];
-                statusTxt.className = "text-xl font-bold text-purple-600 mt-1";
-            } else if (scheduledPublishTime) {
-                statusTxt.textContent = langData['unpublishedPendingStatus'];
-                statusTxt.className = "text-xl font-bold text-indigo-600 mt-1";
-            } else {
-                statusTxt.textContent = langData.unpublishedCreationPhase;
-                statusTxt.className = "text-xl font-bold text-slate-600 mt-1";
+            if (statusTxt) {
+                if (isPublished) {
+                    const liveTextTmpl = langData['publishQuizLiveStatus'];
+                    statusTxt.textContent = liveTextTmpl.replace('{k}', currentQuizSession);
+                    statusTxt.className = "text-xl font-bold text-emerald-600 mt-1";
+                } else if (isPending) {
+                    statusTxt.textContent = langData['unpublishedPendingStatus'];
+                    statusTxt.className = "text-xl font-bold text-purple-600 mt-1";
+                } else if (scheduledPublishTime) {
+                    statusTxt.textContent = langData['unpublishedPendingStatus'];
+                    statusTxt.className = "text-xl font-bold text-indigo-600 mt-1";
+                } else {
+                    statusTxt.textContent = langData.unpublishedCreationPhase;
+                    statusTxt.className = "text-xl font-bold text-slate-600 mt-1";
+                }
             }
 
             const recordsTable = document.getElementById('quizRecordsTableBody');
-            if (quizRecords.length === 0) {
-                recordsTable.innerHTML = `<tr><td colspan="6" class="px-6 py-6 text-center text-slate-400" data-i18n="noArchivedQuizRecords">${langData.noArchivedQuizRecords}</td></tr>`;
-            } else {
-                recordsTable.innerHTML = quizRecords.map(r => {
-                    const sessSubs = Object.values(submissions).flat().filter(s => s.quiz_session_id === r.quiz_session_id);
-                    const participantCount = sessSubs.length;
-                    
-                    let avgPerf = 0;
-                    let avgTimeSecs = 0;
-                    let championName = "N/A";
-                    let championAvatar = "";
+            if (recordsTable) {
+                if (quizRecords.length === 0) {
+                    recordsTable.innerHTML = `<tr><td colspan="6" class="px-6 py-6 text-center text-slate-400" data-i18n="noArchivedQuizRecords">${langData.noArchivedQuizRecords}</td></tr>`;
+                } else {
+                    recordsTable.innerHTML = quizRecords.map(r => {
+                        const sessSubs = Object.values(submissions).flat().filter(s => s.quiz_session_id === r.quiz_session_id);
+                        const participantCount = sessSubs.length;
+                        
+                        let avgPerf = 0;
+                        let avgTimeSecs = 0;
+                        let championName = "N/A";
+                        let championAvatar = "";
 
-                    if (participantCount > 0) {
-                        const totalPerf = sessSubs.reduce((acc, curr) => acc + curr.percentage, 0);
-                        const totalTime = sessSubs.reduce((acc, curr) => acc + (curr.time_taken_seconds || 0), 0);
-                        avgPerf = Math.round(totalPerf / participantCount);
-                        avgTimeSecs = Math.round(totalTime / participantCount);
+                        if (participantCount > 0) {
+                            const totalPerf = sessSubs.reduce((acc, curr) => acc + curr.percentage, 0);
+                            const totalTime = sessSubs.reduce((acc, curr) => acc + (curr.time_taken_seconds || 0), 0);
+                            avgPerf = Math.round(totalPerf / participantCount);
+                            avgTimeSecs = Math.round(totalTime / participantCount);
 
-                        sessSubs.sort((a, b) => b.percentage - a.percentage || a.time_taken_seconds - b.time_taken_seconds);
-                        championName = sessSubs[0].username;
-                        championAvatar = getUserAvatarUrl(championName, sessSubs[0].user_avatar);
-                    }
+                            sessSubs.sort((a, b) => b.percentage - a.percentage || a.time_taken_seconds - b.time_taken_seconds);
+                            championName = sessSubs[0].username;
+                            championAvatar = getUserAvatarUrl(championName, sessSubs[0].user_avatar);
+                        }
 
-                    const champAvatarTag = championAvatar ? `<img src="${championAvatar}" class="w-5 h-5 rounded-full object-cover border inline mr-1">` : '';
+                        const champAvatarTag = championAvatar ? `<img src="${championAvatar}" class="w-5 h-5 rounded-full object-cover border inline mr-1">` : '';
+
+                        return `
+                            <tr class="hover:bg-slate-50 transition">
+                                <td class="px-6 py-4 font-bold text-indigo-600">Quiz #${r.quiz_session_id}</td>
+                                <td class="px-6 py-4 font-semibold text-slate-700">${r.total_questions} questions</td>
+                                <td class="px-6 py-4 font-semibold text-slate-700">${participantCount} user(s)</td>
+                                <td class="px-6 py-4 font-bold text-emerald-600">${avgPerf}%</td>
+                                <td class="px-6 py-4 font-mono text-xs">${formatSecondsToSmartTime(avgTimeSecs)}</td>
+                                <td class="px-6 py-4 font-bold text-slate-800 flex items-center">${champAvatarTag} ${escapeHTML(championName)}</td>
+                            </tr>
+                        `;
+                    }).join('');
+                }
+            }
+
+            const table = document.getElementById('userManagementTable');
+            if (table) {
+                table.innerHTML = users.map((u, idx) => {
+                    const count = questions.filter(q => q.author === u.name).length;
+                    const userAvatarTag = u.avatar_url ? `<img src="${u.avatar_url}" class="w-6 h-6 rounded-full object-cover border">` : '<i data-lucide="user" class="w-4 h-4 text-slate-400"></i>';
 
                     return `
-                        <tr class="hover:bg-slate-50 transition">
-                            <td class="px-6 py-4 font-bold text-indigo-600">Quiz #${r.quiz_session_id}</td>
-                            <td class="px-6 py-4 font-semibold text-slate-700">${r.total_questions} questions</td>
-                            <td class="px-6 py-4 font-semibold text-slate-700">${participantCount} user(s)</td>
-                            <td class="px-6 py-4 font-bold text-emerald-600">${avgPerf}%</td>
-                            <td class="px-6 py-4 font-mono text-xs">${formatSecondsToSmartTime(avgTimeSecs)}</td>
-                            <td class="px-6 py-4 font-bold text-slate-800 flex items-center">${champAvatarTag} ${escapeHTML(championName)}</td>
+                        <tr class="hover:bg-slate-50 transition" ${isHost ? `draggable="true" ondragstart="handleDragStart(event, ${idx})" ondragover="handleDragOver(event)" ondrop="handleDrop(event, ${idx})"` : ''}>
+                            <td class="px-4 py-4 text-slate-300 cursor-grab desktop-user-mgmt-col">${isHost ? '⋮⋮' : ''}</td>
+                            <td class="px-6 py-4 font-semibold text-slate-800 flex items-center gap-2">
+                                ${userAvatarTag} ${escapeHTML(u.name)}
+                            </td>
+                            <td class="px-6 py-4">
+                                ${isHost ? `
+                                    <select onchange="updateUserRole('${escapeHTML(u.name)}', this.value)" class="px-2.5 py-1 text-xs font-bold rounded-lg border border-slate-300 bg-white">
+                                        <option value="participant" ${u.role === 'participant' ? 'selected' : ''}>Participant</option>
+                                        <option value="co-host" ${u.role === 'co-host' ? 'selected' : ''}>Co-host</option>
+                                        <option value="host" ${u.role === 'host' ? 'selected' : ''}>Host</option>
+                                    </select>
+                                ` : `<span class="px-2.5 py-1 text-xs font-bold rounded-full bg-slate-100 text-slate-700 uppercase">${u.role}</span>`}
+                            </td>
+                            <td class="px-6 py-4 text-sm font-medium text-slate-700 desktop-user-mgmt-col">${count} questions</td>
+                            <td class="px-6 py-4 text-right space-x-2">
+                                <button onclick="openAdminPasswordReset('${escapeHTML(u.name)}')" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded font-medium">Reset Pass</button>
+                                ${isHost && u.role !== 'host' ? `<button onclick="deleteUserAccount('${escapeHTML(u.name)}')" class="text-xs bg-red-50 hover:bg-red-100 text-red-600 px-3 py-1.5 rounded font-medium">Delete</button>` : ''}
+                            </td>
                         </tr>
                     `;
                 }).join('');
             }
-
-            const table = document.getElementById('userManagementTable');
-            table.innerHTML = users.map((u, idx) => {
-                const count = questions.filter(q => q.author === u.name).length;
-                const userAvatarTag = u.avatar_url ? `<img src="${u.avatar_url}" class="w-6 h-6 rounded-full object-cover border">` : '<i data-lucide="user" class="w-4 h-4 text-slate-400"></i>';
-
-                return `
-                    <tr class="hover:bg-slate-50 transition" ${isHost ? `draggable="true" ondragstart="handleDragStart(event, ${idx})" ondragover="handleDragOver(event)" ondrop="handleDrop(event, ${idx})"` : ''}>
-                        <td class="px-4 py-4 text-slate-300 cursor-grab desktop-user-mgmt-col">${isHost ? '⋮⋮' : ''}</td>
-                        <td class="px-6 py-4 font-semibold text-slate-800 flex items-center gap-2">
-                            ${userAvatarTag} ${escapeHTML(u.name)}
-                        </td>
-                        <td class="px-6 py-4">
-                            ${isHost ? `
-                                <select onchange="updateUserRole('${escapeHTML(u.name)}', this.value)" class="px-2.5 py-1 text-xs font-bold rounded-lg border border-slate-300 bg-white">
-                                    <option value="participant" ${u.role === 'participant' ? 'selected' : ''}>Participant</option>
-                                    <option value="co-host" ${u.role === 'co-host' ? 'selected' : ''}>Co-host</option>
-                                    <option value="host" ${u.role === 'host' ? 'selected' : ''}>Host</option>
-                                </select>
-                            ` : `<span class="px-2.5 py-1 text-xs font-bold rounded-full bg-slate-100 text-slate-700 uppercase">${u.role}</span>`}
-                        </td>
-                        <td class="px-6 py-4 text-sm font-medium text-slate-700 desktop-user-mgmt-col">${count} questions</td>
-                        <td class="px-6 py-4 text-right space-x-2">
-                            <button onclick="openAdminPasswordReset('${escapeHTML(u.name)}')" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded font-medium">Reset Pass</button>
-                            ${isHost && u.role !== 'host' ? `<button onclick="deleteUserAccount('${escapeHTML(u.name)}')" class="text-xs bg-red-50 hover:bg-red-100 text-red-600 px-3 py-1.5 rounded font-medium">Delete</button>` : ''}
-                        </td>
-                    </tr>
-                `;
-            }).join('');
 
             applyMobileRules();
             lucide.createIcons();
@@ -3322,11 +3357,17 @@
             if (isPending || isPublished) return showToast("Question repository is locked during pending/published phase.", "error");
 
             try {
-                const id = document.getElementById('qId').value;
-                const type = document.getElementById('qType').value;
-                const prompt = document.getElementById('qPrompt').value.trim();
-                const explanation = document.getElementById('qExplanation').value.trim();
-                const isVault = document.getElementById('qIsVault').value === 'true';
+                const qIdEl = document.getElementById('qId');
+                const qTypeEl = document.getElementById('qType');
+                const qPromptEl = document.getElementById('qPrompt');
+                const qExplanationEl = document.getElementById('qExplanation');
+                const qIsVaultEl = document.getElementById('qIsVault');
+
+                const id = qIdEl ? qIdEl.value : '';
+                const type = qTypeEl ? qTypeEl.value : 'mcq';
+                const prompt = qPromptEl ? qPromptEl.value.trim() : '';
+                const explanation = qExplanationEl ? qExplanationEl.value.trim() : '';
+                const isVault = qIsVaultEl ? qIsVaultEl.value === 'true' : false;
 
                 let qData = {
                     id: id || 'q-' + Date.now(),
@@ -3349,7 +3390,8 @@
                     if (!correct) return showToast("Please select True, False, or Not Given.", "error");
                     qData.correctAnswer = correct.value;
                 } else if (type === 'fill') {
-                    qData.correctAnswer = document.getElementById('fillCorrectAnswer').value.trim();
+                    const fillAns = document.getElementById('fillCorrectAnswer');
+                    qData.correctAnswer = fillAns ? fillAns.value.trim() : '';
                 } else if (type === 'matching') {
                     const rows = document.querySelectorAll('.pair-row');
                     const pairs = [];
@@ -3383,7 +3425,8 @@
         }
 
         function editQuestion(id, isVault = false) {
-            document.getElementById('qIsVault').value = isVault ? 'true' : 'false';
+            const vaultInput = document.getElementById('qIsVault');
+            if (vaultInput) vaultInput.value = isVault ? 'true' : 'false';
             openQuestionModal(id);
         }
 
@@ -3397,8 +3440,7 @@
         }
 
         /**
-         * 【修復後的 openQuestionModal 函數】
-         * 增加完整的防禦性檢查，避免因 DOM 元素不存在或未就緒而引發異常錯誤
+         * 【強力防禦修復後的 openQuestionModal 函數】
          */
         function openQuestionModal(editId = null) {
             if (isPending || isPublished) {
@@ -3418,7 +3460,7 @@
                 const qIsVaultInput = document.getElementById('qIsVault');
                 if (qIsVaultInput) qIsVaultInput.value = 'false';
 
-                const pool = questions;
+                const pool = questions || [];
 
                 if (editId) {
                     const q = pool.find(item => item.id === editId);
@@ -3450,9 +3492,7 @@
                     }
                 }
 
-                if (typeof openModal === 'function') {
-                    openModal('questionModal');
-                }
+                openModal('questionModal');
 
             } catch (err) {
                 console.error("Error opening question modal:", err);
@@ -3460,9 +3500,17 @@
             }
         }
 
+        /**
+         * 【強力防禦修復後的 renderQuestionTypeInputs 函數】
+         */
         function renderQuestionTypeInputs(existingQ = null) {
-            const type = document.getElementById('qType').value;
+            const qTypeSelect = document.getElementById('qType');
+            if (!qTypeSelect) return;
+            
+            const type = qTypeSelect.value;
             const container = document.getElementById('typeSpecificInputs');
+            if (!container) return;
+            
             const langData = i18n[currentLang] || i18n.EN;
 
             if (type === 'mcq') {
@@ -3470,7 +3518,7 @@
                 const correctIdx = existingQ && existingQ.type === 'mcq' ? parseInt(existingQ.correctAnswer) : 0;
 
                 container.innerHTML = `
-                    <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2" data-i18n="lblOptionsAndCorrect">${langData.lblOptionsAndCorrect || 'OPTIONS & CORRECT ANSWER'}</label>
+                    <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2">${langData.lblOptionsAndCorrect || 'OPTIONS & CORRECT ANSWER'}</label>
                     <div class="space-y-2">
                         ${opts.map((opt, i) => `
                             <div class="flex items-center gap-2">
@@ -3483,7 +3531,7 @@
             } else if (type === 'tf') {
                 const currentAns = existingQ && existingQ.type === 'tf' ? existingQ.correctAnswer : 'true';
                 container.innerHTML = `
-                    <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2" data-i18n="lblSelectCorrectAns">${langData.lblSelectCorrectAns || 'SELECT CORRECT ANSWER'}</label>
+                    <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2">${langData.lblSelectCorrectAns || 'SELECT CORRECT ANSWER'}</label>
                     <div class="grid grid-cols-3 gap-3">
                         <label class="flex items-center gap-2 text-sm font-bold text-emerald-700">
                             <input type="radio" name="tfCorrect" value="true" ${currentAns === 'true' ? 'checked' : ''} class="w-4 h-4"> True
@@ -3499,7 +3547,7 @@
             } else if (type === 'fill') {
                 const answer = existingQ && existingQ.type === 'fill' ? existingQ.correctAnswer : '';
                 container.innerHTML = `
-                    <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-1" data-i18n="lblExpectedCorrectText">${langData.lblExpectedCorrectText || 'EXPECTED CORRECT TEXT ANSWER'}</label>
+                    <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-1">${langData.lblExpectedCorrectText || 'EXPECTED CORRECT TEXT ANSWER'}</label>
                     <input type="text" id="fillCorrectAnswer" required value="${escapeHTML(answer)}" placeholder="e.g. truth" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-sm">
                 `;
             } else if (type === 'matching') {
@@ -3508,7 +3556,7 @@
                 ];
 
                 container.innerHTML = `
-                    <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-1" data-i18n="lblMatchingPairs">${langData.lblMatchingPairs || 'MATCHING PAIRS'}</label>
+                    <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-1">${langData.lblMatchingPairs || 'MATCHING PAIRS'}</label>
                     <div id="matchingPairsContainer" class="space-y-2">
                         ${pairs.map(p => `
                             <div class="flex items-center gap-2 pair-row">
@@ -3519,14 +3567,14 @@
                         `).join('')}
                     </div>
                     <button type="button" onclick="addMatchingPairRow()" class="mt-2 text-xs font-semibold text-blue-600 hover:text-blue-800 flex items-center gap-1">
-                        <i data-lucide="plus" class="w-3.5 h-3.5"></i> <span data-i18n="btnAddPair">${langData.btnAddPair || 'Add Pair'}</span>
+                        <i data-lucide="plus" class="w-3.5 h-3.5"></i> <span>${langData.btnAddPair || 'Add Pair'}</span>
                     </button>
                 `;
             } else if (type === 'ordering') {
                 const items = existingQ && (existingQ.type === 'ordering' || existingQ.type === 'order') ? (existingQ.orderedItems || existingQ.correctAnswer.split('|')) : ['', '', ''];
 
                 container.innerHTML = `
-                    <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-1" data-i18n="lblOrderedSequenceItems">${langData.lblOrderedSequenceItems || 'ORDERED SEQUENCE ITEMS (IN CORRECT ORDER 1 → N)'}</label>
+                    <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-1">${langData.lblOrderedSequenceItems || 'ORDERED SEQUENCE ITEMS'}</label>
                     <div id="orderingItemsContainer" class="space-y-2">
                         ${items.map((item, idx) => `
                             <div class="flex items-center gap-2 ordering-item-row">
@@ -3536,17 +3584,17 @@
                         `).join('')}
                     </div>
                     <button type="button" onclick="addOrderingItemRow()" class="mt-2 text-xs font-semibold text-blue-600 hover:text-blue-800 flex items-center gap-1">
-                        <i data-lucide="plus" class="w-3.5 h-3.5"></i> <span data-i18n="btnAddSequenceStep">${langData.btnAddSequenceStep || 'Add Sequence Step'}</span>
+                        <i data-lucide="plus" class="w-3.5 h-3.5"></i> <span>${langData.btnAddSequenceStep || 'Add Sequence Step'}</span>
                     </button>
                 `;
             }
-            applyLanguage();
+            if (typeof applyLanguage === 'function') applyLanguage();
         }
 
         function addMatchingPairRow() {
             const container = document.getElementById('matchingPairsContainer');
+            if (!container) return;
             const row = document.createElement('div');
-            const langData = i18n[currentLang] || i18n.EN;
             row.className = "flex items-center gap-2 pair-row";
             row.innerHTML = `
                 <input type="text" class="pair-item w-1/2 px-3 py-2 rounded border border-slate-300 text-sm" placeholder="Item" required>
@@ -3559,6 +3607,7 @@
 
         function addOrderingItemRow() {
             const container = document.getElementById('orderingItemsContainer');
+            if (!container) return;
             const rowsCount = container.querySelectorAll('.ordering-item-row').length + 1;
             const row = document.createElement('div');
             row.className = "flex items-center gap-2 ordering-item-row";
@@ -3581,6 +3630,7 @@
 
             let pool = isGuestMode ? activeQuizQuestions : questions;
             const form = document.getElementById('quizActiveForm');
+            if (!form) return;
             const formData = new FormData(form);
 
             if (!isAutoTimeUp) {
@@ -3733,7 +3783,9 @@
 
         function handleEmailShareSubmit(e) {
             e.preventDefault();
-            const recipient = document.getElementById('shareEmailAddress').value.trim();
+            const recipientInput = document.getElementById('shareEmailAddress');
+            if (!recipientInput) return;
+            const recipient = recipientInput.value.trim();
             const userSubs = submissions[currentUser.name] || [];
             const userSub = userSubs.find(s => s.quiz_session_id === (isGuestMode ? 999999 : currentQuizSession)) || userSubs[userSubs.length - 1];
             
@@ -3775,46 +3827,51 @@
             }
 
             if (!userSub) {
-                noRes.classList.remove('hidden');
-                resContent.classList.add('hidden');
+                if (noRes) noRes.classList.remove('hidden');
+                if (resContent) resContent.classList.add('hidden');
                 return;
             }
 
-            noRes.classList.add('hidden');
-            resContent.classList.remove('hidden');
+            if (noRes) noRes.classList.add('hidden');
+            if (resContent) resContent.classList.remove('hidden');
 
             if (isGuestMode) {
-                guestRetakeBox.classList.remove('hidden');
-                resultsTitleHeader.setAttribute('data-i18n', 'titleGuestResults');
+                if (guestRetakeBox) guestRetakeBox.classList.remove('hidden');
+                if (resultsTitleHeader) resultsTitleHeader.setAttribute('data-i18n', 'titleGuestResults');
             } else {
-                guestRetakeBox.classList.add('hidden');
-                resultsTitleHeader.setAttribute('data-i18n', 'titleQuizResults');
+                if (guestRetakeBox) guestRetakeBox.classList.add('hidden');
+                if (resultsTitleHeader) resultsTitleHeader.setAttribute('data-i18n', 'titleQuizResults');
             }
 
             applyLanguage();
 
-            document.getElementById('resultScoreFraction').textContent = `${userSub.score} / ${userSub.total}`;
-            document.getElementById('resultPercentage').textContent = `${userSub.percentage}%`;
-            document.getElementById('resultSubmittedTime').textContent = `Submitted on: ${userSub.timestamp || '-'}`;
+            const sFrac = document.getElementById('resultScoreFraction');
+            const sPerc = document.getElementById('resultPercentage');
+            const sTime = document.getElementById('resultSubmittedTime');
+            if (sFrac) sFrac.textContent = `${userSub.score} / ${userSub.total}`;
+            if (sPerc) sPerc.textContent = `${userSub.percentage}%`;
+            if (sTime) sTime.textContent = `Submitted on: ${userSub.timestamp || '-'}`;
 
             let pool = isGuestMode ? activeQuizQuestions : questions;
 
             const breakdown = document.getElementById('solutionsBreakdownList');
-            breakdown.innerHTML = pool.map((q, idx) => {
-                const ansObj = userSub.answers[q.id] || { isCorrect: false, userVal: 'None' };
-                return `
-                    <div class="bg-white rounded-xl border ${ansObj.isCorrect ? 'border-emerald-200 bg-emerald-50/20' : 'border-red-200 bg-red-50/20'} p-6 shadow-sm space-y-4">
-                        <div class="flex justify-between items-start gap-2">
-                            <span class="px-2 py-0.5 rounded text-xs font-bold uppercase ${ansObj.isCorrect ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-800'}">
-                                ${ansObj.isCorrect ? 'Correct ✓' : 'Incorrect ✗'}
-                            </span>
-                            <span class="text-xs text-slate-400">By: ${escapeHTML(q.author)}</span>
+            if (breakdown) {
+                breakdown.innerHTML = pool.map((q, idx) => {
+                    const ansObj = userSub.answers[q.id] || { isCorrect: false, userVal: 'None' };
+                    return `
+                        <div class="bg-white rounded-xl border ${ansObj.isCorrect ? 'border-emerald-200 bg-emerald-50/20' : 'border-red-200 bg-red-50/20'} p-6 shadow-sm space-y-4">
+                            <div class="flex justify-between items-start gap-2">
+                                <span class="px-2 py-0.5 rounded text-xs font-bold uppercase ${ansObj.isCorrect ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-800'}">
+                                    ${ansObj.isCorrect ? 'Correct ✓' : 'Incorrect ✗'}
+                                </span>
+                                <span class="text-xs text-slate-400">By: ${escapeHTML(q.author)}</span>
+                            </div>
+                            <h4 class="font-bold text-slate-800 text-base">${escapeHTML(q.prompt)}</h4>
+                            <div class="text-sm space-y-2">${renderSolutionDetail(q, ansObj)}</div>
                         </div>
-                        <h4 class="font-bold text-slate-800 text-base">${escapeHTML(q.prompt)}</h4>
-                        <div class="text-sm space-y-2">${renderSolutionDetail(q, ansObj)}</div>
-                    </div>
-                `;
-            }).join('');
+                    `;
+                }).join('');
+            }
             lucide.createIcons();
         }
 
@@ -3870,17 +3927,23 @@
                 const avatarPrev = document.getElementById('settingsAvatarPreview');
                 const fallbackIcon = document.getElementById('settingsAvatarFallbackIcon');
                 
-                avatarPrev.src = tempAvatarBase64;
-                avatarPrev.classList.remove('hidden');
-                fallbackIcon.classList.add('hidden');
+                if (avatarPrev) {
+                    avatarPrev.src = tempAvatarBase64;
+                    avatarPrev.classList.remove('hidden');
+                }
+                if (fallbackIcon) fallbackIcon.classList.add('hidden');
             };
             reader.readAsDataURL(file);
         }
 
         async function handleUserProfileUpdate(e) {
             e.preventDefault();
-            const newName = document.getElementById('editUserNameInput').value.trim();
-            const newPass = document.getElementById('newPasswordInput').value.trim();
+            const editUserInput = document.getElementById('editUserNameInput');
+            const newPassInput = document.getElementById('newPasswordInput');
+            if (!editUserInput || !newPassInput) return;
+
+            const newName = editUserInput.value.trim();
+            const newPass = newPassInput.value.trim();
 
             if (!currentUser || isGuestMode) return;
 
@@ -3904,15 +3967,21 @@
         }
 
         function openAdminPasswordReset(username) {
-            document.getElementById('adminResetTargetUser').value = username;
-            document.getElementById('adminResetUserName').textContent = username;
+            const targetEl = document.getElementById('adminResetTargetUser');
+            const nameEl = document.getElementById('adminResetUserName');
+            if (targetEl) targetEl.value = username;
+            if (nameEl) nameEl.textContent = username;
             openModal('resetUserPasswordModal');
         }
 
         async function handleAdminPasswordReset(e) {
             e.preventDefault();
-            const target = document.getElementById('adminResetTargetUser').value;
-            const newPass = document.getElementById('adminNewPassword').value;
+            const targetEl = document.getElementById('adminResetTargetUser');
+            const passEl = document.getElementById('adminNewPassword');
+            if (!targetEl || !passEl) return;
+
+            const target = targetEl.value;
+            const newPass = passEl.value;
 
             await _supabase.from('app_users').update({ pass: newPass }).eq('name', target);
             closeModal('resetUserPasswordModal');
@@ -3921,9 +3990,14 @@
 
         async function handleAddUserAccount(e) {
             e.preventDefault();
-            const name = document.getElementById('newAccountName').value.trim();
-            const role = document.getElementById('newAccountRole').value;
-            const pass = document.getElementById('newAccountPassword').value.trim();
+            const nameEl = document.getElementById('newAccountName');
+            const roleEl = document.getElementById('newAccountRole');
+            const passEl = document.getElementById('newAccountPassword');
+            if (!nameEl || !roleEl || !passEl) return;
+
+            const name = nameEl.value.trim();
+            const role = roleEl.value;
+            const pass = passEl.value.trim();
 
             if (users.some(u => u.name.toLowerCase() === name.toLowerCase())) {
                 return showToast("Account name already exists!", "error");
@@ -3950,6 +4024,7 @@
 
         function showToast(message, type = "info") {
             const container = document.getElementById('toastContainer');
+            if (!container) return;
             const toast = document.createElement('div');
             const bgClass = type === 'success' ? 'bg-emerald-600' : type === 'error' ? 'bg-red-600' : 'bg-slate-800';
             toast.className = `${bgClass} text-white px-4 py-3 rounded-lg shadow-xl text-sm font-medium flex items-center justify-between gap-3 transform transition-all duration-300 translate-y-2 opacity-0`;
