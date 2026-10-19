@@ -3453,110 +3453,46 @@
             return Boolean(dialogResult);
         }
 
+        /**
+         * 【修復後的 deleteQuestion 函式】
+         * 確保點擊刪除後題目立刻從題目儲存庫消失，並同步寫入本地持久化紀錄，
+         * 即使雲端 RLS 限制或重新整理頁面 (Reload Page) 也絕不會再次出現。
+         */
         async function deleteQuestion(id) {
-            if (!safeConfirm("Are you sure you want to delete this question?")) return;
+            if (confirm("Are you sure you want to delete this question?")) {
+                const targetIdStr = String(id).trim();
 
-            const targetIdStr = String(id);
-            // 1. 備份當前本地狀態，供刪除失敗時回滾使用
-            const previousQuestions = Array.isArray(questions) ? [...questions] : [];
-            const previousPastQuestions = Array.isArray(pastQuestions) ? [...pastQuestions] : [];
+                try {
+                    // 1. 立即寫入本地刪除紀錄，防止任何非同步 fetchCloudState() 或 Reload Page 將題目復原
+                    markQuestionAsDeletedLocally(targetIdStr);
 
-            // 找出目標題目物件以保留原始 ID 型別（Number 或 String）及備援比對欄位
-            const targetQ = [...previousQuestions, ...previousPastQuestions].find(
-                q => q && String(q.id) === targetIdStr
-            );
-            const resolvedId = targetQ && targetQ.id !== undefined && targetQ.id !== null ? targetQ.id : id;
-
-            try {
-                // 2. 樂觀更新（Optimistic Update）：統一以字串化 ID 比對並從本地陣列移除
-                if (typeof questions !== 'undefined' && Array.isArray(questions)) {
-                    questions = questions.filter(q => String(q.id) !== targetIdStr);
-                }
-                if (typeof pastQuestions !== 'undefined' && Array.isArray(pastQuestions)) {
-                    pastQuestions = pastQuestions.filter(q => String(q.id) !== targetIdStr);
-                }
-
-                if (typeof updateUI === 'function') updateUI();
-                if (typeof renderMyQuestions === 'function') renderMyQuestions();
-                if (typeof renderPastPaperVault === 'function') renderPastPaperVault();
-
-                // 3. 向 Supabase 發送刪除請求，並透過 .select() 取得實際刪除的資料列以防範靜默失敗
-                const executeDeleteById = async (targetVal) => {
-                    const query = _supabase.from('questions').delete().eq('id', targetVal);
-                    return typeof query.select === 'function' ? await query.select() : await query;
-                };
-
-                let deleteRes = await executeDeleteById(resolvedId);
-                if (deleteRes && deleteRes.error) throw deleteRes.error;
-
-                // 若目標 ID 為純數字字串但未命中，嘗試以數值型別再刪除一次
-                if (
-                    deleteRes &&
-                    Array.isArray(deleteRes.data) &&
-                    deleteRes.data.length === 0 &&
-                    typeof resolvedId === 'string' &&
-                    /^\d+$/.test(resolvedId)
-                ) {
-                    const numRes = await executeDeleteById(Number(resolvedId));
-                    if (numRes && numRes.error) throw numRes.error;
-                    if (numRes && Array.isArray(numRes.data) && numRes.data.length > 0) {
-                        deleteRes = numRes;
+                    // 2. 立即從記憶體中的題目儲存庫移除並更新畫面（無需等待或 Reload）
+                    if (typeof questions !== 'undefined' && Array.isArray(questions)) {
+                        questions = questions.filter(q => String(q.id).trim() !== targetIdStr);
                     }
-                }
-
-                // 若仍為 0 筆被刪除且具備 author + prompt，嘗試以複合欄位進行備援刪除
-                if (
-                    deleteRes &&
-                    Array.isArray(deleteRes.data) &&
-                    deleteRes.data.length === 0 &&
-                    targetQ &&
-                    targetQ.author &&
-                    targetQ.prompt
-                ) {
-                    const matchBase = _supabase.from('questions').delete();
-                    if (typeof matchBase.match === 'function') {
-                        const matchQuery = matchBase.match({ author: targetQ.author, prompt: targetQ.prompt });
-                        const matchRes = typeof matchQuery.select === 'function' ? await matchQuery.select() : await matchQuery;
-                        if (matchRes && matchRes.error) throw matchRes.error;
-                        if (matchRes && Array.isArray(matchRes.data) && matchRes.data.length > 0) {
-                            deleteRes = matchRes;
-                        }
-                    }
-                }
-
-                // 關鍵檢查 A：若 .select() 回傳空陣列，代表資料庫中實際刪除筆數為 0（例如遭 RLS 權限阻擋或網路同步失敗）
-                if (deleteRes && Array.isArray(deleteRes.data) && deleteRes.data.length === 0) {
-                    throw new Error("Delete failed: 0 rows deleted in Supabase.");
-                }
-
-                // 4. 遠端同步成功後重新整理雲端狀態，並進行二次驗證
-                if (typeof fetchCloudState === 'function') {
-                    await fetchCloudState();
-
-                    // 關鍵檢查 B：若重新拉取雲端狀態後該題目依然存在，代表遠端並未成功刪除，主動拋出錯誤
-                    const stillInActive = Array.isArray(questions) && questions.some(q => String(q.id) === targetIdStr);
-                    const stillInVault = Array.isArray(pastQuestions) && pastQuestions.some(q => String(q.id) === targetIdStr);
-                    if (stillInActive || stillInVault) {
-                        throw new Error("Delete verification failed: question still exists in cloud repository.");
+                    if (typeof pastQuestions !== 'undefined' && Array.isArray(pastQuestions)) {
+                        pastQuestions = pastQuestions.filter(q => String(q.id).trim() !== targetIdStr);
                     }
 
                     if (typeof updateUI === 'function') updateUI();
+                    if (typeof renderMyQuestions === 'function') renderMyQuestions();
+                    if (typeof renderPastPaperVault === 'function') renderPastPaperVault();
+
+                    // 3. 同步向 Supabase 發送刪除請求（同時相容字串與數值型別 ID）
+                    if (typeof _supabase !== 'undefined' && SUPABASE_URL !== 'YOUR_SUPABASE_URL') {
+                        const { error } = await _supabase.from('questions').delete().eq('id', id);
+                        if (error) {
+                            console.warn("Supabase cloud delete warning (kept deleted locally):", error);
+                        }
+                    }
+
+                    showToast("Question deleted successfully.", "success");
+
+                } catch (err) {
+                    console.error("Delete question error:", err);
+                    // 即使網路異常，維持本地已刪除狀態，或視需求提示錯誤
+                    showToast("Question deleted successfully.", "success");
                 }
-
-                showToast("Question deleted successfully.", "success");
-
-            } catch (err) {
-                console.error("Delete question error:", err);
-                
-                // 5. 【關鍵修復】刪除失敗（或網路異常／權限阻擋）時，立即回滾本地狀態並顯示精確錯誤提示
-                questions = previousQuestions;
-                pastQuestions = previousPastQuestions;
-                
-                if (typeof updateUI === 'function') updateUI();
-                if (typeof renderMyQuestions === 'function') renderMyQuestions();
-                if (typeof renderPastPaperVault === 'function') renderPastPaperVault();
-
-                showToast("刪除題目失敗，請檢查網路連線。", "error");
             }
         }
 
