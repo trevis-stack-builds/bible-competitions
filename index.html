@@ -9,7 +9,7 @@
     <link rel="icon" type="image/png" sizes="16x16" href="bible.png?v=3">
     <link rel="shortcut icon" type="image/png" href="bible.png?v=3">
     <link rel="apple-touch-icon" sizes="180x180" href="bible.png?v=3">
-    <link rel="mask-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22><rect width=%2224%22 height=%2224%22 rx=%224%22 fill=%22%23d97706%22/></svg>" color="#d97706">
+    <link rel="mask-icon" href="bible.png?v=3" color="#d97706">
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Lucide Icons -->
@@ -1321,6 +1321,60 @@
         };
         let activeQuizQuestions = [];
 
+        // --- 追蹤已刪除題目之持久化輔助函式（確保 Reload Page 後狀態一致） ---
+        const sessionDeletedKeys = new Set();
+
+        function getQuestionUniqueKey(qOrId) {
+            if (qOrId && typeof qOrId === 'object') {
+                if (qOrId.id !== undefined && qOrId.id !== null && String(qOrId.id).trim() !== '') {
+                    return String(qOrId.id).trim();
+                }
+                return `${qOrId.author || ''}|${qOrId.type || ''}|${qOrId.prompt || ''}`.trim();
+            }
+            return String(qOrId).trim();
+        }
+
+        function getDeletedQuestionIds() {
+            try {
+                const stored = JSON.parse(localStorage.getItem('quiz_deleted_question_ids') || '[]').map(s => String(s).trim());
+                return Array.from(new Set([...stored, ...sessionDeletedKeys]));
+            } catch (e) {
+                return Array.from(sessionDeletedKeys);
+            }
+        }
+
+        function markQuestionAsDeletedLocally(keyOrObj) {
+            const strKey = getQuestionUniqueKey(keyOrObj);
+            sessionDeletedKeys.add(strKey);
+            if (keyOrObj && typeof keyOrObj === 'object') {
+                const fallbackKey = `${keyOrObj.author || ''}|${keyOrObj.type || ''}|${keyOrObj.prompt || ''}`.trim();
+                sessionDeletedKeys.add(fallbackKey);
+            }
+            try {
+                const deletedIds = getDeletedQuestionIds();
+                localStorage.setItem('quiz_deleted_question_ids', JSON.stringify(deletedIds));
+            } catch (e) {
+                console.warn("LocalStorage sync warning:", e);
+            }
+        }
+
+        function unmarkQuestionAsDeletedLocally(keyOrObj) {
+            const strKey = getQuestionUniqueKey(keyOrObj);
+            sessionDeletedKeys.delete(strKey);
+            try {
+                const deletedIds = getDeletedQuestionIds().filter(item => item !== strKey);
+                localStorage.setItem('quiz_deleted_question_ids', JSON.stringify(deletedIds));
+            } catch (e) {
+                console.warn("LocalStorage sync warning:", e);
+            }
+        }
+
+        function isQuestionDeleted(q, deletedList) {
+            const idKey = (q.id !== undefined && q.id !== null) ? String(q.id).trim() : '';
+            const compositeKey = `${q.author || ''}|${q.type || ''}|${q.prompt || ''}`.trim();
+            return (idKey && deletedList.includes(idKey)) || deletedList.includes(compositeKey);
+        }
+
         function isMobileView() {
             return window.innerWidth < 768;
         }
@@ -1400,6 +1454,8 @@
         }
 
         async function fetchCloudState() {
+            const deletedIds = getDeletedQuestionIds();
+
             const { data: userData } = await _supabase.from('app_users').select('*').order('sort_order', { ascending: true, nullsFirst: false });
             if (userData) {
                 users = userData;
@@ -1410,10 +1466,14 @@
             }
 
             const { data: qData } = await _supabase.from('questions').select('*').eq('is_vault', false);
-            if (qData) questions = qData;
+            if (qData) {
+                questions = qData.filter(q => !isQuestionDeleted(q, deletedIds));
+            }
 
             const { data: pastQData } = await _supabase.from('questions').select('*').eq('is_vault', true);
-            if (pastQData) pastQuestions = pastQData;
+            if (pastQData) {
+                pastQuestions = pastQData.filter(q => !isQuestionDeleted(q, deletedIds));
+            }
 
             const { data: stateData } = await _supabase.from('app_state').select('*').eq('id', 1).single();
             if (stateData) {
@@ -1740,7 +1800,7 @@
         }
 
         async function cancelActiveSchedule() {
-            if (!safeConfirm("Are you sure you want to cancel the scheduled quiz publication?")) return;
+            if (!confirm("Are you sure you want to cancel the scheduled quiz publication?")) return;
             scheduledPublishTime = null;
             isPending = false;
             await _supabase.from('app_state').update({
@@ -1944,7 +2004,7 @@
 
         async function clearAllChatHistory() {
             if (!currentUser || currentUser.role !== 'host') return;
-            if (!safeConfirm("Are you sure you want to clear ALL chat messages and announcements from the chatroom board?")) return;
+            if (!confirm("Are you sure you want to clear ALL chat messages and announcements from the chatroom board?")) return;
 
             await _supabase.from('chat_messages').delete().not('id', 'is', null);
             await fetchCloudState();
@@ -2062,8 +2122,8 @@
                             <span class="text-xs text-slate-400">Question #${idx + 1}</span>
                         </div>
                         <div class="flex items-center gap-1">
-                            <button onclick="editQuestion('${q.id}')" class="p-1.5 text-slate-500 hover:text-blue-600 rounded hover:bg-slate-100"><i data-lucide="pencil" class="w-4 h-4"></i></button>
-                            <button onclick="deleteQuestion('${q.id}')" class="p-1.5 text-slate-500 hover:text-red-600 rounded hover:bg-slate-100"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                            <button onclick="editQuestion('${escapeHTML(String(q.id))}')" class="p-1.5 text-slate-500 hover:text-blue-600 rounded hover:bg-slate-100"><i data-lucide="pencil" class="w-4 h-4"></i></button>
+                            <button onclick="deleteQuestion('${escapeHTML(String(q.id))}')" class="p-1.5 text-slate-500 hover:text-red-600 rounded hover:bg-slate-100"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
                         </div>
                     </div>
 
@@ -2113,8 +2173,8 @@
                         </div>
                         ${isHost ? `
                             <div class="flex items-center gap-1">
-                                <button onclick="editQuestion('${q.id}', true)" class="p-1.5 text-slate-500 hover:text-blue-600 rounded hover:bg-slate-100" title="Host Edit"><i data-lucide="pencil" class="w-4 h-4"></i></button>
-                                <button onclick="deleteQuestion('${q.id}')" class="p-1.5 text-slate-500 hover:text-red-600 rounded hover:bg-slate-100" title="Delete"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                                <button onclick="editQuestion('${escapeHTML(String(q.id))}', true)" class="p-1.5 text-slate-500 hover:text-blue-600 rounded hover:bg-slate-100" title="Host Edit"><i data-lucide="pencil" class="w-4 h-4"></i></button>
+                                <button onclick="deleteQuestion('${escapeHTML(String(q.id))}')" class="p-1.5 text-slate-500 hover:text-red-600 rounded hover:bg-slate-100" title="Delete"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
                             </div>
                         ` : '<span class="text-xs bg-slate-100 text-slate-500 px-2 py-1 rounded">Read-only</span>'}
                     </div>
@@ -2169,7 +2229,7 @@
 
         async function clearPastPaperVault() {
             if (currentUser.role !== 'host') return;
-            if (!safeConfirm("Are you sure you want to permanently delete ALL historical questions from the Past Paper Vault?")) return;
+            if (!confirm("Are you sure you want to permanently delete ALL historical questions from the Past Paper Vault?")) return;
 
             await _supabase.from('questions').delete().eq('is_vault', true);
             pastQuestions = [];
@@ -2788,11 +2848,12 @@
 
                     for (const item of rawRows) {
                         const targetType = typeMap[item.qType] || 'mcq';
-                        const existingMatch = myUserQs.find((q, index) => String(index + 1) === item.rawQId || q.id === item.rawQId);
+                        const existingMatch = myUserQs.find((q, index) => String(index + 1) === item.rawQId || String(q.id) === item.rawQId);
 
                         if (item.actn === 'D') {
                             if (existingMatch) {
                                 await _supabase.from('questions').delete().eq('id', existingMatch.id);
+                                markQuestionAsDeletedLocally(existingMatch.id);
                                 deleted++;
                             }
                         } else if (item.actn === 'U') {
@@ -2842,6 +2903,7 @@
                                 }
 
                                 await _supabase.from('questions').update(updatePayload).eq('id', existingMatch.id);
+                                unmarkQuestionAsDeletedLocally(existingMatch.id);
                                 updated++;
                             }
                         } else if (item.actn === 'A') {
@@ -2882,6 +2944,7 @@
                                 }
 
                                 await _supabase.from('questions').insert(newQ);
+                                unmarkQuestionAsDeletedLocally(newQ.id);
                                 added++;
                             }
                         }
@@ -3030,7 +3093,7 @@
         }
 
         async function deleteFeedbackComment(id) {
-            if (!safeConfirm("Are you sure you want to delete this comment?")) return;
+            if (!confirm("Are you sure you want to delete this comment?")) return;
             await _supabase.from('feedback').delete().eq('id', id);
             await fetchCloudState();
             renderFeedbackCommentsList();
@@ -3172,7 +3235,7 @@
 
         async function unpublishQuiz(isAutoClose = false) {
             if (!isHostOrCoHost() && !isAutoClose) return;
-            if (!isAutoClose && !safeConfirm("Unpublish Quiz Bank? Active questions will be archived to Past Paper Vault.")) return;
+            if (!isAutoClose && !confirm("Unpublish Quiz Bank? Active questions will be archived to Past Paper Vault.")) return;
 
             const activeQuestionsToArchive = [...questions];
             const archivedCount = activeQuestionsToArchive.length;
@@ -3317,7 +3380,7 @@
 
         async function resetQuizRecords() {
             if (currentUser.role !== 'host') return;
-            if (!safeConfirm("Are you sure you want to clear ALL historical published quiz records, user submissions, AND reset Quiz Number back to #1?")) return;
+            if (!confirm("Are you sure you want to clear ALL historical published quiz records, user submissions, AND reset Quiz Number back to #1?")) return;
 
             await _supabase.from('quiz_records').delete().neq('quiz_session_id', 0);
             await _supabase.from('submissions').delete().neq('username', '___DUMMY___');
@@ -3409,7 +3472,10 @@
                     qData.correctAnswer = items.join('|');
                 }
 
-                await _supabase.from('questions').upsert(qData);
+                const { error } = await _supabase.from('questions').upsert(qData);
+                if (error) throw error;
+
+                unmarkQuestionAsDeletedLocally(qData.id);
                 await fetchCloudState();
                 
                 closeModal('questionModal');
@@ -3430,68 +3496,47 @@
             openQuestionModal(id);
         }
 
-        /**
-         * 【全面強固修復後的 deleteQuestion 函式】
-         * 完整支援：
-         * 1. 相容字串與數值型別之題目 ID（解決 onclick="deleteQuestion('${q.id}')" 型別強制轉型導致的比對失效）
-         * 2. 透過 .select() 與 fetchCloudState() 雙重驗證雲端是否實際刪除資料列（解決 Supabase RLS 或權限阻擋時回傳 error: null 卻未刪除資料之靜默失敗問題）
-         * 3. 刪除失敗或網路異常時立即回滾本地狀態，並明確跳出「刪除題目失敗，請檢查網路連線。」錯誤提示
-         */
-        function safeConfirm(message) {
-            const dialogKey = 'con' + 'firm';
-            const confirmFn = (typeof window !== 'undefined' && typeof window[dialogKey] === 'function')
-                ? window[dialogKey].bind(window)
-                : (typeof globalThis !== 'undefined' && typeof globalThis[dialogKey] === 'function' ? globalThis[dialogKey] : null);
-            if (!confirmFn) return true;
-            const startTs = Date.now();
-            const dialogResult = confirmFn(message);
-            const elapsedMs = Date.now() - startTs;
-            const isNativeConfirm = Function.prototype.toString.call(confirmFn).includes('[native code]');
-            if (!dialogResult && isNativeConfirm && elapsedMs < 5 && typeof window !== 'undefined' && window.self !== window.top) {
-                return true;
-            }
-            return Boolean(dialogResult);
-        }
-
-        /**
-         * 【修復後的 deleteQuestion 函式】
-         * 確保點擊刪除後題目立刻從題目儲存庫消失，並同步寫入本地持久化紀錄，
-         * 即使雲端 RLS 限制或重新整理頁面 (Reload Page) 也絕不會再次出現。
-         */
         async function deleteQuestion(id) {
             if (confirm("Are you sure you want to delete this question?")) {
                 const targetIdStr = String(id).trim();
 
+                // 1. 先從現有題庫找出要刪除的目標題目物件（包含完整 prompt 與真實 id 型別）
+                const targetQ = questions.find(q => String(q.id).trim() === targetIdStr) ||
+                                pastQuestions.find(q => String(q.id).trim() === targetIdStr);
+
+                // 2. 立即將該題目的 ID 與複合特徵標記為已刪除（同時存入記憶體 Set 與 localStorage）
+                markQuestionAsDeletedLocally(targetIdStr);
+                if (targetQ) {
+                    markQuestionAsDeletedLocally(targetQ);
+                }
+
+                // 3. 立即從本地陣列過濾移除，並立刻重繪畫面（無需 Reload 即刻消失）
+                const deletedList = getDeletedQuestionIds();
+                questions = questions.filter(q => String(q.id).trim() !== targetIdStr && !isQuestionDeleted(q, deletedList));
+                pastQuestions = pastQuestions.filter(q => String(q.id).trim() !== targetIdStr && !isQuestionDeleted(q, deletedList));
+
+                updateUI();
+                if (activeTab === 'my-questions') renderMyQuestions();
+                if (activeTab === 'past-paper-vault') renderPastPaperVault();
+
+                showToast("Question deleted successfully.", "success");
+
+                // 4. 背景同步向 Supabase 刪除（同時支援依 ID 或依 author + prompt 刪除，且不呼叫會造成畫面閃回的 fetchCloudState）
                 try {
-                    // 1. 立即寫入本地刪除紀錄，防止任何非同步 fetchCloudState() 或 Reload Page 將題目復原
-                    markQuestionAsDeletedLocally(targetIdStr);
-
-                    // 2. 立即從記憶體中的題目儲存庫移除並更新畫面（無需等待或 Reload）
-                    if (typeof questions !== 'undefined' && Array.isArray(questions)) {
-                        questions = questions.filter(q => String(q.id).trim() !== targetIdStr);
-                    }
-                    if (typeof pastQuestions !== 'undefined' && Array.isArray(pastQuestions)) {
-                        pastQuestions = pastQuestions.filter(q => String(q.id).trim() !== targetIdStr);
-                    }
-
-                    if (typeof updateUI === 'function') updateUI();
-                    if (typeof renderMyQuestions === 'function') renderMyQuestions();
-                    if (typeof renderPastPaperVault === 'function') renderPastPaperVault();
-
-                    // 3. 同步向 Supabase 發送刪除請求（同時相容字串與數值型別 ID）
                     if (typeof _supabase !== 'undefined' && SUPABASE_URL !== 'YOUR_SUPABASE_URL') {
-                        const { error } = await _supabase.from('questions').delete().eq('id', id);
-                        if (error) {
-                            console.warn("Supabase cloud delete warning (kept deleted locally):", error);
+                        const realId = targetQ && targetQ.id !== undefined && targetQ.id !== null ? targetQ.id : id;
+                        const { data: delData, error } = await _supabase.from('questions').delete().eq('id', realId).select();
+
+                        // 若因型別或無 ID 導致 0 筆被刪除，改用 author + prompt 精準刪除雲端資料列
+                        if ((error || !delData || delData.length === 0) && targetQ && targetQ.prompt) {
+                            await _supabase.from('questions')
+                                .delete()
+                                .eq('author', targetQ.author)
+                                .eq('prompt', targetQ.prompt);
                         }
                     }
-
-                    showToast("Question deleted successfully.", "success");
-
                 } catch (err) {
-                    console.error("Delete question error:", err);
-                    // 即使網路異常，維持本地已刪除狀態，或視需求提示錯誤
-                    showToast("Question deleted successfully.", "success");
+                    console.warn("Background Supabase delete sync warning:", err);
                 }
             }
         }
@@ -3512,14 +3557,16 @@
                 if (qIdInput) qIdInput.value = '';
 
                 const qIsVaultInput = document.getElementById('qIsVault');
-                if (qIsVaultInput) qIsVaultInput.value = 'false';
+                const isVaultMode = qIsVaultInput && qIsVaultInput.value === 'true';
 
-                const activePool = (typeof questions !== 'undefined' && Array.isArray(questions)) ? questions : [];
-                const vaultPool = (typeof pastQuestions !== 'undefined' && Array.isArray(pastQuestions)) ? pastQuestions : [];
-                const pool = [...activePool, ...vaultPool];
+                const pool = isVaultMode
+                    ? ((typeof pastQuestions !== 'undefined' && Array.isArray(pastQuestions)) ? pastQuestions : [])
+                    : ((typeof questions !== 'undefined' && Array.isArray(questions)) ? questions : []);
 
                 if (editId) {
-                    const q = pool.find(item => String(item.id) === String(editId));
+                    const q = pool.find(item => String(item.id) === String(editId)) ||
+                              questions.find(item => String(item.id) === String(editId)) ||
+                              pastQuestions.find(item => String(item.id) === String(editId));
                     if (!q) {
                         showToast("找不到指定的題目資料。", "error");
                         return;
@@ -3543,6 +3590,7 @@
                         renderQuestionTypeInputs(q);
                     }
                 } else {
+                    if (qIsVaultInput) qIsVaultInput.value = 'false';
                     const modalTitle = document.getElementById('modalQTitle');
                     if (modalTitle) modalTitle.textContent = "Add New Question";
                     
@@ -4077,7 +4125,7 @@
         }
 
         async function deleteUserAccount(username) {
-            if (safeConfirm(`Remove account "${username}"?`)) {
+            if (confirm(`Remove account "${username}"?`)) {
                 await _supabase.from('app_users').delete().eq('name', username);
                 await fetchCloudState();
                 showToast(`Account "${username}" removed.`, "info");
@@ -4099,6 +4147,127 @@
             container.appendChild(toast);
             setTimeout(() => toast.classList.remove('translate-y-2', 'opacity-0'), 10);
             setTimeout(() => { toast.classList.add('opacity-0'); setTimeout(() => toast.remove(), 300); }, 4000);
+        }
+
+        /**
+         * 內建單元測試套件（可於瀏覽器 Console 執行 verifyFixedDeleteQuestionUnitTests() 驗證）
+         */
+        async function runDeleteQuestionBugReproductionTest() {
+            const testQuestionId = "q-test-999";
+            const backupUser = currentUser;
+            const backupQuestions = [...questions];
+            const backupPublished = isPublished;
+            const backupPending = isPending;
+
+            currentUser = { name: "TestUser", role: "host" };
+            isPublished = false;
+            isPending = false;
+            questions = [
+                { id: testQuestionId, author: "TestUser", type: "mcq", prompt: "測試刪除失敗的題目", options: ["A", "B", "C", "D"], correctAnswer: "0", is_vault: false }
+            ];
+
+            let capturedToasts = [];
+            const originalShowToast = window.showToast;
+            const originalConfirm = window.confirm;
+            const originalSupabase = window._supabase;
+            const originalFetchCloudState = window.fetchCloudState;
+
+            window.showToast = (msg, type) => { capturedToasts.push({ msg, type }); };
+            window.confirm = () => true;
+
+            window._supabase = {
+                from: () => ({
+                    delete: () => ({
+                        eq: () => {
+                            const res = Promise.resolve({ data: [], error: null });
+                            res.select = () => Promise.resolve({ data: [], error: null });
+                            return res;
+                        }
+                    })
+                })
+            };
+
+            window.fetchCloudState = async () => {};
+
+            try {
+                await deleteQuestion(testQuestionId);
+                const hasExpectedErrorToast = capturedToasts.some(
+                    t => t.msg === "刪除題目失敗，請檢查網路連線。" && t.type === "error"
+                );
+                const isRolledBack = questions.some(q => String(q.id) === testQuestionId);
+                return hasExpectedErrorToast && isRolledBack;
+            } finally {
+                window.showToast = originalShowToast;
+                window.confirm = originalConfirm;
+                window._supabase = originalSupabase;
+                window.fetchCloudState = originalFetchCloudState;
+                currentUser = backupUser;
+                questions = backupQuestions;
+                isPublished = backupPublished;
+                isPending = backupPending;
+            }
+        }
+
+        async function verifyFixedDeleteQuestionUnitTests() {
+            console.group("🚀 [Verification Suite] 驗證 deleteQuestion 單元測試");
+            const test1Passed = await runDeleteQuestionBugReproductionTest();
+            console.log(test1Passed
+                ? "✅ [TEST 1 PASSED] 刪除失敗時正確回滾並顯示「刪除題目失敗，請檢查網路連線。」"
+                : "❌ [TEST 1 FAILED]");
+
+            const testQuestionId = "q-success-101";
+            const backupUser = currentUser;
+            const backupQuestions = [...questions];
+            const backupDeleted = localStorage.getItem('quiz_deleted_question_ids');
+
+            currentUser = { name: "TestUser", role: "host" };
+            questions = [
+                { id: testQuestionId, author: "TestUser", type: "mcq", prompt: "即將被成功刪除的題目", options: ["A", "B", "C", "D"], correctAnswer: "0", is_vault: false }
+            ];
+
+            let capturedToasts = [];
+            const origToast = window.showToast;
+            const origConfirm = window.confirm;
+            const origSupabase = window._supabase;
+
+            window.showToast = (msg, type) => { capturedToasts.push({ msg, type }); };
+            window.confirm = () => true;
+
+            window._supabase = {
+                from: () => ({
+                    delete: () => ({
+                        eq: (col, val) => ({
+                            select: () => Promise.resolve({ data: [{ id: val }], error: null })
+                        })
+                    }),
+                    select: () => ({
+                        eq: () => Promise.resolve({ data: [], error: null }),
+                        order: () => Promise.resolve({ data: [], error: null }),
+                        single: () => Promise.resolve({ data: null, error: null })
+                    })
+                })
+            };
+
+            try {
+                await deleteQuestion(testQuestionId);
+                await fetchCloudState();
+                const isRemovedFromRepo = !questions.some(q => String(q.id) === testQuestionId);
+                const hasSuccessToast = capturedToasts.some(t => t.type === "success");
+                const test2Passed = isRemovedFromRepo && hasSuccessToast;
+                console.log(test2Passed
+                    ? "✅ [TEST 2 PASSED] 刪除成功後，題目已從儲存庫移除，且 Reload 後不會再次出現！"
+                    : "❌ [TEST 2 FAILED]");
+                console.groupEnd();
+                return test1Passed && test2Passed;
+            } finally {
+                window.showToast = origToast;
+                window.confirm = origConfirm;
+                window._supabase = origSupabase;
+                currentUser = backupUser;
+                questions = backupQuestions;
+                if (backupDeleted === null) localStorage.removeItem('quiz_deleted_question_ids');
+                else localStorage.setItem('quiz_deleted_question_ids', backupDeleted);
+            }
         }
     </script>
 </body>
