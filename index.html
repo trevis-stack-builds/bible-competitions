@@ -43,9 +43,15 @@
             </div>
 
             <div class="flex items-center gap-3">
-                <span id="publishingBadge" class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                <span id="publishingBadge" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/30">
                     <i data-lucide="clock" class="w-3.5 h-3.5"></i> <span data-i18n="badgeCreationPhase">Creation Phase</span>
                 </span>
+
+                <div id="loginProfileHeader" class="flex items-center gap-2 pl-3 border-l border-slate-700">
+                    <button id="loginHeaderLangBtn" type="button" onclick="toggleLanguage()" class="px-2.5 py-1 text-xs font-bold rounded-lg border border-amber-500 text-amber-300 hover:bg-slate-800 transition shadow-sm flex items-center gap-1">
+                        <i data-lucide="languages" class="w-3.5 h-3.5"></i> <span class="langToggleBtnText">繁</span>
+                    </button>
+                </div>
 
                 <div id="guestProfileHeader" class="hidden flex items-center gap-2 pl-3 border-l border-slate-700">
                     <button type="button" onclick="toggleLanguage()" class="px-2.5 py-1 text-xs font-bold rounded-lg border border-amber-500 text-amber-300 hover:bg-slate-800 transition shadow-sm flex items-center gap-1">
@@ -120,13 +126,13 @@
                 </div>
                 <div>
                     <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2" data-i18n="lblAccountNameInput">User Account Name</label>
-                    <input type="text" id="loginUserNameInput" required placeholder="Enter exact account name (Case-Sensitive)" class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-slate-50 text-slate-800 transition font-medium">
+                    <input type="text" id="loginUserNameInput" required data-i18n-placeholder="placeholderLoginUser" placeholder="Enter exact account name (Case-Sensitive)" class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-slate-50 text-slate-800 transition font-medium">
                 </div>
 
                 <div>
                     <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2" data-i18n="lblPassword">Password</label>
                     <div class="relative">
-                        <input type="password" id="loginPassword" required placeholder="Enter your password" class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-slate-50 text-slate-800 transition">
+                        <input type="password" id="loginPassword" required data-i18n-placeholder="placeholderLoginPass" placeholder="Enter your password" class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-slate-50 text-slate-800 transition">
                         <button type="button" onclick="togglePasswordVisibility('loginPassword', 'loginPasswordIcon')" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
                             <i id="loginPasswordIcon" data-lucide="eye" class="w-5 h-5"></i>
                         </button>
@@ -636,7 +642,7 @@
             <form onsubmit="confirmPublishQuiz(event)" class="p-6 space-y-4">
                 <div>
                     <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2" data-i18n="lblCountdownDuration">Countdown Duration (Minutes)</label>
-                    <input type="number" id="quizDurationInput" min="1" max="180" placeholder="e.g. 15 (Leave blank for no timer limit)" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-sm">
+                    <input type="number" id="quizDurationInput" min="1" max="180" data-i18n-placeholder="placeholderQuizDuration" placeholder="e.g. 15 (Leave blank for no timer limit)" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-sm">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2" data-i18n="lblScheduledPublish">Automatic Publication Schedule</label>
@@ -655,7 +661,7 @@
                     <p class="text-xs text-slate-400 mt-1" data-i18n="subClosureDueDate">The quiz will automatically close and unpublish when this deadline passes.</p>
                 </div>
                 <div class="pt-4 flex justify-between items-center gap-2">
-                    <button type="button" onclick="resetPublishModalForm()" class="px-3 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg text-xs font-bold transition">Reset Fields</button>
+                    <button type="button" onclick="resetPublishModalForm()" class="px-3 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg text-xs font-bold transition" data-i18n="btnResetFields">Reset Fields</button>
                     <div class="flex gap-2">
                         <button type="button" onclick="closeModal('publishModal')" class="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg text-sm" data-i18n="btnCancel">Cancel</button>
                         <button type="submit" id="publishModalSubmitBtn" class="px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm font-medium hover:bg-emerald-700 shadow" data-i18n="btnPublishNow">Save & Publish</button>
@@ -680,11 +686,11 @@
                 <div>
                     <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2" data-i18n="lblQType">Question Type</label>
                     <select id="qType" onchange="renderQuestionTypeInputs()" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 text-sm font-medium">
-                        <option value="mcq">Multiple Choice Question (MCQ)</option>
-                        <option value="tf">True / False / Not Given Question</option>
-                        <option value="fill">Fill in the Blanks</option>
-                        <option value="matching">Matching Pairs</option>
-                        <option value="ordering">Sequence Ordering</option>
+                        <option value="mcq" data-i18n="optTypeMCQ">Multiple Choice Question (MCQ)</option>
+                        <option value="tf" data-i18n="optTypeTF">True / False / Not Given Question</option>
+                        <option value="fill" data-i18n="optTypeFill">Fill in the Blanks</option>
+                        <option value="matching" data-i18n="optTypeMatching">Matching Pairs</option>
+                        <option value="ordering" data-i18n="optTypeOrdering">Sequence Ordering</option>
                     </select>
                 </div>
 
@@ -762,7 +768,7 @@
                 <div>
                     <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2" data-i18n="lblUpdatePassword">Update Password</label>
                     <div class="relative">
-                        <input type="password" id="newPasswordInput" required minlength="4" placeholder="Enter new password" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 text-sm">
+                        <input type="password" id="newPasswordInput" required minlength="4" data-i18n-placeholder="placeholderNewPassword" placeholder="Enter new password" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 text-sm">
                         <button type="button" onclick="togglePasswordVisibility('newPasswordInput', 'newPasswordIcon')" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
                             <i id="newPasswordIcon" data-lucide="eye" class="w-4 h-4"></i>
                         </button>
@@ -825,7 +831,7 @@
                 <div>
                     <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2" data-i18n="lblNewPassword">New Password for User</label>
                     <div class="relative">
-                        <input type="password" id="adminNewPassword" required minlength="4" placeholder="Enter new password" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 text-sm">
+                        <input type="password" id="adminNewPassword" required minlength="4" data-i18n-placeholder="placeholderNewPassword" placeholder="Enter new password" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 text-sm">
                         <button type="button" onclick="togglePasswordVisibility('adminNewPassword', 'adminPasswordIcon')" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
                             <i id="adminPasswordIcon" data-lucide="eye" class="w-4 h-4"></i>
                         </button>
@@ -851,7 +857,7 @@
             <form onsubmit="handleAddUserAccount(event)" class="p-6 space-y-4">
                 <div>
                     <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2" data-i18n="lblAccountName">Account Name</label>
-                    <input type="text" id="newAccountName" required placeholder="e.g. Sarah" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 text-sm">
+                    <input type="text" id="newAccountName" required data-i18n-placeholder="placeholderNewAccountName" placeholder="e.g. Sarah" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 text-sm">
                 </div>
 
                 <div>
@@ -866,7 +872,7 @@
                 <div>
                     <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2" data-i18n="lblPassword">Password</label>
                     <div class="relative">
-                        <input type="password" id="newAccountPassword" required placeholder="Default password" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 text-sm">
+                        <input type="password" id="newAccountPassword" required data-i18n-placeholder="placeholderDefaultPassword" placeholder="Default password" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 text-sm">
                         <button type="button" onclick="togglePasswordVisibility('newAccountPassword', 'newAccPasswordIcon')" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
                             <i id="newAccPasswordIcon" data-lucide="eye" class="w-4 h-4"></i>
                         </button>
@@ -889,7 +895,7 @@
             <input type="text" id="customDialogInput" class="hidden w-full px-3.5 py-2 rounded-lg border border-slate-300 text-sm focus:ring-2 focus:ring-blue-500">
             <div class="flex justify-end gap-2 pt-2">
                 <button type="button" id="customDialogCancelBtn" class="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg text-sm hover:bg-slate-50" data-i18n="btnCancel">Cancel</button>
-                <button type="button" id="customDialogConfirmBtn" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-blue-700 shadow">OK</button>
+                <button type="button" id="customDialogConfirmBtn" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-blue-700 shadow" data-i18n="btnOk">OK</button>
             </div>
         </div>
     </div>
@@ -918,7 +924,7 @@
             try { localStorage.removeItem(key); } catch (e) {}
         }
 
-        function askDialog({ title = 'Confirmation', message = '', isPrompt = false, defaultValue = '' }) {
+        function askDialog({ title = t('titleConfirmDefault'), message = '', isPrompt = false, defaultValue = '' }) {
             return new Promise(resolve => {
                 const modal = document.getElementById('customDialogModal');
                 const titleEl = document.getElementById('customDialogTitle');
@@ -929,6 +935,8 @@
 
                 titleEl.textContent = title;
                 msgEl.textContent = message;
+                cancelBtn.textContent = t('btnCancel');
+                confirmBtn.textContent = t('btnOk');
                 if (isPrompt) {
                     inputEl.value = defaultValue;
                     inputEl.classList.remove('hidden');
@@ -1100,6 +1108,7 @@
             EN: {
                 appSubtitle: "Interactive Bible Q&A Platform",
                 badgeCreationPhase: "Creation Phase",
+                scheduledPendingStatus: "Scheduled (Pending)",
                 badgePendingPhase: "Pending (Locked)",
                 navDashboard: "Dashboard",
                 navMyQuestions: "My Questions",
@@ -1260,10 +1269,12 @@
                 btnAlreadyScheduled: "Already Scheduled",
                 noFeedbackReceived: "No user feedback comments received yet.",
                 quizLockedPublishedMsg: "Quiz Phase Locked: The quiz bank is published and active. Editing and adding questions is disabled.",
+                quizLockedPendingCountdown: "Quiz Phase Locked (Pending): The quiz starts in {mins} minutes.",
+                quizLockedPendingMsg: "Quiz Phase Locked (Pending): The quiz is scheduled to start shortly. Editing and adding questions is disabled.",
                 'Live Bible Quiz Assessment': "Live Bible Quiz Assessment",
                 'Past Paper Vault is Empty': "Past Paper Vault is Empty",
                 'Questions will be automatically archived here whenever the Host/Co-host unpublishes a Quiz Bank.': "Questions will be automatically archived here whenever the Host/Co-host unpublishes a Quiz Bank.",
-                unpublishedPendingStatus: "Unpublished (Pending)",
+                unpublishedPendingStatus: "Pending (Locked)",
                 publishQuizLiveStatus: "Publish (Quiz #{k} Live)",
                 titleAddQuestion: "Add New Question",
                 titleEditQuestion: "Edit Question",
@@ -1275,11 +1286,136 @@
                 lblOrderedSequenceItems: "ORDERED SEQUENCE ITEMS (IN CORRECT ORDER 1 → N)",
                 btnAddSequenceStep: "Add Sequence Step",
                 placeholderQPrompt: "Enter your question prompt here...",
-                placeholderQExplanation: "Explain why this answer is correct..."
+                placeholderQExplanation: "Explain why this answer is correct...",
+                placeholderLoginUser: "Enter exact account name (Case-Sensitive)",
+                placeholderLoginPass: "Enter your password",
+                placeholderQuizDuration: "e.g. 15 (Leave blank for no timer limit)",
+                placeholderNewPassword: "Enter new password",
+                placeholderNewAccountName: "e.g. Sarah",
+                placeholderDefaultPassword: "Default password",
+                placeholderOptionX: "Option {char}",
+                placeholderFillExample: "e.g. truth",
+                placeholderPairItem: "Item",
+                placeholderPairMatch: "Matches With",
+                placeholderSequenceItem: "Sequence Item #{n}",
+                placeholderFillAnswer: "Type your answer here...",
+                btnResetFields: "Reset Fields",
+                btnOk: "OK",
+                btnEdit: "Edit",
+                btnResetPass: "Reset Pass",
+                btnDeleteUser: "Delete",
+                optTypeMCQ: "Multiple Choice Question (MCQ)",
+                optTypeTF: "True / False / Not Given Question",
+                optTypeFill: "Fill in the Blanks",
+                optTypeMatching: "Matching Pairs",
+                optTypeOrdering: "Sequence Ordering",
+                lblQuestionNum: "Question #{n}",
+                lblExplanation: "Explanation:",
+                lblCorrectAnswer: "Correct Answer:",
+                lblCorrectMark: "✓ (Correct)",
+                lblCorrectAnswerBadge: "Correct Answer ✓",
+                lblYourChoiceBadge: "Your Choice ✗",
+                lblMatchingPairsTitle: "Matching Pairs:",
+                lblCorrectSequenceOrder: "Correct Sequence Order:",
+                lblReadOnly: "Read-only",
+                lblQuizSessionBadge: "Quiz #{n}",
+                lblTimerLimit: "Timer limit: {mins} minutes. ",
+                lblNoTimerLimit: "No timer limit. ",
+                lblDueDatePrefix: "Due date: ",
+                lblAnnouncementBy: "ANNOUNCEMENT by {user}",
+                titleGuestModeChallenge: "Guest Mode Challenge",
+                lblQuestionXofY: "Question {idx} of {total}",
+                lblAuthorPrefix: "Author: {author}",
+                lblByAuthor: "By: {author}",
+                lblSelectMatchingInstruction: "Select the matching pair for each item below:",
+                optChooseMatch: "-- Choose Match --",
+                lblArrangeSequenceInstruction: "Arrange items into the correct sequence (assign position numbers 1 to {n}):",
+                lblPosition: "Position:",
+                lblSubmittedOn: "Submitted on: {time}",
+                badgeCorrect: "Correct ✓",
+                badgeIncorrect: "Incorrect ✗",
+                lblYourAnswer: "Your Answer:",
+                lblOfficialCorrectAnswer: "Official Correct Answer:",
+                lblYourMatches: "Your Matches:",
+                lblOfficialMatches: "Official Matches:",
+                lblYourSubmittedSequence: "Your Submitted Sequence:",
+                lblOfficialCorrectSequence: "Official Correct Sequence:",
+                lblNoAnswer: "No Answer",
+                lblEmptyAnswer: "Empty",
+                lblQuestionsCountUnit: "{count} questions",
+                lblUsersCountUnit: "{count} user(s)",
+                titleConfirmDefault: "Confirmation",
+                titleDeleteQuestion: "Delete Question",
+                msgDeleteQuestionConfirm: "Are you sure you want to delete this question?",
+                titleDeleteFeedback: "Delete Feedback",
+                msgDeleteFeedbackConfirm: "Are you sure you want to delete this comment?",
+                titleDeleteUserAccount: "Delete User Account",
+                msgDeleteUserAccountConfirm: "Remove account \"{name}\"?",
+                titleEditMessage: "Edit Message",
+                msgEditMessagePrompt: "Update your chat message below:",
+                msgCancelScheduleConfirm: "Are you sure you want to cancel the scheduled quiz publication?",
+                msgClearChatConfirm: "Are you sure you want to clear ALL chat messages and announcements from the chatroom board?",
+                msgClearVaultConfirm: "Are you sure you want to permanently delete ALL historical questions from the Past Paper Vault?",
+                msgUnpublishConfirm: "Unpublish Quiz Bank? Active questions will be archived to Past Paper Vault.",
+                msgResetRecordsConfirm: "Are you sure you want to clear ALL historical published quiz records, user submissions, AND reset Quiz Number back to #1?",
+                toastQuizNowLive: "Quiz #{session} is now LIVE!",
+                toastQuizEnteredPending: "Quiz entered 'Pending' phase. Questions repository is now locked.",
+                toastInvalidLogin: "Invalid user account name or password!",
+                toastWelcomeBack: "Welcome back, {name}!",
+                toastEnteredGuestMode: "Entered Guest Mode - Take the Challenge!",
+                toastLoggedOut: "Logged out successfully.",
+                toastScheduleCancelled: "Quiz publication schedule cancelled successfully.",
+                toastMsgEmpty: "Message cannot be empty.",
+                toastMsgUpdated: "Message updated successfully.",
+                toastChatCleared: "All chat history cleared successfully.",
+                toastVaultEmpty: "Past Paper Vault is empty!",
+                toastSelectAtLeastOneGuestQ: "Please select at least one question for the Guest Challenge.",
+                toastRepublishedGuest: "Republished Guest Challenge successfully!",
+                toastVaultEmptied: "Past Paper Vault emptied successfully.",
+                toastTimeUpAutoSubmit: "Time is up! Auto-submitting quiz.",
+                toastTemplateDownloaded: "Clean template CSV generated and downloaded successfully!",
+                toastBatchExported: "Exported repository successfully in unified format!",
+                toastBatchUploadSuccess: "Batch Upload Successful! Added: {added}, Updated: {updated}, Deleted: {deleted}",
+                toastBatchUploadFailed: "Upload failed: {err}",
+                toastFileReadError: "File read error, please try again later.",
+                toastEnterComment: "Please enter a comment.",
+                toastFeedbackSent: "Feedback sent to Host and Co-host!",
+                toastFeedbackDeleted: "Feedback comment deleted.",
+                toastPubSchedulePast: "Publication schedule is in the past. Prompting immediate publication instead.",
+                toastValClosurePast: "Validation Error: Automatic closure date & time cannot fall in the past.",
+                toastValPubBeforeClosure: "Validation Error: Publication schedule must be before closure due date & time.",
+                toastQuizPublishedLive: "Quiz #{session} Published Live successfully!",
+                toastQuizScheduled: "Quiz scheduled successfully!",
+                toastPublishFailed: "Failed to publish quiz. Check your configuration or connection.",
+                toastQuizAutoClosed: "Quiz closed automatically (due date reached).",
+                toastQuizUnpublished: "Quiz Unpublished! Questions archived.",
+                toastRecordsReset: "Historical quiz records, leaderboard submissions, and Quiz Session Number reset to #1.",
+                toastUserOrderUpdated: "User order updated!",
+                toastRoleUpdated: "Role updated for {user} to {role}",
+                toastRepoLocked: "Question repository is locked during pending/published phase.",
+                toastSelectCorrectOpt: "Please select a correct option.",
+                toastSelectTFNG: "Please select True, False, or Not Given.",
+                toastMatchingMin2: "Matching questions require at least 2 pairs.",
+                toastOrderingMin2: "Ordering questions require at least 2 items.",
+                toastQuestionSaved: "Question saved successfully!",
+                toastQuestionSaveFailed: "Failed to save question. Please check your connection or Supabase settings.",
+                toastQuestionDeleted: "Question deleted successfully.",
+                toastQuestionDeleteFailed: "Failed to delete question. Please check your network connection.",
+                toastQuestionNotFound: "Specified question data not found.",
+                toastQuizNotFinished: "Not Yet Finished! Still remains {count} questions in the quiz.",
+                toastQuizSubmitted: "Quiz Submitted! Score: {score}/{total} ({percentage}%)",
+                toastResultsCopiedInstagram: "Results copied to clipboard! Paste into Instagram Story/DM.",
+                toastOpeningEmail: "Opening email client...",
+                toastAccountExists: "Account name already exists!",
+                toastProfileUpdated: "Profile updated across all devices!",
+                toastPasswordUpdatedFor: "Password updated for {target}!",
+                toastAccountCreated: "Account \"{name}\" created!",
+                toastAccountRemoved: "Account \"{name}\" removed."
             },
             繁: {
                 appSubtitle: "互動式聖經問答平台",
                 badgeCreationPhase: "題目籌備階段",
+                scheduledPendingStatus: "已排程（準備發布）",
                 badgePendingPhase: "準備發布（已鎖定）",
                 navDashboard: "儀表板",
                 navMyQuestions: "我的題目",
@@ -1440,10 +1576,12 @@
                 btnAlreadyScheduled: "已排程發布",
                 noFeedbackReceived: "目前尚未收到任何使用者意見回饋。",
                 quizLockedPublishedMsg: "測驗階段已鎖定：題庫已發布並處於啟用狀態，目前已停用題目的新增與編輯功能。",
+                quizLockedPendingCountdown: "測驗階段已鎖定（準備發布）：測驗將於 {mins} 分鐘後開始。",
+                quizLockedPendingMsg: "測驗階段已鎖定（準備發布）：測驗即將開始，目前已停用題目的新增與編輯功能。",
                 'Live Bible Quiz Assessment': "即時聖經問答測驗",
                 'Past Paper Vault is Empty': "歷屆試題庫目前是空的",
                 'Questions will be automatically archived here whenever the Host/Co-host unpublishes a Quiz Bank.': "每當主持人或副主持人取消發布題庫時，題目將會自動封存至此。",
-                unpublishedPendingStatus: "未發布（準備中）",
+                unpublishedPendingStatus: "準備發布（已鎖定）",
                 publishQuizLiveStatus: "已發布（第 #{k} 期測驗進行中）",
                 titleAddQuestion: "新增題目",
                 titleEditQuestion: "編輯題目",
@@ -1455,7 +1593,131 @@
                 lblOrderedSequenceItems: "排序項目（按正確順序 1 → N）",
                 btnAddSequenceStep: "新增排序步驟",
                 placeholderQPrompt: "請在此輸入您的題目敘述...",
-                placeholderQExplanation: "請說明此答案正確的原因..."
+                placeholderQExplanation: "請說明此答案正確的原因...",
+                placeholderLoginUser: "請輸入完整帳號名稱（區分大小寫）",
+                placeholderLoginPass: "請輸入您的密碼",
+                placeholderQuizDuration: "例如：15（留空代表無時間限制）",
+                placeholderNewPassword: "請輸入新密碼",
+                placeholderNewAccountName: "例如：Sarah",
+                placeholderDefaultPassword: "預設密碼",
+                placeholderOptionX: "選項 {char}",
+                placeholderFillExample: "例如：真理",
+                placeholderPairItem: "項目",
+                placeholderPairMatch: "配對內容",
+                placeholderSequenceItem: "排序項目 #{n}",
+                placeholderFillAnswer: "請在此輸入您的答案...",
+                btnResetFields: "重置欄位",
+                btnOk: "確定",
+                btnEdit: "編輯",
+                btnResetPass: "重置密碼",
+                btnDeleteUser: "刪除",
+                optTypeMCQ: "選擇題 (MCQ)",
+                optTypeTF: "是非與無從判斷題 (TFNGQ)",
+                optTypeFill: "填充題 (FILL_BLANK)",
+                optTypeMatching: "配對題 (MATCHING)",
+                optTypeOrdering: "排序題 (ORDERING)",
+                lblQuestionNum: "題目 #{n}",
+                lblExplanation: "解析說明：",
+                lblCorrectAnswer: "正確答案：",
+                lblCorrectMark: "✓（正確）",
+                lblCorrectAnswerBadge: "正確答案 ✓",
+                lblYourChoiceBadge: "您的選擇 ✗",
+                lblMatchingPairsTitle: "配對組合：",
+                lblCorrectSequenceOrder: "正確排序順序：",
+                lblReadOnly: "唯讀",
+                lblQuizSessionBadge: "第 #{n} 期測驗",
+                lblTimerLimit: "限時：{mins} 分鐘。",
+                lblNoTimerLimit: "無時間限制。",
+                lblDueDatePrefix: "截止時間：",
+                lblAnnouncementBy: "由 {user} 發布的公告",
+                titleGuestModeChallenge: "訪客模式挑戰賽",
+                lblQuestionXofY: "第 {idx} / {total} 題",
+                lblAuthorPrefix: "出題者：{author}",
+                lblByAuthor: "出題者：{author}",
+                lblSelectMatchingInstruction: "請為下方每個項目選擇對應的配對：",
+                optChooseMatch: "-- 請選擇配對 --",
+                lblArrangeSequenceInstruction: "請將項目排列成正確順序（指定 1 至 {n} 的順序編號）：",
+                lblPosition: "順序位置：",
+                lblSubmittedOn: "提交時間：{time}",
+                badgeCorrect: "答對 ✓",
+                badgeIncorrect: "答錯 ✗",
+                lblYourAnswer: "您的答案：",
+                lblOfficialCorrectAnswer: "官方正確答案：",
+                lblYourMatches: "您的配對：",
+                lblOfficialMatches: "官方正確配對：",
+                lblYourSubmittedSequence: "您提交的順序：",
+                lblOfficialCorrectSequence: "官方正確順序：",
+                lblNoAnswer: "未作答",
+                lblEmptyAnswer: "空白",
+                lblQuestionsCountUnit: "{count} 題",
+                lblUsersCountUnit: "{count} 位參與者",
+                titleConfirmDefault: "確認操作",
+                titleDeleteQuestion: "刪除題目",
+                msgDeleteQuestionConfirm: "您確定要刪除此題目嗎？",
+                titleDeleteFeedback: "刪除意見回饋",
+                msgDeleteFeedbackConfirm: "您確定要刪除此則意見回饋嗎？",
+                titleDeleteUserAccount: "刪除使用者帳號",
+                msgDeleteUserAccountConfirm: "確定要移除帳號「{name}」嗎？",
+                titleEditMessage: "編輯訊息",
+                msgEditMessagePrompt: "請在下方更新您的聊天訊息：",
+                msgCancelScheduleConfirm: "您確定要取消已排程的測驗發布嗎？",
+                msgClearChatConfirm: "您確定要清除聊天室中的所有訊息與公告嗎？",
+                msgClearVaultConfirm: "您確定要永久刪除歷屆試題庫中的所有歷史題目嗎？",
+                msgUnpublishConfirm: "確定要取消發布題庫嗎？目前的題目將會封存至歷屆試題庫。",
+                msgResetRecordsConfirm: "您確定要清除所有歷屆發布測驗紀錄、參與者提交紀錄，並將測驗期數重置回 #1 嗎？",
+                toastQuizNowLive: "第 #{session} 期測驗現已正式開放！",
+                toastQuizEnteredPending: "測驗已進入「準備發布」階段，題目庫現已鎖定。",
+                toastInvalidLogin: "使用者帳號名稱或密碼錯誤！",
+                toastWelcomeBack: "歡迎回來，{name}！",
+                toastEnteredGuestMode: "已進入訪客模式 - 開始挑戰答題！",
+                toastLoggedOut: "已成功登出。",
+                toastScheduleCancelled: "已成功取消測驗發布排程。",
+                toastMsgEmpty: "訊息內容不可為空。",
+                toastMsgUpdated: "訊息已成功更新。",
+                toastChatCleared: "已成功清除所有聊天紀錄。",
+                toastVaultEmpty: "歷屆試題庫目前是空的！",
+                toastSelectAtLeastOneGuestQ: "請至少勾選一題供訪客挑戰使用。",
+                toastRepublishedGuest: "已成功重新發布訪客挑戰！",
+                toastVaultEmptied: "已成功清空歷屆試題庫。",
+                toastTimeUpAutoSubmit: "時間到！系統正在自動提交測驗。",
+                toastTemplateDownloaded: "已成功產生並下載空白範本 CSV！",
+                toastBatchExported: "已成功以統一格式匯出題目儲存庫！",
+                toastBatchUploadSuccess: "批次上傳成功！新增：{added}，更新：{updated}，刪除：{deleted}",
+                toastBatchUploadFailed: "上傳失敗：{err}",
+                toastFileReadError: "檔案讀取發生錯誤，請稍後再試。",
+                toastEnterComment: "請輸入意見內容。",
+                toastFeedbackSent: "意見回饋已傳送給主持人與副主持人！",
+                toastFeedbackDeleted: "已刪除意見回饋留言。",
+                toastPubSchedulePast: "預定發布時間已過，將改為立即發布。",
+                toastValClosurePast: "驗證錯誤：自動截止關閉時間不可設定於過去。",
+                toastValPubBeforeClosure: "驗證錯誤：預定發布時間必須早於自動截止關閉時間。",
+                toastQuizPublishedLive: "第 #{session} 期測驗已成功即時發布！",
+                toastQuizScheduled: "測驗排程設定成功！",
+                toastPublishFailed: "發布測驗失敗，請檢查設定或網路連線。",
+                toastQuizAutoClosed: "測驗已到達截止時間並自動結束。",
+                toastQuizUnpublished: "已取消發布測驗！題目已封存至歷屆試題庫。",
+                toastRecordsReset: "歷屆測驗紀錄、排行榜提交紀錄已清空，且測驗期數已重置為 #1。",
+                toastUserOrderUpdated: "使用者順序已更新！",
+                toastRoleUpdated: "{user} 的身份角色已更新為 {role}",
+                toastRepoLocked: "題目庫於準備發布或已發布階段期間處於鎖定狀態。",
+                toastSelectCorrectOpt: "請選擇一個正確答案選項。",
+                toastSelectTFNG: "請選擇 True、False 或 Not Given。",
+                toastMatchingMin2: "配對題至少需要輸入 2 組配對項目。",
+                toastOrderingMin2: "排序題至少需要輸入 2 個排序項目。",
+                toastQuestionSaved: "題目已成功儲存！",
+                toastQuestionSaveFailed: "儲存題目失敗，請檢查網路連線或 Supabase 專案設定。",
+                toastQuestionDeleted: "題目已成功刪除。",
+                toastQuestionDeleteFailed: "刪除題目失敗，請檢查網路連線。",
+                toastQuestionNotFound: "找不到指定的題目資料。",
+                toastQuizNotFinished: "尚未完成作答！測驗仍有 {count} 題未作答。",
+                toastQuizSubmitted: "測驗已提交！得分：{score}/{total} ({percentage}%)",
+                toastResultsCopiedInstagram: "成績已複製到剪貼簿！可貼上至 Instagram 限時動態或訊息。",
+                toastOpeningEmail: "正在開啟郵件軟體...",
+                toastAccountExists: "帳號名稱已存在！",
+                toastProfileUpdated: "個人檔案已更新並同步至所有裝置！",
+                toastPasswordUpdatedFor: "已更新 {target} 的密碼！",
+                toastAccountCreated: "已建立帳號「{name}」！",
+                toastAccountRemoved: "已移除帳號「{name}」。"
             }
         };
 
@@ -1484,6 +1746,43 @@
         let guestChallengeConfig = { active: false, duration: 10, maxQuestions: 5, questionIds: [] };
         let activeQuizQuestions = [];
         let quizShuffleCache = {};
+        let quizActiveSessionKey = null;
+        let quizDraftAnswers = {};
+
+        function resetQuizTimerState() {
+            if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+            quizStartTime = null;
+            quizActiveSessionKey = null;
+            quizShuffleCache = {};
+            quizDraftAnswers = {};
+            safeRemoveStorage('quiz_timer_state');
+        }
+
+        function saveQuizDraftInputs() {
+            const form = document.getElementById('quizActiveForm');
+            if (!form) return;
+            form.querySelectorAll('input, select, textarea').forEach(el => {
+                if (!el.name) return;
+                if (el.type === 'radio' || el.type === 'checkbox') {
+                    if (el.checked) quizDraftAnswers[el.name] = el.value;
+                } else {
+                    quizDraftAnswers[el.name] = el.value;
+                }
+            });
+        }
+
+        function restoreQuizDraftInputs() {
+            const form = document.getElementById('quizActiveForm');
+            if (!form || !quizDraftAnswers) return;
+            form.querySelectorAll('input, select, textarea').forEach(el => {
+                if (!el.name || !(el.name in quizDraftAnswers)) return;
+                if (el.type === 'radio' || el.type === 'checkbox') {
+                    el.checked = (String(el.value) === String(quizDraftAnswers[el.name]));
+                } else {
+                    el.value = quizDraftAnswers[el.name];
+                }
+            });
+        }
 
         function t(key) {
             const langData = i18n[currentLang] || i18n.EN;
@@ -1509,6 +1808,18 @@
             document.querySelectorAll('.langToggleBtnText').forEach(el => {
                 el.textContent = currentLang === 'EN' ? '繁' : 'EN';
             });
+            const lockedNoticeText = document.getElementById('questionsLockedNoticeText');
+            if (lockedNoticeText && (isPublished || isPending)) {
+                lockedNoticeText.removeAttribute('data-i18n');
+                if (isPending && scheduledPublishTime) {
+                    const diffMins = Math.max(1, Math.ceil((new Date(scheduledPublishTime) - new Date()) / (1000 * 60)));
+                    lockedNoticeText.innerHTML = `<strong>${escapeHTML(t('quizLockedPendingCountdown').replace('{mins}', diffMins))}</strong>`;
+                } else if (isPending) {
+                    lockedNoticeText.innerHTML = `<strong>${escapeHTML(t('quizLockedPendingMsg'))}</strong>`;
+                } else {
+                    lockedNoticeText.innerHTML = `<strong>${escapeHTML(t('quizLockedPublishedMsg'))}</strong>`;
+                }
+            }
             syncPublishButtonsUI();
         }
 
@@ -1548,6 +1859,16 @@
                     currentUser = JSON.parse(savedCurrentUser);
                     activeTab = safeGetStorage('quiz_active_tab', 'dashboard');
                 } catch (e) { currentUser = null; }
+            }
+            const savedTimer = safeGetStorage('quiz_timer_state');
+            if (savedTimer) {
+                try {
+                    const parsedTimer = JSON.parse(savedTimer);
+                    if (parsedTimer && parsedTimer.key && parsedTimer.startTime) {
+                        quizActiveSessionKey = parsedTimer.key;
+                        quizStartTime = new Date(parsedTimer.startTime);
+                    }
+                } catch (e) {}
             }
 
             await fetchCloudState();
@@ -1664,14 +1985,20 @@
                     await fetchCloudState();
                     updateUI();
                     renderCurrentView();
-                    showToast(`Quiz #${currentQuizSession} is now LIVE!`, "success");
+                    showToast(t("toastQuizNowLive").replace("{session}", currentQuizSession), "success");
                 } else if (diffMins <= 15 && !isPending) {
                     isPending = true;
                     await _supabase.from('app_state').update({ is_pending: true }).eq('id', 1);
                     await fetchCloudState();
                     updateUI();
                     renderCurrentView();
-                    showToast("Quiz entered 'Pending' phase. Questions repository is now locked.", "info");
+                    showToast(t("toastQuizEnteredPending"), "info");
+                } else if (diffMins > 15 && isPending) {
+                    isPending = false;
+                    await _supabase.from('app_state').update({ is_pending: false }).eq('id', 1);
+                    await fetchCloudState();
+                    updateUI();
+                    renderCurrentView();
                 }
             }
 
@@ -1702,7 +2029,7 @@
 
             const found = users.find(u => u.name === typedName);
             if (!found || found.pass !== passwordInput) {
-                showToast("Invalid user account name or password!", "error");
+                showToast(t("toastInvalidLogin"), "error");
                 return;
             }
 
@@ -1710,16 +2037,16 @@
             safeSetStorage('quiz_current_user', JSON.stringify(currentUser));
             document.getElementById('loginPassword').value = '';
             document.getElementById('loginUserNameInput').value = '';
-            showToast(`Welcome back, ${currentUser.name}!`, "success");
+            showToast(t("toastWelcomeBack").replace("{name}", currentUser.name), "success");
 
             updateUI();
             switchTab('dashboard');
         }
 
         function startGuestMode() {
+            resetQuizTimerState();
             isGuestMode = true;
             currentUser = { name: "Guest User", role: "guest", avatar_url: "" };
-            quizShuffleCache = {};
 
             if (guestChallengeConfig.active && guestChallengeConfig.questionIds.length > 0) {
                 let pool = pastQuestions.filter(q => guestChallengeConfig.questionIds.includes(q.id));
@@ -1734,7 +2061,7 @@
 
             updateUI();
             switchTab('take-quiz');
-            showToast("Entered Guest Mode - Take the Challenge!", "info");
+            showToast(t("toastEnteredGuestMode"), "info");
         }
 
         function logout() {
@@ -1742,7 +2069,7 @@
             isGuestMode = false;
             safeRemoveStorage('quiz_current_user');
             safeRemoveStorage('quiz_active_tab');
-            if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+            resetQuizTimerState();
 
             ['dashboard', 'my-questions', 'past-paper-vault', 'take-quiz', 'results', 'achievements', 'host-controls'].forEach(v => {
                 const el = document.getElementById(`view-${v}`);
@@ -1751,7 +2078,7 @@
 
             activeTab = 'dashboard';
             document.getElementById('view-login').classList.remove('hidden');
-            showToast("Logged out successfully.", "info");
+            showToast(t("toastLoggedOut"), "info");
             updateUI();
         }
 
@@ -1771,7 +2098,9 @@
 
         function switchTab(tabId) {
             if (!currentUser) return;
-            const prevTab = activeTab;
+            if (activeTab === 'take-quiz' && tabId !== 'take-quiz') {
+                saveQuizDraftInputs();
+            }
             activeTab = tabId;
             safeSetStorage('quiz_active_tab', tabId);
 
@@ -1787,29 +2116,40 @@
                 btn.classList.toggle('text-slate-300', !isCurrent);
             });
 
-            if (tabId === 'take-quiz' && (isPublished || isGuestMode) && (prevTab !== 'take-quiz' || !quizStartTime)) {
-                quizStartTime = new Date();
-                quizShuffleCache = {};
+            if (tabId === 'take-quiz' && (isPublished || isGuestMode)) {
+                const targetSession = isGuestMode ? 999999 : currentQuizSession;
+                const sessionKey = `${currentUser.name}_${targetSession}`;
+                if (quizActiveSessionKey !== sessionKey || !quizStartTime) {
+                    quizActiveSessionKey = sessionKey;
+                    quizStartTime = new Date();
+                    quizShuffleCache = {};
+                    quizDraftAnswers = {};
+                    safeSetStorage('quiz_timer_state', JSON.stringify({ key: sessionKey, startTime: quizStartTime.getTime() }));
+                }
             }
 
-            renderCurrentView();
             applyLanguage();
+            renderCurrentView();
             lucide.createIcons();
         }
 
         function updateUI() {
             const userHeader = document.getElementById('userProfileHeader');
             const guestHeader = document.getElementById('guestProfileHeader');
+            const loginHeader = document.getElementById('loginProfileHeader');
             const nav = document.getElementById('appNav');
             const loginView = document.getElementById('view-login');
 
             if (!currentUser) {
                 userHeader.classList.add('hidden');
                 guestHeader.classList.add('hidden');
+                if (loginHeader) loginHeader.classList.remove('hidden');
                 nav.classList.add('hidden');
                 loginView.classList.remove('hidden');
+                syncPublishButtonsUI();
             } else {
                 loginView.classList.add('hidden');
+                if (loginHeader) loginHeader.classList.add('hidden');
                 userHeader.classList.toggle('hidden', isGuestMode);
                 guestHeader.classList.toggle('hidden', !isGuestMode);
                 nav.classList.toggle('hidden', isGuestMode);
@@ -1847,18 +2187,25 @@
             const ctrlPublishBtn = document.getElementById('ctrlCenterPublishBtn');
             const badge = document.getElementById('publishingBadge');
 
-            if (!currentUser || isGuestMode) {
+            if (isGuestMode) {
                 if (badge) badge.classList.add('hidden');
                 return;
             }
             if (badge) badge.classList.remove('hidden');
 
             const baseBtnClass = "px-5 py-3 rounded-xl font-bold text-sm shadow-lg transition flex items-center gap-2 text-white ";
+            const statusTxt = document.getElementById('hostPublishStatusText');
 
             if (isPublished) {
                 if (ctrlPublishBtn) {
                     ctrlPublishBtn.className = baseBtnClass + "bg-amber-600 hover:bg-amber-700";
+                    ctrlPublishText.setAttribute('data-i18n', 'btnUnpublishQuizBank');
                     ctrlPublishText.textContent = t('btnUnpublishQuizBank');
+                }
+                if (statusTxt) {
+                    statusTxt.removeAttribute('data-i18n');
+                    statusTxt.textContent = t('publishQuizLiveStatus').replace('{k}', currentQuizSession);
+                    statusTxt.className = "text-xl font-bold text-emerald-600 mt-1";
                 }
                 const dueText = quizDueDate ? ` | Due: ${new Date(quizDueDate).toLocaleString()}` : '';
                 badge.className = "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30";
@@ -1866,24 +2213,42 @@
             } else if (scheduledPublishTime && !isPending) {
                 if (ctrlPublishBtn) {
                     ctrlPublishBtn.className = baseBtnClass + "bg-purple-600 hover:bg-purple-700";
+                    ctrlPublishText.setAttribute('data-i18n', 'btnAlreadyScheduled');
                     ctrlPublishText.textContent = t('btnAlreadyScheduled');
                 }
-                badge.className = "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-purple-500/20 text-purple-300 border border-purple-500/30";
-                badge.innerHTML = `<i data-lucide="clock" class="w-3.5 h-3.5"></i> <span>${escapeHTML(t('badgePendingPhase'))}</span>`;
+                if (statusTxt) {
+                    statusTxt.setAttribute('data-i18n', 'scheduledPendingStatus');
+                    statusTxt.textContent = t('scheduledPendingStatus');
+                    statusTxt.className = "text-xl font-bold text-indigo-600 mt-1";
+                }
+                badge.className = "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30";
+                badge.innerHTML = `<i data-lucide="clock" class="w-3.5 h-3.5"></i> <span data-i18n="scheduledPendingStatus">${escapeHTML(t('scheduledPendingStatus'))}</span>`;
             } else if (isPending) {
                 if (ctrlPublishBtn) {
-                    ctrlPublishBtn.className = baseBtnClass + "bg-emerald-500 hover:bg-emerald-600";
-                    ctrlPublishText.textContent = t('btnPublishAllQuestions');
+                    ctrlPublishBtn.className = baseBtnClass + "bg-purple-600 hover:bg-purple-700";
+                    ctrlPublishText.setAttribute('data-i18n', 'btnAlreadyScheduled');
+                    ctrlPublishText.textContent = t('btnAlreadyScheduled');
+                }
+                if (statusTxt) {
+                    statusTxt.setAttribute('data-i18n', 'unpublishedPendingStatus');
+                    statusTxt.textContent = t('unpublishedPendingStatus');
+                    statusTxt.className = "text-xl font-bold text-purple-600 mt-1";
                 }
                 badge.className = "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-purple-500/20 text-purple-300 border border-purple-500/30";
-                badge.innerHTML = `<i data-lucide="clock" class="w-3.5 h-3.5"></i> <span>${escapeHTML(t('badgePendingPhase'))}</span>`;
+                badge.innerHTML = `<i data-lucide="clock" class="w-3.5 h-3.5"></i> <span data-i18n="badgePendingPhase">${escapeHTML(t('badgePendingPhase'))}</span>`;
             } else {
                 if (ctrlPublishBtn) {
                     ctrlPublishBtn.className = baseBtnClass + "bg-emerald-500 hover:bg-emerald-600";
+                    ctrlPublishText.setAttribute('data-i18n', 'btnPublishAllQuestions');
                     ctrlPublishText.textContent = t('btnPublishAllQuestions');
                 }
+                if (statusTxt) {
+                    statusTxt.setAttribute('data-i18n', 'unpublishedCreationPhase');
+                    statusTxt.textContent = t('unpublishedCreationPhase');
+                    statusTxt.className = "text-xl font-bold text-slate-600 mt-1";
+                }
                 badge.className = "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/30";
-                badge.innerHTML = `<i data-lucide="clock" class="w-3.5 h-3.5"></i> <span>${escapeHTML(t('badgeCreationPhase'))}</span>`;
+                badge.innerHTML = `<i data-lucide="clock" class="w-3.5 h-3.5"></i> <span data-i18n="badgeCreationPhase">${escapeHTML(t('badgeCreationPhase'))}</span>`;
             }
             lucide.createIcons();
         }
@@ -1892,11 +2257,13 @@
             if (!isHostOrCoHost()) return;
             if (isPublished) {
                 unpublishQuiz(false);
-            } else if (scheduledPublishTime && !isPending) {
+            } else if (scheduledPublishTime || isPending) {
                 openModal('scheduleDetailsModal');
-                document.getElementById('modalScheduleTimeDisplay').textContent = new Date(scheduledPublishTime).toLocaleString('en-GB', {
-                    day: '2-digit', month: '2-digit', year: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true
-                });
+                document.getElementById('modalScheduleTimeDisplay').textContent = scheduledPublishTime
+                    ? new Date(scheduledPublishTime).toLocaleString('en-GB', {
+                        day: '2-digit', month: '2-digit', year: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true
+                    })
+                    : t('unpublishedPendingStatus');
             } else {
                 openPublishModal();
             }
@@ -1905,7 +2272,7 @@
         async function cancelActiveSchedule() {
             const confirmed = await askDialog({
                 title: t('btnCancelSchedule'),
-                message: "Are you sure you want to cancel the scheduled quiz publication?"
+                message: t('msgCancelScheduleConfirm')
             });
             if (!confirmed) return;
             scheduledPublishTime = null;
@@ -1915,7 +2282,7 @@
             closeModal('scheduleDetailsModal');
             updateUI();
             renderCurrentView();
-            showToast("Quiz publication schedule cancelled successfully.", "info");
+            showToast(t("toastScheduleCancelled"), "info");
         }
 
         function renderCurrentView() {
@@ -1936,8 +2303,8 @@
             document.getElementById('statMyCount').textContent = myQs.length;
             document.getElementById('statPublishedCount').textContent = questions.length;
             document.getElementById('statQuizStatus').textContent = isPublished
-                ? `Quiz #${currentQuizSession} Live`
-                : (scheduledPublishTime && !isPending) ? "Already Scheduled" : isPending ? "Pending" : t('draft');
+                ? (currentLang === 'EN' ? `Quiz #${currentQuizSession} Live` : t('publishQuizLiveStatus').replace('{k}', currentQuizSession))
+                : (scheduledPublishTime && !isPending) ? t('scheduledPendingStatus') : isPending ? t('unpublishedPendingStatus') : t('draft');
 
             const userSubs = submissions[currentUser.name] || [];
             const latestSub = userSubs.find(s => s.quiz_session_id === currentQuizSession) || userSubs[userSubs.length - 1];
@@ -1954,8 +2321,8 @@
                         <div class="space-y-1">
                             <h4 class="font-bold text-slate-800">${escapeHTML(titleStr)}</h4>
                             <p class="text-sm text-slate-600">
-                                ${quizDurationMins ? 'Timer limit: ' + quizDurationMins + ' minutes. ' : 'No timer limit. '}
-                                ${quizDueDate ? 'Due date: ' + escapeHTML(new Date(quizDueDate).toLocaleString()) : ''}
+                                ${quizDurationMins ? escapeHTML(t('lblTimerLimit').replace('{mins}', quizDurationMins)) : escapeHTML(t('lblNoTimerLimit'))}
+                                ${quizDueDate ? escapeHTML(t('lblDueDatePrefix')) + escapeHTML(new Date(quizDueDate).toLocaleString()) : ''}
                             </p>
                             <button onclick="switchTab('take-quiz')" class="mt-3 inline-flex items-center gap-2 text-sm font-semibold text-blue-600 hover:text-blue-800">
                                 ${escapeHTML(t('btnTakeQuiz'))} <i data-lucide="arrow-right" class="w-4 h-4"></i>
@@ -1967,8 +2334,8 @@
                     <div class="flex items-start gap-4">
                         <div class="p-3 bg-indigo-100 text-indigo-700 rounded-xl shrink-0"><i data-lucide="clock" class="w-6 h-6 animate-pulse"></i></div>
                         <div class="space-y-1">
-                            <h4 class="font-bold text-slate-800">Quiz Already Scheduled</h4>
-                            <p class="text-sm text-slate-600">Scheduled to go live on: <strong>${escapeHTML(new Date(scheduledPublishTime).toLocaleString())}</strong></p>
+                            <h4 class="font-bold text-slate-800">${escapeHTML(t('titleScheduleDetails'))}</h4>
+                            <p class="text-sm text-slate-600">${escapeHTML(t('lblScheduledPublishTime'))}: <strong>${escapeHTML(new Date(scheduledPublishTime).toLocaleString())}</strong></p>
                         </div>
                     </div>`;
             } else if (isPending) {
@@ -2044,7 +2411,7 @@
                         <div class="flex justify-center my-2">
                             <div class="bg-amber-50 border border-amber-300 text-amber-900 p-3 rounded-2xl max-w-md w-full shadow-sm text-center space-y-1">
                                 <div class="flex items-center justify-center gap-1.5 text-xs font-bold text-amber-700">
-                                    <i data-lucide="megaphone" class="w-3.5 h-3.5"></i> <span>ANNOUNCEMENT by ${escapeHTML(m.username)}</span>
+                                    <i data-lucide="megaphone" class="w-3.5 h-3.5"></i> <span>${escapeHTML(t("lblAnnouncementBy").replace("{user}", m.username))}</span>
                                 </div>
                                 <p class="text-sm font-semibold">${escapeHTML(m.text)}</p>
                                 <span class="text-[10px] text-amber-600 block">${timeStr}</span>
@@ -2058,7 +2425,7 @@
                         <div class="max-w-[75%] space-y-1">
                             <div class="flex items-center gap-2 ${isMe ? 'justify-end' : 'justify-start'} px-1">
                                 <span class="text-[10px] text-slate-400 font-medium">${escapeHTML(m.username)}</span>
-                                ${isMe ? `<button onclick="editChatMessage('${escapeAttr(m.id)}', '${encodeURIComponent(m.text)}')" class="text-[10px] text-blue-500 hover:underline">Edit</button>` : ''}
+                                ${isMe ? `<button onclick="editChatMessage('${escapeAttr(m.id)}', '${encodeURIComponent(m.text)}')" class="text-[10px] text-blue-500 hover:underline">${escapeHTML(t('btnEdit'))}</button>` : ''}
                             </div>
                             <div class="p-3 rounded-2xl text-sm ${isMe ? 'bg-blue-600 text-white rounded-br-none shadow' : 'bg-white text-slate-800 rounded-bl-none border border-slate-200 shadow-sm'}">
                                 ${escapeHTML(m.text)}
@@ -2075,33 +2442,33 @@
         async function editChatMessage(msgId, encodedText) {
             const currentText = decodeURIComponent(encodedText);
             const newText = await askDialog({
-                title: "Edit Message",
-                message: "Update your chat message below:",
+                title: t('titleEditMessage'),
+                message: t('msgEditMessagePrompt'),
                 isPrompt: true,
                 defaultValue: currentText
             });
             if (newText === null) return;
             const trimmed = newText.trim();
-            if (!trimmed) return showToast("Message cannot be empty.", "error");
+            if (!trimmed) return showToast(t('toastMsgEmpty'), "error");
 
             await _supabase.from('chat_messages').update({ text: trimmed }).eq('id', msgId);
             await fetchCloudState();
             renderChatroom();
-            showToast("Message updated successfully.", "success");
+            showToast(t('toastMsgUpdated'), "success");
         }
 
         async function clearAllChatHistory() {
             if (!currentUser || currentUser.role !== 'host') return;
             const confirmed = await askDialog({
                 title: t('btnClearAllChat'),
-                message: "Are you sure you want to clear ALL chat messages and announcements from the chatroom board?"
+                message: t('msgClearChatConfirm')
             });
             if (!confirmed) return;
 
             await _supabase.from('chat_messages').delete().not('id', 'is', null);
             await fetchCloudState();
             renderChatroom();
-            showToast("All chat history cleared successfully.", "info");
+            showToast(t('toastChatCleared'), "info");
         }
 
         function toggleAnnouncementMode() {
@@ -2170,11 +2537,15 @@
 
             if (isLocked) {
                 list.innerHTML = '';
+                lockedNoticeText.removeAttribute('data-i18n');
                 if (isPending && scheduledPublishTime) {
                     const diffMins = Math.max(1, Math.ceil((new Date(scheduledPublishTime) - new Date()) / (1000 * 60)));
-                    lockedNoticeText.innerHTML = `<strong>Quiz Phase Locked (Pending): The quiz starts in ${diffMins} minutes.</strong>`;
+                    const msg = t('quizLockedPendingCountdown').replace('{mins}', diffMins);
+                    lockedNoticeText.innerHTML = `<strong>${escapeHTML(msg)}</strong>`;
+                } else if (isPending) {
+                    lockedNoticeText.innerHTML = `<strong>${escapeHTML(t('quizLockedPendingMsg'))}</strong>`;
                 } else {
-                    lockedNoticeText.innerHTML = `<strong data-i18n="quizLockedPublishedMsg">${escapeHTML(t('quizLockedPublishedMsg'))}</strong>`;
+                    lockedNoticeText.innerHTML = `<strong>${escapeHTML(t('quizLockedPublishedMsg'))}</strong>`;
                 }
                 return;
             }
@@ -2200,7 +2571,7 @@
                     <div class="flex justify-between items-start gap-4">
                         <div class="flex items-center gap-2">
                             <span class="px-2.5 py-1 bg-slate-100 text-slate-700 font-bold text-xs rounded-md uppercase">${formatTypeBadgeLabel(q.type)}</span>
-                            <span class="text-xs text-slate-400">Question #${idx + 1}</span>
+                            <span class="text-xs text-slate-400">${escapeHTML(t('lblQuestionNum').replace('{n}', idx + 1))}</span>
                         </div>
                         <div class="flex items-center gap-1">
                             <button onclick="editQuestion('${escapeAttr(q.id)}')" class="p-1.5 text-slate-500 hover:text-blue-600 rounded hover:bg-slate-100"><i data-lucide="pencil" class="w-4 h-4"></i></button>
@@ -2209,7 +2580,7 @@
                     </div>
                     <h4 class="font-semibold text-slate-800 text-base">${escapeHTML(q.prompt)}</h4>
                     ${renderQuestionDetailsPreview(q)}
-                    ${q.explanation ? `<div class="text-xs text-slate-500 bg-slate-50 p-2.5 rounded border border-slate-100"><strong>Explanation:</strong> ${escapeHTML(q.explanation)}</div>` : ''}
+                    ${q.explanation ? `<div class="text-xs text-slate-500 bg-slate-50 p-2.5 rounded border border-slate-100"><strong>${escapeHTML(t('lblExplanation'))}</strong> ${escapeHTML(q.explanation)}</div>` : ''}
                 </div>`).join('');
             lucide.createIcons();
         }
@@ -2239,7 +2610,7 @@
                     <div class="flex justify-between items-start gap-4">
                         <div class="flex items-center gap-2">
                             <span class="px-2.5 py-1 bg-amber-100 text-amber-800 font-bold text-xs rounded-md uppercase">${formatTypeBadgeLabel(q.type)}</span>
-                            <span class="text-xs font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded">Quiz #${q.quiz_session_id || 1}</span>
+                            <span class="text-xs font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded">${escapeHTML(t('lblQuizSessionBadge').replace('{n}', q.quiz_session_id || 1))}</span>
                             <span class="text-xs text-slate-400">| ${escapeHTML(t('lblOriginalAuthor'))}: ${escapeHTML(q.author)}</span>
                         </div>
                         ${isHost ? `
@@ -2247,18 +2618,18 @@
                                 <button onclick="editQuestion('${escapeAttr(q.id)}', true)" class="p-1.5 text-slate-500 hover:text-blue-600 rounded hover:bg-slate-100" title="Host Edit"><i data-lucide="pencil" class="w-4 h-4"></i></button>
                                 <button onclick="deleteQuestion('${escapeAttr(q.id)}')" class="p-1.5 text-slate-500 hover:text-red-600 rounded hover:bg-slate-100" title="Delete"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
                             </div>
-                        ` : '<span class="text-xs bg-slate-100 text-slate-500 px-2 py-1 rounded">Read-only</span>'}
+                        ` : `<span class="text-xs bg-slate-100 text-slate-500 px-2 py-1 rounded">${escapeHTML(t('lblReadOnly'))}</span>`}
                     </div>
                     <h4 class="font-semibold text-slate-800 text-base">${escapeHTML(q.prompt)}</h4>
                     ${renderQuestionDetailsPreview(q)}
-                    ${q.explanation ? `<div class="text-xs text-slate-500 bg-slate-50 p-2.5 rounded border border-slate-100"><strong>Explanation:</strong> ${escapeHTML(q.explanation)}</div>` : ''}
+                    ${q.explanation ? `<div class="text-xs text-slate-500 bg-slate-50 p-2.5 rounded border border-slate-100"><strong>${escapeHTML(t('lblExplanation'))}</strong> ${escapeHTML(q.explanation)}</div>` : ''}
                 </div>`).join('');
             lucide.createIcons();
         }
 
         function openRepublishGuestModal() {
             const listContainer = document.getElementById('guestVaultSelectionList');
-            if (pastQuestions.length === 0) return showToast("Past Paper Vault is empty!", "error");
+            if (pastQuestions.length === 0) return showToast(t("toastVaultEmpty"), "error");
 
             listContainer.innerHTML = pastQuestions.map(q => {
                 const checked = !guestChallengeConfig.questionIds.length || guestChallengeConfig.questionIds.includes(q.id);
@@ -2279,20 +2650,20 @@
             const selectedIds = Array.from(document.querySelectorAll('.guest-q-checkbox:checked')).map(cb => cb.value);
 
             if (selectedIds.length === 0) {
-                return showToast("Please select at least one question for the Guest Challenge.", "error");
+                return showToast(t("toastSelectAtLeastOneGuestQ"), "error");
             }
 
             guestChallengeConfig = { active: true, duration, maxQuestions: maxQ, questionIds: selectedIds };
             await _supabase.from('app_state').update({ guest_challenge_config: guestChallengeConfig }).eq('id', 1);
             closeModal('republishGuestModal');
-            showToast("Republished Guest Challenge successfully!", "success");
+            showToast(t("toastRepublishedGuest"), "success");
         }
 
         async function clearPastPaperVault() {
             if (!currentUser || currentUser.role !== 'host') return;
             const confirmed = await askDialog({
                 title: t('btnEmptyHistory'),
-                message: "Are you sure you want to permanently delete ALL historical questions from the Past Paper Vault?"
+                message: t('msgClearVaultConfirm')
             });
             if (!confirmed) return;
 
@@ -2300,7 +2671,7 @@
             pastQuestions = [];
             await fetchCloudState();
             renderPastPaperVault();
-            showToast("Past Paper Vault emptied successfully.", "info");
+            showToast(t('toastVaultEmptied'), "info");
         }
 
         function renderAchievements() {
@@ -2457,7 +2828,7 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
                         ${(q.options || []).map((opt, i) => `
                             <div class="p-2 rounded border ${parseInt(q.correctAnswer, 10) === i ? 'bg-emerald-50 border-emerald-300 font-semibold text-emerald-800' : 'bg-slate-50 border-slate-200 text-slate-600'}">
-                                ${String.fromCharCode(65 + i)}. ${escapeHTML(opt)} ${parseInt(q.correctAnswer, 10) === i ? '✓ (Correct)' : ''}
+                                ${String.fromCharCode(65 + i)}. ${escapeHTML(opt)} ${parseInt(q.correctAnswer, 10) === i ? escapeHTML(t('lblCorrectMark')) : ''}
                             </div>`).join('')}
                     </div>`;
             }
@@ -2465,16 +2836,16 @@
                 const formatTF = v => v === 'not_given' ? 'NOT GIVEN' : String(v).toUpperCase();
                 return `
                     <div class="text-xs bg-slate-50 p-2.5 rounded border border-slate-200 text-slate-700">
-                        <strong>Correct Answer:</strong> <code class="bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded font-mono font-bold">${escapeHTML(formatTF(q.correctAnswer))}</code>
+                        <strong>${escapeHTML(t('lblCorrectAnswer'))}</strong> <code class="bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded font-mono font-bold">${escapeHTML(formatTF(q.correctAnswer))}</code>
                     </div>`;
             }
             if (q.type === 'fill') {
-                return `<div class="text-xs bg-slate-50 p-2.5 rounded border border-slate-200 text-slate-700"><strong>Correct Answer:</strong> <code class="bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded font-mono font-bold">${escapeHTML(q.correctAnswer)}</code></div>`;
+                return `<div class="text-xs bg-slate-50 p-2.5 rounded border border-slate-200 text-slate-700"><strong>${escapeHTML(t('lblCorrectAnswer'))}</strong> <code class="bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded font-mono font-bold">${escapeHTML(q.correctAnswer)}</code></div>`;
             }
             if (q.type === 'matching') {
                 return `
                     <div class="space-y-1.5 text-xs">
-                        <div class="font-semibold text-slate-500">Matching Pairs:</div>
+                        <div class="font-semibold text-slate-500">${escapeHTML(t('lblMatchingPairsTitle'))}</div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                             ${(q.pairs || []).map(p => `
                                 <div class="p-2 bg-slate-50 rounded border border-slate-200 flex justify-between">
@@ -2488,7 +2859,7 @@
                 const items = getOrderingItems(q);
                 return `
                     <div class="space-y-1.5 text-xs">
-                        <div class="font-semibold text-slate-500">Correct Sequence Order:</div>
+                        <div class="font-semibold text-slate-500">${escapeHTML(t('lblCorrectSequenceOrder'))}</div>
                         <div class="flex flex-wrap gap-2">
                             ${items.map((item, idx) => `
                                 <span class="bg-indigo-50 border border-indigo-200 text-indigo-800 px-2.5 py-1 rounded-md font-semibold">
@@ -2522,7 +2893,7 @@
             const pool = isGuestMode ? activeQuizQuestions : questions;
             const duration = isGuestMode ? guestChallengeConfig.duration : quizDurationMins;
 
-            document.getElementById('quizTitleHeader').textContent = isGuestMode ? "Guest Mode Challenge" : t('Live Bible Quiz Assessment');
+            document.getElementById('quizTitleHeader').textContent = isGuestMode ? t('titleGuestModeChallenge') : t('Live Bible Quiz Assessment');
             document.getElementById('quizTotalQuestionsCount').textContent = pool.length;
 
             const userSubs = submissions[currentUser.name] || [];
@@ -2530,14 +2901,24 @@
             const userSub = userSubs.find(s => s.quiz_session_id === targetSession);
             const hasSubmitted = Boolean(userSub);
 
+            const sessionKey = `${currentUser.name}_${targetSession}`;
+            if (!hasSubmitted && (quizActiveSessionKey !== sessionKey || !quizStartTime)) {
+                quizActiveSessionKey = sessionKey;
+                quizStartTime = new Date();
+                safeSetStorage('quiz_timer_state', JSON.stringify({ key: sessionKey, startTime: quizStartTime.getTime() }));
+            }
+
             if (duration > 0 && !hasSubmitted) {
                 document.getElementById('quizTimerBox').classList.remove('hidden');
-                startQuizTimer(duration * 60);
+                const totalDurationSecs = duration * 60;
+                const elapsedSecs = quizStartTime ? Math.floor((Date.now() - quizStartTime.getTime()) / 1000) : 0;
+                startQuizTimer(Math.max(0, totalDurationSecs - elapsedSecs), totalDurationSecs);
             } else {
                 document.getElementById('quizTimerBox').classList.add('hidden');
                 if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
             }
 
+            saveQuizDraftInputs();
             const qList = document.getElementById('quizQuestionsContainer');
             qList.innerHTML = pool.map((q, idx) => {
                 const qToRender = JSON.parse(JSON.stringify(q));
@@ -2556,13 +2937,17 @@
                 return `
                     <div class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm space-y-4">
                         <div class="flex justify-between items-center">
-                            <span class="text-xs font-bold text-blue-600 uppercase tracking-wider">Question ${idx + 1} of ${pool.length}</span>
-                            <span class="text-xs text-slate-400 bg-slate-100 px-2.5 py-1 rounded">Author: ${escapeHTML(q.author)}</span>
+                            <span class="text-xs font-bold text-blue-600 uppercase tracking-wider">${escapeHTML(t('lblQuestionXofY').replace('{idx}', idx + 1).replace('{total}', pool.length))}</span>
+                            <span class="text-xs text-slate-400 bg-slate-100 px-2.5 py-1 rounded">${escapeHTML(t('lblAuthorPrefix').replace('{author}', q.author))}</span>
                         </div>
                         <h3 class="text-lg font-bold text-slate-800">${escapeHTML(q.prompt)}</h3>
                         <div>${renderQuizInputForType(qToRender, idx, hasSubmitted, ansObj)}</div>
                     </div>`;
             }).join('');
+
+            if (!hasSubmitted) {
+                restoreQuizDraftInputs();
+            }
 
             const submitBtn = document.getElementById('submitQuizBtn');
             submitBtn.disabled = hasSubmitted;
@@ -2573,22 +2958,31 @@
             lucide.createIcons();
         }
 
-        function startQuizTimer(secondsLeft) {
+        function startQuizTimer(secondsLeft, totalDurationSecs = null) {
             if (timerInterval) clearInterval(timerInterval);
             const display = document.getElementById('quizTimerDisplay');
-            const renderTick = () => {
-                const mins = Math.floor(Math.max(0, secondsLeft) / 60);
-                const secs = Math.max(0, secondsLeft) % 60;
-                display.textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+            const computeRemaining = () => {
+                if (totalDurationSecs !== null && quizStartTime) {
+                    const elapsed = Math.floor((Date.now() - quizStartTime.getTime()) / 1000);
+                    return totalDurationSecs - elapsed;
+                }
+                return secondsLeft;
             };
-            renderTick();
+            const renderTick = (rem) => {
+                const clamped = Math.max(0, rem);
+                const mins = Math.floor(clamped / 60);
+                const secs = clamped % 60;
+                if (display) display.textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+            };
+            renderTick(computeRemaining());
             timerInterval = setInterval(() => {
                 secondsLeft--;
-                renderTick();
-                if (secondsLeft < 0) {
+                const rem = computeRemaining();
+                renderTick(rem);
+                if (rem < 0) {
                     clearInterval(timerInterval);
                     timerInterval = null;
-                    showToast("Time is up! Auto-submitting quiz.", "error");
+                    showToast(t("toastTimeUpAutoSubmit"), "error");
                     handleQuizSubmit(null, true);
                 }
             }, 1000);
@@ -2609,10 +3003,10 @@
                             if (hasSubmitted) {
                                 if (i === correctIdx) {
                                     styleClass = "bg-emerald-50 border-emerald-400 text-emerald-900 font-bold";
-                                    badgeTag = `<span class="ml-auto text-xs font-bold text-emerald-600 bg-emerald-100 px-2 py-0.5 rounded">Correct Answer ✓</span>`;
+                                    badgeTag = `<span class="ml-auto text-xs font-bold text-emerald-600 bg-emerald-100 px-2 py-0.5 rounded">${escapeHTML(t("lblCorrectAnswerBadge"))}</span>`;
                                 } else if (i === userValNum && !ansObj.isCorrect) {
                                     styleClass = "bg-red-50 border-red-400 text-red-900 font-semibold";
-                                    badgeTag = `<span class="ml-auto text-xs font-bold text-red-600 bg-red-100 px-2 py-0.5 rounded">Your Choice ✗</span>`;
+                                    badgeTag = `<span class="ml-auto text-xs font-bold text-red-600 bg-red-100 px-2 py-0.5 rounded">${escapeHTML(t("lblYourChoiceBadge"))}</span>`;
                                 } else {
                                     styleClass = "bg-slate-50 border-slate-200 text-slate-500 opacity-60";
                                 }
@@ -2654,8 +3048,8 @@
                 const borderStyle = hasSubmitted ? (isCorrect ? 'border-emerald-400 bg-emerald-50 text-emerald-900' : 'border-red-400 bg-red-50 text-red-900') : 'border-slate-300 bg-slate-50';
                 return `
                     <div class="mt-3 space-y-2">
-                        <input type="text" name="ans_${escapeAttr(q.id)}" value="${escapeAttr(userVal)}" ${disabledAttr} placeholder="Type your answer here..." class="w-full px-4 py-3 rounded-lg border ${borderStyle} text-sm font-medium">
-                        ${hasSubmitted && !isCorrect ? `<div class="text-xs font-bold text-emerald-700 bg-emerald-50 p-2 rounded border border-emerald-200">Correct Answer: ${escapeHTML(q.correctAnswer)}</div>` : ''}
+                        <input type="text" name="ans_${escapeAttr(q.id)}" value="${escapeAttr(userVal)}" ${disabledAttr} placeholder="${escapeAttr(t('placeholderFillAnswer'))}" class="w-full px-4 py-3 rounded-lg border ${borderStyle} text-sm font-medium">
+                        ${hasSubmitted && !isCorrect ? `<div class="text-xs font-bold text-emerald-700 bg-emerald-50 p-2 rounded border border-emerald-200">${escapeHTML(t('lblCorrectAnswer'))} ${escapeHTML(q.correctAnswer)}</div>` : ''}
                     </div>`;
             }
 
@@ -2664,7 +3058,7 @@
                 const matchTargets = (q.pairs || []).map(p => p.match);
                 return `
                     <div class="space-y-3 mt-3">
-                        <p class="text-xs text-slate-500 font-medium">Select the matching pair for each item below:</p>
+                        <p class="text-xs text-slate-500 font-medium">${escapeHTML(t("lblSelectMatchingInstruction"))}</p>
                         ${pairsToUse.map((p, pairIdx) => {
                             let selectedMatch = '';
                             if (hasSubmitted && ansObj && Array.isArray(ansObj.userVal)) {
@@ -2678,7 +3072,7 @@
                                     <span class="text-sm font-semibold text-slate-800">${escapeHTML(p.item)}</span>
                                     <div class="flex items-center gap-2">
                                         <select name="ans_${escapeAttr(q.id)}_${pairIdx}" data-pair-item="${escapeAttr(p.item)}" ${disabledAttr} class="px-3 py-2 rounded border border-slate-300 text-sm bg-white">
-                                            <option value="">-- Choose Match --</option>
+                                            <option value="">${escapeHTML(t("optChooseMatch"))}</option>
                                             ${matchTargets.map(target => `<option value="${escapeAttr(target)}" ${selectedMatch === target ? 'selected' : ''}>${escapeHTML(target)}</option>`).join('')}
                                         </select>
                                         ${hasSubmitted ? `<span class="text-xs font-bold ${isPairCorrect ? 'text-emerald-600' : 'text-red-600'}">${isPairCorrect ? '✓' : '✗ (Correct: ' + escapeHTML(p.match) + ')'}</span>` : ''}
@@ -2693,7 +3087,7 @@
                 const submittedSeq = (hasSubmitted && ansObj && ansObj.userVal) ? ansObj.userVal.split('|') : [];
                 return `
                     <div class="space-y-3 mt-3">
-                        <p class="text-xs text-slate-500 font-medium">Arrange items into the correct sequence (assign position numbers 1 to ${itemsToOrder.length}):</p>
+                        <p class="text-xs text-slate-500 font-medium">${escapeHTML(t("lblArrangeSequenceInstruction").replace("{n}", itemsToOrder.length))}</p>
                         <div class="space-y-2">
                             ${itemsToOrder.map((item, itemIdx) => {
                                 const chosenPos = submittedSeq.indexOf(item) + 1;
@@ -2701,7 +3095,7 @@
                                     <div class="flex items-center justify-between gap-3 p-3 bg-slate-50 rounded-lg border border-slate-200">
                                         <span class="text-sm font-semibold text-slate-800">${escapeHTML(item)}</span>
                                         <div class="flex items-center gap-2">
-                                            <span class="text-xs text-slate-500 font-medium">Position:</span>
+                                            <span class="text-xs text-slate-500 font-medium">${escapeHTML(t("lblPosition"))}</span>
                                             <select name="ans_${escapeAttr(q.id)}_pos_${itemIdx}" data-item="${escapeAttr(item)}" ${disabledAttr} class="ordering-select-${escapeAttr(q.id)} px-3 py-1.5 rounded border border-slate-300 text-sm font-bold bg-white">
                                                 <option value="">-</option>
                                                 ${itemsToOrder.map((_, pIdx) => `<option value="${pIdx + 1}" ${hasSubmitted && chosenPos === (pIdx + 1) ? 'selected' : ''}>${pIdx + 1}</option>`).join('')}
@@ -2729,7 +3123,7 @@
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, "Template");
             XLSX.writeFile(wb, "Bible_QuizCraft_Unified_Template.csv");
-            showToast("Clean template CSV generated and downloaded successfully!", "success");
+            showToast(t("toastTemplateDownloaded"), "success");
         }
 
         function downloadUnifiedBatchExcel() {
@@ -2767,7 +3161,7 @@
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, "MyQuestions");
             XLSX.writeFile(wb, "My_Question_Repository_Unified.xlsx");
-            showToast("Exported repository successfully in unified format!", "success");
+            showToast(t("toastBatchExported"), "success");
         }
 
         function buildQuestionFieldsFromBatchItem(item, targetType, fallback = {}) {
@@ -2909,16 +3303,16 @@
                     await fetchCloudState();
                     updateUI();
                     switchTab('my-questions');
-                    showToast(`Batch Upload Successful! Added: ${added}, Updated: ${updated}, Deleted: ${deleted}`, "success");
+                    showToast(t("toastBatchUploadSuccess").replace("{added}", added).replace("{updated}", updated).replace("{deleted}", deleted), "success");
                 } catch (err) {
                     fileInput.value = '';
-                    showToast(`上傳失敗：${err.message}`, "error");
+                    showToast(t("toastBatchUploadFailed").replace("{err}", err.message), "error");
                 }
             };
 
             reader.onerror = function() {
                 fileInput.value = '';
-                showToast("檔案讀取發生錯誤，請稍後再試。", "error");
+                showToast(t("toastFileReadError"), "error");
             };
             reader.readAsArrayBuffer(file);
         }
@@ -2971,7 +3365,7 @@
             const input = document.getElementById('userFeedbackInput');
             if (!input) return;
             const comment = input.value.trim();
-            if (!comment) return showToast("Please enter a comment.", "error");
+            if (!comment) return showToast(t("toastEnterComment"), "error");
 
             await _supabase.from('feedback').insert({
                 username: currentUser.name,
@@ -2981,7 +3375,7 @@
 
             input.value = '';
             closeModal('settingsModal');
-            showToast("Feedback sent to Host and Co-host!", "success");
+            showToast(t("toastFeedbackSent"), "success");
             await fetchCloudState();
         }
 
@@ -3020,14 +3414,14 @@
 
         async function deleteFeedbackComment(id) {
             const confirmed = await askDialog({
-                title: "Delete Feedback",
-                message: "Are you sure you want to delete this comment?"
+                title: t('titleDeleteFeedback'),
+                message: t('msgDeleteFeedbackConfirm')
             });
             if (!confirmed) return;
             await _supabase.from('feedback').delete().eq('id', id);
             await fetchCloudState();
             renderFeedbackCommentsList();
-            showToast("Feedback comment deleted.", "info");
+            showToast(t('toastFeedbackDeleted'), "info");
         }
 
         function openPublishModal() {
@@ -3072,10 +3466,13 @@
                 const now = new Date();
 
                 let scheduledPubISO = null;
-                if (pubDate && pubTime) {
-                    scheduledPubISO = new Date(`${pubDate}T${pubTime}`).toISOString();
+                if (pubDate || pubTime) {
+                    const localToday = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().split('T')[0];
+                    const effectiveDate = pubDate || localToday;
+                    const effectiveTime = pubTime || '23:59';
+                    scheduledPubISO = new Date(`${effectiveDate}T${effectiveTime}`).toISOString();
                     if (new Date(scheduledPubISO) <= now) {
-                        showToast("Publication schedule is in the past. Prompting immediate publication instead.", "info");
+                        showToast(t("toastPubSchedulePast"), "info");
                         scheduledPubISO = null;
                     }
                 }
@@ -3085,11 +3482,11 @@
                     quizDueISO = new Date(`${dueDate}T${dueTime}`).toISOString();
                     const dueDateObj = new Date(quizDueISO);
                     if (dueDateObj <= now) {
-                        return showToast("Validation Error: Automatic closure date & time cannot fall in the past.", "error");
+                        return showToast(t("toastValClosurePast"), "error");
                     }
                     const effectivePubObj = scheduledPubISO ? new Date(scheduledPubISO) : now;
                     if (dueDateObj <= effectivePubObj) {
-                        return showToast("Validation Error: Publication schedule must be before closure due date & time.", "error");
+                        return showToast(t("toastValPubBeforeClosure"), "error");
                     }
                 }
 
@@ -3109,9 +3506,9 @@
                 closeModal('publishModal');
                 updateUI();
                 renderCurrentView();
-                showToast(shouldBeLive ? `Quiz #${currentQuizSession} Published Live successfully!` : "Quiz scheduled successfully!", shouldBeLive ? "success" : "info");
+                showToast(shouldBeLive ? t("toastQuizPublishedLive").replace("{session}", currentQuizSession) : t("toastQuizScheduled"), shouldBeLive ? "success" : "info");
             } catch (err) {
-                showToast("Failed to publish quiz. Check your configuration or connection.", "error");
+                showToast(t("toastPublishFailed"), "error");
             }
         }
 
@@ -3120,7 +3517,7 @@
             if (!isAutoClose) {
                 const confirmed = await askDialog({
                     title: t('btnUnpublishQuizBank'),
-                    message: "Unpublish Quiz Bank? Active questions will be archived to Past Paper Vault."
+                    message: t('msgUnpublishConfirm')
                 });
                 if (!confirmed) return;
             }
@@ -3146,10 +3543,11 @@
                 current_quiz_session: currentQuizSession + 1
             }).eq('id', 1);
 
+            resetQuizTimerState();
             await fetchCloudState();
             updateUI();
             renderCurrentView();
-            showToast(isAutoClose ? "Quiz closed automatically (due date reached)." : "Quiz Unpublished! Questions archived.", "info");
+            showToast(isAutoClose ? t("toastQuizAutoClosed") : t("toastQuizUnpublished"), "info");
         }
 
         function renderHostControls() {
@@ -3165,19 +3563,7 @@
             if (addAccBtn) addAccBtn.style.display = (isHost && !isMobile) ? 'flex' : 'none';
             if (resetRecBtn) resetRecBtn.style.display = isHost ? 'flex' : 'none';
 
-            const statusTxt = document.getElementById('hostPublishStatusText');
-            if (statusTxt) {
-                if (isPublished) {
-                    statusTxt.textContent = t('publishQuizLiveStatus').replace('{k}', currentQuizSession);
-                    statusTxt.className = "text-xl font-bold text-emerald-600 mt-1";
-                } else if (isPending || scheduledPublishTime) {
-                    statusTxt.textContent = t('unpublishedPendingStatus');
-                    statusTxt.className = `text-xl font-bold ${isPending ? 'text-purple-600' : 'text-indigo-600'} mt-1`;
-                } else {
-                    statusTxt.textContent = t('unpublishedCreationPhase');
-                    statusTxt.className = "text-xl font-bold text-slate-600 mt-1";
-                }
-            }
+            syncPublishButtonsUI();
 
             const recordsTable = document.getElementById('quizRecordsTableBody');
             if (recordsTable) {
@@ -3200,9 +3586,9 @@
                         const champAvatarTag = championAvatar ? `<img src="${escapeAttr(championAvatar)}" class="w-5 h-5 rounded-full object-cover border inline mr-1" alt="Avatar">` : '';
                         return `
                             <tr class="hover:bg-slate-50 transition">
-                                <td class="px-6 py-4 font-bold text-indigo-600">Quiz #${r.quiz_session_id}</td>
-                                <td class="px-6 py-4 font-semibold text-slate-700">${r.total_questions} questions</td>
-                                <td class="px-6 py-4 font-semibold text-slate-700">${participantCount} user(s)</td>
+                                <td class="px-6 py-4 font-bold text-indigo-600">${escapeHTML(t('lblQuizSessionBadge').replace('{n}', r.quiz_session_id))}</td>
+                                <td class="px-6 py-4 font-semibold text-slate-700">${escapeHTML(t('lblQuestionsCountUnit').replace('{count}', r.total_questions))}</td>
+                                <td class="px-6 py-4 font-semibold text-slate-700">${escapeHTML(t('lblUsersCountUnit').replace('{count}', participantCount))}</td>
                                 <td class="px-6 py-4 font-bold text-emerald-600">${avgPerf}%</td>
                                 <td class="px-6 py-4 font-mono text-xs">${formatSecondsToSmartTime(avgTimeSecs)}</td>
                                 <td class="px-6 py-4 font-bold text-slate-800 flex items-center">${champAvatarTag} ${escapeHTML(championName)}</td>
@@ -3232,10 +3618,10 @@
                                     </select>
                                 ` : `<span class="px-2.5 py-1 text-xs font-bold rounded-full bg-slate-100 text-slate-700 uppercase">${escapeHTML(u.role)}</span>`}
                             </td>
-                            <td class="px-6 py-4 text-sm font-medium text-slate-700 desktop-user-mgmt-col">${count} questions</td>
+                            <td class="px-6 py-4 text-sm font-medium text-slate-700 desktop-user-mgmt-col">${escapeHTML(t('lblQuestionsCountUnit').replace('{count}', count))}</td>
                             <td class="px-6 py-4 text-right space-x-2">
-                                <button onclick="openAdminPasswordReset('${escapeAttr(u.name)}')" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded font-medium">Reset Pass</button>
-                                ${isHost && u.role !== 'host' ? `<button onclick="deleteUserAccount('${escapeAttr(u.name)}')" class="text-xs bg-red-50 hover:bg-red-100 text-red-600 px-3 py-1.5 rounded font-medium">Delete</button>` : ''}
+                                <button onclick="openAdminPasswordReset('${escapeAttr(u.name)}')" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded font-medium">${escapeHTML(t('btnResetPass'))}</button>
+                                ${isHost && u.role !== 'host' ? `<button onclick="deleteUserAccount('${escapeAttr(u.name)}')" class="text-xs bg-red-50 hover:bg-red-100 text-red-600 px-3 py-1.5 rounded font-medium">${escapeHTML(t('btnDeleteUser'))}</button>` : ''}
                             </td>
                         </tr>`;
                 }).join('');
@@ -3249,7 +3635,7 @@
             if (!currentUser || currentUser.role !== 'host') return;
             const confirmed = await askDialog({
                 title: t('btnResetRecords'),
-                message: "Are you sure you want to clear ALL historical published quiz records, user submissions, AND reset Quiz Number back to #1?"
+                message: t('msgResetRecordsConfirm')
             });
             if (!confirmed) return;
 
@@ -3260,7 +3646,7 @@
             await fetchCloudState();
             renderHostControls();
             updateUI();
-            showToast("Historical quiz records, leaderboard submissions, and Quiz Session Number reset to #1.", "info");
+            showToast(t('toastRecordsReset'), "info");
         }
 
         function handleDragStart(e, index) { draggedUserIndex = index; }
@@ -3276,19 +3662,19 @@
                 await _supabase.from('app_users').update({ sort_order: i }).eq('name', users[i].name);
             }
             renderHostControls();
-            showToast("User order updated!", "success");
+            showToast(t("toastUserOrderUpdated"), "success");
         }
 
         async function updateUserRole(username, newRole) {
             await _supabase.from('app_users').update({ role: newRole }).eq('name', username);
             await fetchCloudState();
             renderHostControls();
-            showToast(`Role updated for ${username} to ${newRole}`, "success");
+            showToast(t("toastRoleUpdated").replace("{user}", username).replace("{role}", newRole), "success");
         }
 
         async function handleSaveQuestion(e) {
             e.preventDefault();
-            if (isPending || isPublished) return showToast("Question repository is locked during pending/published phase.", "error");
+            if (isPending || isPublished) return showToast(t("toastRepoLocked"), "error");
 
             try {
                 const id = document.getElementById('qId').value;
@@ -3312,11 +3698,11 @@
                 if (type === 'mcq') {
                     qData.options = Array.from(document.querySelectorAll('.mcq-option-input')).map(i => i.value.trim());
                     const correct = document.querySelector('input[name="mcqCorrect"]:checked');
-                    if (!correct) return showToast("Please select a correct option.", "error");
+                    if (!correct) return showToast(t("toastSelectCorrectOpt"), "error");
                     qData.correctAnswer = correct.value;
                 } else if (type === 'tf') {
                     const correct = document.querySelector('input[name="tfCorrect"]:checked');
-                    if (!correct) return showToast("Please select True, False, or Not Given.", "error");
+                    if (!correct) return showToast(t("toastSelectTFNG"), "error");
                     qData.correctAnswer = correct.value;
                 } else if (type === 'fill') {
                     qData.correctAnswer = document.getElementById('fillCorrectAnswer').value.trim();
@@ -3327,11 +3713,11 @@
                         const match = r.querySelector('.pair-match').value.trim();
                         if (item && match) pairs.push({ item, match });
                     });
-                    if (pairs.length < 2) return showToast("Matching questions require at least 2 pairs.", "error");
+                    if (pairs.length < 2) return showToast(t("toastMatchingMin2"), "error");
                     qData.pairs = pairs;
                 } else if (type === 'ordering') {
                     const items = Array.from(document.querySelectorAll('.ordering-item-input')).map(i => i.value.trim()).filter(Boolean);
-                    if (items.length < 2) return showToast("Ordering questions require at least 2 items.", "error");
+                    if (items.length < 2) return showToast(t("toastOrderingMin2"), "error");
                     qData.options = items;
                     qData.correctAnswer = items.join('|');
                 }
@@ -3344,9 +3730,9 @@
                 closeModal('questionModal');
                 updateUI();
                 renderCurrentView();
-                showToast("Question saved successfully!", "success");
+                showToast(t("toastQuestionSaved"), "success");
             } catch (err) {
-                showToast("儲存題目失敗，請檢查網路連線或 Supabase 專案設定。", "error");
+                showToast(t("toastQuestionSaveFailed"), "error");
             }
         }
 
@@ -3358,8 +3744,8 @@
 
         async function deleteQuestion(id) {
             const confirmed = await askDialog({
-                title: "Delete Question",
-                message: "Are you sure you want to delete this question?"
+                title: t('titleDeleteQuestion'),
+                message: t('msgDeleteQuestionConfirm')
             });
             if (!confirmed) return;
 
@@ -3389,19 +3775,19 @@
                 await fetchCloudState();
                 updateUI();
                 renderCurrentView();
-                showToast("Question deleted successfully.", "success");
+                showToast(t("toastQuestionDeleted"), "success");
             } catch (err) {
                 questions = previousQuestions;
                 pastQuestions = previousPastQuestions;
                 updateUI();
                 renderCurrentView();
-                showToast("刪除題目失敗，請檢查網路連線。", "error");
+                showToast(t("toastQuestionDeleteFailed"), "error");
             }
         }
 
         function openQuestionModal(editId = null) {
             if (isPending || isPublished) {
-                return showToast("Question repository is locked during pending/published phase.", "error");
+                return showToast(t("toastRepoLocked"), "error");
             }
 
             const form = document.getElementById('questionForm');
@@ -3414,7 +3800,7 @@
             if (editId) {
                 const q = questions.find(item => String(item.id) === String(editId)) ||
                           pastQuestions.find(item => String(item.id) === String(editId));
-                if (!q) return showToast("找不到指定的題目資料。", "error");
+                if (!q) return showToast(t("toastQuestionNotFound"), "error");
 
                 modalTitle.setAttribute('data-i18n', 'titleEditQuestion');
                 qIdInput.value = q.id || '';
@@ -3429,6 +3815,13 @@
             }
 
             openModal('questionModal');
+            if (editId) {
+                const q = questions.find(item => String(item.id) === String(editId)) ||
+                          pastQuestions.find(item => String(item.id) === String(editId));
+                if (q) renderQuestionTypeInputs(q);
+            } else {
+                renderQuestionTypeInputs();
+            }
         }
 
         function renderQuestionTypeInputs(existingQ = null) {
@@ -3446,7 +3839,7 @@
                         ${opts.map((opt, i) => `
                             <div class="flex items-center gap-2">
                                 <input type="radio" name="mcqCorrect" value="${i}" ${correctIdx === i ? 'checked' : ''} class="w-4 h-4 text-blue-600">
-                                <input type="text" class="mcq-option-input w-full px-3 py-2 rounded border border-slate-300 text-sm" placeholder="Option ${String.fromCharCode(65 + i)}" value="${escapeAttr(opt)}" required>
+                                <input type="text" class="mcq-option-input w-full px-3 py-2 rounded border border-slate-300 text-sm" placeholder="${escapeAttr(t('placeholderOptionX').replace('{char}', String.fromCharCode(65 + i)))}" value="${escapeAttr(opt)}" required>
                             </div>`).join('')}
                     </div>`;
             } else if (type === 'tf') {
@@ -3468,7 +3861,7 @@
                 const answer = (existingQ && existingQ.type === 'fill') ? existingQ.correctAnswer : '';
                 container.innerHTML = `
                     <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-1">${escapeHTML(t('lblExpectedCorrectText'))}</label>
-                    <input type="text" id="fillCorrectAnswer" required value="${escapeAttr(answer)}" placeholder="e.g. truth" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-sm">`;
+                    <input type="text" id="fillCorrectAnswer" required value="${escapeAttr(answer)}" placeholder="${escapeAttr(t('placeholderFillExample'))}" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-sm">`;
             } else if (type === 'matching') {
                 const pairs = (existingQ && existingQ.type === 'matching' && Array.isArray(existingQ.pairs)) ? existingQ.pairs : [{ item: '', match: '' }, { item: '', match: '' }];
                 container.innerHTML = `
@@ -3476,9 +3869,9 @@
                     <div id="matchingPairsContainer" class="space-y-2">
                         ${pairs.map(p => `
                             <div class="flex items-center gap-2 pair-row">
-                                <input type="text" class="pair-item w-1/2 px-3 py-2 rounded border border-slate-300 text-sm" placeholder="Item" value="${escapeAttr(p.item)}" required>
+                                <input type="text" class="pair-item w-1/2 px-3 py-2 rounded border border-slate-300 text-sm" placeholder="${escapeAttr(t('placeholderPairItem'))}" value="${escapeAttr(p.item)}" required>
                                 <span class="text-slate-400 font-bold">→</span>
-                                <input type="text" class="pair-match w-1/2 px-3 py-2 rounded border border-slate-300 text-sm" placeholder="Matches With" value="${escapeAttr(p.match)}" required>
+                                <input type="text" class="pair-match w-1/2 px-3 py-2 rounded border border-slate-300 text-sm" placeholder="${escapeAttr(t('placeholderPairMatch'))}" value="${escapeAttr(p.match)}" required>
                             </div>`).join('')}
                     </div>
                     <button type="button" onclick="addMatchingPairRow()" class="mt-2 text-xs font-semibold text-blue-600 hover:text-blue-800 flex items-center gap-1">
@@ -3495,7 +3888,7 @@
                         ${items.map((item, idx) => `
                             <div class="flex items-center gap-2 ordering-item-row">
                                 <span class="w-6 text-center font-bold text-slate-400 text-xs">${idx + 1}.</span>
-                                <input type="text" class="ordering-item-input w-full px-3 py-2 rounded border border-slate-300 text-sm" placeholder="Sequence Item #${idx + 1}" value="${escapeAttr(item)}" ${idx < 2 ? 'required' : ''}>
+                                <input type="text" class="ordering-item-input w-full px-3 py-2 rounded border border-slate-300 text-sm" placeholder="${escapeAttr(t('placeholderSequenceItem').replace('{n}', idx + 1))}" value="${escapeAttr(item)}" ${idx < 2 ? 'required' : ''}>
                             </div>`).join('')}
                     </div>
                     <button type="button" onclick="addOrderingItemRow()" class="mt-2 text-xs font-semibold text-blue-600 hover:text-blue-800 flex items-center gap-1">
@@ -3510,9 +3903,9 @@
             const row = document.createElement('div');
             row.className = "flex items-center gap-2 pair-row";
             row.innerHTML = `
-                <input type="text" class="pair-item w-1/2 px-3 py-2 rounded border border-slate-300 text-sm" placeholder="Item" required>
+                <input type="text" class="pair-item w-1/2 px-3 py-2 rounded border border-slate-300 text-sm" placeholder="${escapeAttr(t('placeholderPairItem'))}" required>
                 <span class="text-slate-400 font-bold">→</span>
-                <input type="text" class="pair-match w-1/2 px-3 py-2 rounded border border-slate-300 text-sm" placeholder="Matches With" required>`;
+                <input type="text" class="pair-match w-1/2 px-3 py-2 rounded border border-slate-300 text-sm" placeholder="${escapeAttr(t('placeholderPairMatch'))}" required>`;
             container.appendChild(row);
         }
 
@@ -3524,7 +3917,7 @@
             row.className = "flex items-center gap-2 ordering-item-row";
             row.innerHTML = `
                 <span class="w-6 text-center font-bold text-slate-400 text-xs">${rowsCount}.</span>
-                <input type="text" class="ordering-item-input w-full px-3 py-2 rounded border border-slate-300 text-sm" placeholder="Sequence Item #${rowsCount}">`;
+                <input type="text" class="ordering-item-input w-full px-3 py-2 rounded border border-slate-300 text-sm" placeholder="${escapeAttr(t('placeholderSequenceItem').replace('{n}', rowsCount))}">`;
             container.appendChild(row);
         }
 
@@ -3556,7 +3949,7 @@
                 });
 
                 if (unansweredCount > 0) {
-                    return showToast(`Not Yet Finished! Still remains ${unansweredCount} questions in the quiz.`, "error");
+                    return showToast(t("toastQuizNotFinished").replace("{count}", unansweredCount), "error");
                 }
             }
 
@@ -3568,6 +3961,7 @@
 
             const endTime = new Date();
             const timeTakenSecs = quizStartTime ? Math.round((endTime - quizStartTime) / 1000) : 0;
+            resetQuizTimerState();
 
             let score = 0;
             const answers = {};
@@ -3633,7 +4027,7 @@
 
             updateUI();
             triggerFireworks();
-            showToast(`Quiz Submitted! Score: ${score}/${total} (${percentage}%)`, "success");
+            showToast(t("toastQuizSubmitted").replace("{score}", score).replace("{total}", total).replace("{percentage}", percentage), "success");
             switchTab('results');
         }
 
@@ -3680,7 +4074,7 @@
                 window.open(`https://signal.me/#p/?text=${encodeURIComponent(shareText)}`, '_blank');
             } else if (platform === 'instagram') {
                 copyTextSafe(shareText);
-                showToast("Results copied to clipboard! Paste into Instagram Story/DM.", "info");
+                showToast(t("toastResultsCopiedInstagram"), "info");
             }
         }
 
@@ -3695,7 +4089,7 @@
             const body = encodeURIComponent(`Hi!\n\nI just completed a quiz on Bible QuizCraft:\nScore: ${userSub.score}/${userSub.total}\nAccuracy: ${userSub.percentage}%\nCompletion Time: ${formatSecondsToSmartTime(userSub.time_taken_seconds)}\n\nTest your Bible knowledge as well!`);
             window.location.href = `mailto:${recipient}?subject=${subject}&body=${body}`;
             closeModal('emailShareModal');
-            showToast("Opening email client...", "success");
+            showToast(t("toastOpeningEmail"), "success");
         }
 
         function formatStandardDateTime(d) {
@@ -3730,7 +4124,7 @@
 
             document.getElementById('resultScoreFraction').textContent = `${userSub.score} / ${userSub.total}`;
             document.getElementById('resultPercentage').textContent = `${userSub.percentage}%`;
-            document.getElementById('resultSubmittedTime').textContent = `Submitted on: ${userSub.timestamp || '-'}`;
+            document.getElementById('resultSubmittedTime').textContent = t('lblSubmittedOn').replace('{time}', userSub.timestamp || '-');
 
             const pool = isGuestMode ? activeQuizQuestions : questions;
             const breakdown = document.getElementById('solutionsBreakdownList');
@@ -3740,13 +4134,13 @@
                     <div class="bg-white rounded-xl border ${ansObj.isCorrect ? 'border-emerald-200 bg-emerald-50/20' : 'border-red-200 bg-red-50/20'} p-6 shadow-sm space-y-4">
                         <div class="flex justify-between items-start gap-2">
                             <span class="px-2 py-0.5 rounded text-xs font-bold uppercase ${ansObj.isCorrect ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-800'}">
-                                ${ansObj.isCorrect ? 'Correct ✓' : 'Incorrect ✗'}
+                                ${escapeHTML(ansObj.isCorrect ? t('badgeCorrect') : t('badgeIncorrect'))}
                             </span>
-                            <span class="text-xs text-slate-400">By: ${escapeHTML(q.author)}</span>
+                            <span class="text-xs text-slate-400">${escapeHTML(t('lblByAuthor').replace('{author}', q.author))}</span>
                         </div>
                         <h4 class="font-bold text-slate-800 text-base">${escapeHTML(q.prompt)}</h4>
                         <div class="text-sm space-y-2">${renderSolutionDetail(q, ansObj)}</div>
-                        ${q.explanation ? `<div class="text-xs text-slate-600 bg-slate-50 p-2.5 rounded border border-slate-200"><strong>Explanation:</strong> ${escapeHTML(q.explanation)}</div>` : ''}
+                        ${q.explanation ? `<div class="text-xs text-slate-600 bg-slate-50 p-2.5 rounded border border-slate-200"><strong>${escapeHTML(t('lblExplanation'))}</strong> ${escapeHTML(q.explanation)}</div>` : ''}
                     </div>`;
             }).join('');
             lucide.createIcons();
@@ -3760,45 +4154,45 @@
             if (q.type === 'mcq') {
                 const userChoiceIdx = parseInt(ansObj.userVal, 10);
                 const correctIdx = parseInt(q.correctAnswer, 10);
-                const userLabel = isNaN(userChoiceIdx) || !q.options[userChoiceIdx] ? 'No Answer' : `${String.fromCharCode(65 + userChoiceIdx)}. ${escapeHTML(q.options[userChoiceIdx])}`;
+                const userLabel = isNaN(userChoiceIdx) || !q.options[userChoiceIdx] ? escapeHTML(t('lblNoAnswer')) : `${String.fromCharCode(65 + userChoiceIdx)}. ${escapeHTML(q.options[userChoiceIdx])}`;
                 const correctLabel = !q.options[correctIdx] ? '-' : `${String.fromCharCode(65 + correctIdx)}. ${escapeHTML(q.options[correctIdx])}`;
                 return `
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-                        <div class="p-2.5 rounded border bg-slate-50"><span class="text-slate-500 block">Your Answer:</span><span class="font-semibold ${ansObj.isCorrect ? 'text-emerald-700' : 'text-red-600'}">${userLabel}</span></div>
-                        <div class="p-2.5 rounded border bg-emerald-50 border-emerald-200"><span class="text-emerald-800 block">Official Correct Answer:</span><span class="font-bold text-emerald-900">${correctLabel}</span></div>
+                        <div class="p-2.5 rounded border bg-slate-50"><span class="text-slate-500 block">${escapeHTML(t('lblYourAnswer'))}</span><span class="font-semibold ${ansObj.isCorrect ? 'text-emerald-700' : 'text-red-600'}">${userLabel}</span></div>
+                        <div class="p-2.5 rounded border bg-emerald-50 border-emerald-200"><span class="text-emerald-800 block">${escapeHTML(t('lblOfficialCorrectAnswer'))}</span><span class="font-bold text-emerald-900">${correctLabel}</span></div>
                     </div>`;
             }
             if (q.type === 'tf') {
                 const formatTF = v => v === 'not_given' ? 'NOT GIVEN' : String(v || 'None').toUpperCase();
                 return `
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-                        <div class="p-2.5 rounded border bg-slate-50"><span class="text-slate-500 block">Your Answer:</span><span class="font-semibold ${ansObj.isCorrect ? 'text-emerald-700' : 'text-red-600'}">${escapeHTML(formatTF(ansObj.userVal))}</span></div>
-                        <div class="p-2.5 rounded border bg-emerald-50 border-emerald-200"><span class="text-emerald-800 block">Official Correct Answer:</span><span class="font-bold text-emerald-900">${escapeHTML(formatTF(q.correctAnswer))}</span></div>
+                        <div class="p-2.5 rounded border bg-slate-50"><span class="text-slate-500 block">${escapeHTML(t('lblYourAnswer'))}</span><span class="font-semibold ${ansObj.isCorrect ? 'text-emerald-700' : 'text-red-600'}">${escapeHTML(formatTF(ansObj.userVal))}</span></div>
+                        <div class="p-2.5 rounded border bg-emerald-50 border-emerald-200"><span class="text-emerald-800 block">${escapeHTML(t('lblOfficialCorrectAnswer'))}</span><span class="font-bold text-emerald-900">${escapeHTML(formatTF(q.correctAnswer))}</span></div>
                     </div>`;
             }
             if (q.type === 'fill') {
                 return `
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-                        <div class="p-2.5 rounded border bg-slate-50"><span class="text-slate-500 block">Your Answer:</span><span class="font-semibold ${ansObj.isCorrect ? 'text-emerald-700' : 'text-red-600'}">"${escapeHTML(ansObj.userVal || 'Empty')}"</span></div>
-                        <div class="p-2.5 rounded border bg-emerald-50 border-emerald-200"><span class="text-emerald-800 block">Official Correct Answer:</span><span class="font-bold text-emerald-900">"${escapeHTML(q.correctAnswer)}"</span></div>
+                        <div class="p-2.5 rounded border bg-slate-50"><span class="text-slate-500 block">${escapeHTML(t('lblYourAnswer'))}</span><span class="font-semibold ${ansObj.isCorrect ? 'text-emerald-700' : 'text-red-600'}">"${escapeHTML(ansObj.userVal || t('lblEmptyAnswer'))}"</span></div>
+                        <div class="p-2.5 rounded border bg-emerald-50 border-emerald-200"><span class="text-emerald-800 block">${escapeHTML(t('lblOfficialCorrectAnswer'))}</span><span class="font-bold text-emerald-900">"${escapeHTML(q.correctAnswer)}"</span></div>
                     </div>`;
             }
             if (q.type === 'matching') {
-                const userPairs = Array.isArray(ansObj.userVal) ? ansObj.userVal.map(p => `${p.item} → ${p.selected || 'None'}`).join(', ') : 'No Answer';
+                const userPairs = Array.isArray(ansObj.userVal) ? ansObj.userVal.map(p => `${p.item} → ${p.selected || t('lblNoAnswer')}`).join(', ') : t('lblNoAnswer');
                 const officialPairs = (q.pairs || []).map(p => `${p.item} → ${p.match}`).join(', ');
                 return `
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-                        <div class="p-2.5 rounded border bg-slate-50"><span class="text-slate-500 block">Your Matches:</span><span class="font-semibold ${ansObj.isCorrect ? 'text-emerald-700' : 'text-red-600'}">${escapeHTML(userPairs)}</span></div>
-                        <div class="p-2.5 rounded border bg-emerald-50 border-emerald-200"><span class="text-emerald-800 block">Official Matches:</span><span class="font-bold text-emerald-900">${escapeHTML(officialPairs)}</span></div>
+                        <div class="p-2.5 rounded border bg-slate-50"><span class="text-slate-500 block">${escapeHTML(t('lblYourMatches'))}</span><span class="font-semibold ${ansObj.isCorrect ? 'text-emerald-700' : 'text-red-600'}">${escapeHTML(userPairs)}</span></div>
+                        <div class="p-2.5 rounded border bg-emerald-50 border-emerald-200"><span class="text-emerald-800 block">${escapeHTML(t('lblOfficialMatches'))}</span><span class="font-bold text-emerald-900">${escapeHTML(officialPairs)}</span></div>
                     </div>`;
             }
             if (q.type === 'ordering' || q.type === 'order') {
                 const targetCorrectStr = getOrderingItems(q).join(' → ');
-                const userSubmittedStr = ansObj.userVal ? String(ansObj.userVal).replace(/\|/g, ' → ') : 'No Answer';
+                const userSubmittedStr = ansObj.userVal ? String(ansObj.userVal).replace(/\|/g, ' → ') : t('lblNoAnswer');
                 return `
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-                        <div class="p-2.5 rounded border bg-slate-50"><span class="text-slate-500 block">Your Submitted Sequence:</span><span class="font-semibold ${ansObj.isCorrect ? 'text-emerald-700' : 'text-red-600'}">${escapeHTML(userSubmittedStr)}</span></div>
-                        <div class="p-2.5 rounded border bg-emerald-50 border-emerald-200"><span class="text-emerald-800 block">Official Correct Sequence:</span><span class="font-bold text-emerald-900">${escapeHTML(targetCorrectStr)}</span></div>
+                        <div class="p-2.5 rounded border bg-slate-50"><span class="text-slate-500 block">${escapeHTML(t('lblYourSubmittedSequence'))}</span><span class="font-semibold ${ansObj.isCorrect ? 'text-emerald-700' : 'text-red-600'}">${escapeHTML(userSubmittedStr)}</span></div>
+                        <div class="p-2.5 rounded border bg-emerald-50 border-emerald-200"><span class="text-emerald-800 block">${escapeHTML(t('lblOfficialCorrectSequence'))}</span><span class="font-bold text-emerald-900">${escapeHTML(targetCorrectStr)}</span></div>
                     </div>`;
             }
             return '';
@@ -3828,7 +4222,7 @@
             const oldName = currentUser.name;
 
             if (newName !== oldName && users.some(u => u.name.toLowerCase() === newName.toLowerCase())) {
-                return showToast("Account name already exists!", "error");
+                return showToast(t("toastAccountExists"), "error");
             }
 
             await _supabase.from('app_users').update({
@@ -3852,7 +4246,7 @@
             closeModal('settingsModal');
             updateUI();
             renderCurrentView();
-            showToast("Profile updated across all devices!", "success");
+            showToast(t("toastProfileUpdated"), "success");
         }
 
         function openAdminPasswordReset(username) {
@@ -3869,7 +4263,7 @@
             await _supabase.from('app_users').update({ pass: newPass }).eq('name', target);
             await fetchCloudState();
             closeModal('resetUserPasswordModal');
-            showToast(`Password updated for ${target}!`, "success");
+            showToast(t("toastPasswordUpdatedFor").replace("{target}", target), "success");
         }
 
         async function handleAddUserAccount(e) {
@@ -3879,27 +4273,27 @@
             const pass = document.getElementById('newAccountPassword').value.trim();
 
             if (users.some(u => u.name.toLowerCase() === name.toLowerCase())) {
-                return showToast("Account name already exists!", "error");
+                return showToast(t("toastAccountExists"), "error");
             }
 
             await _supabase.from('app_users').insert({ name, role, pass, sort_order: users.length });
             await fetchCloudState();
             closeModal('addUserModal');
             renderHostControls();
-            showToast(`Account "${name}" created!`, "success");
+            showToast(t("toastAccountCreated").replace("{name}", name), "success");
         }
 
         async function deleteUserAccount(username) {
             const confirmed = await askDialog({
-                title: "Delete User Account",
-                message: `Remove account "${username}"?`
+                title: t('titleDeleteUserAccount'),
+                message: t('msgDeleteUserAccountConfirm').replace('{name}', username)
             });
             if (!confirmed) return;
 
             await _supabase.from('app_users').delete().eq('name', username);
             await fetchCloudState();
             renderHostControls();
-            showToast(`Account "${username}" removed.`, "info");
+            showToast(t("toastAccountRemoved").replace("{name}", username), "info");
         }
 
         function escapeHTML(str) {
@@ -3996,6 +4390,293 @@
                 currentUser = backupUser;
                 activeTab = backupTab;
                 if (currentUser) { updateUI(); renderCurrentView(); }
+            }
+        }
+
+        // --- SELF-CHECK UNIT TEST SUITE (Publish Status, Button Label & Take Quiz Timer) ---
+        async function runPublishAndTimerUnitTests() {
+            const backupUser = currentUser;
+            const backupTab = activeTab;
+            const backupLang = currentLang;
+            try {
+                currentLang = 'EN';
+                currentUser = users.find(u => u.name === 'Host') || { name: 'Host', role: 'host', pass: '1234', avatar_url: '' };
+                safeSetStorage('quiz_current_user', JSON.stringify(currentUser));
+
+                // 1. Verify 'Publish (Quiz #1 Live)' persists across page reload and tab switching without requiring language switch
+                await _supabase.from('app_state').update({
+                    is_published: true,
+                    is_pending: false,
+                    scheduled_publish_time: null,
+                    duration_mins: 10,
+                    current_quiz_session: 1
+                }).eq('id', 1);
+                switchTab('host-controls');
+                await window.onload();
+                const statusAfterReload = document.getElementById('hostPublishStatusText').textContent.trim();
+                const liveStatusPass = statusAfterReload === 'Publish (Quiz #1 Live)';
+
+                // 2a. Verify 'Scheduled (Pending)' / '已排程（準備發布）' stage (> 15 mins before scheduled publish time) and editable Question Repository
+                const future30m = new Date(Date.now() + 30 * 60 * 1000).toISOString();
+                await _supabase.from('app_state').update({
+                    is_published: false,
+                    is_pending: false,
+                    scheduled_publish_time: future30m
+                }).eq('id', 1);
+                await fetchCloudState();
+                await checkScheduledPublishAndClosure();
+                updateUI();
+                switchTab('host-controls');
+                const schedPendingStatusEN = document.getElementById('hostPublishStatusText').textContent.trim();
+                const schedPendingBadgeEN = document.getElementById('publishingBadge').textContent.trim();
+                switchTab('my-questions');
+                const repoEditableWhenScheduledPending = !document.getElementById('addQBtn').disabled && document.getElementById('questionsLockedNotice').classList.contains('hidden');
+                toggleLanguage(); // EN -> 繁
+                switchTab('host-controls');
+                const schedPendingStatusZH = document.getElementById('hostPublishStatusText').textContent.trim();
+                const schedPendingBadgeZH = document.getElementById('publishingBadge').textContent.trim();
+                toggleLanguage(); // 繁 -> EN
+                const scheduledPendingStagePass =
+                    schedPendingStatusEN === 'Scheduled (Pending)' &&
+                    schedPendingBadgeEN === 'Scheduled (Pending)' &&
+                    schedPendingStatusZH === '已排程（準備發布）' &&
+                    schedPendingBadgeZH === '已排程（準備發布）' &&
+                    repoEditableWhenScheduledPending;
+
+                // 2b. Verify Login Interface Language Switching button near Header Badge when logged out
+                logout();
+                const loginHeaderBox = document.getElementById('loginProfileHeader');
+                const loginLangBtn = document.getElementById('loginHeaderLangBtn');
+                const badgeOnLogin = document.getElementById('publishingBadge');
+                const loginBtnVisible = Boolean(loginHeaderBox && !loginHeaderBox.classList.contains('hidden') && loginLangBtn && badgeOnLogin && !badgeOnLogin.classList.contains('hidden'));
+                loginLangBtn.click(); // Switch EN -> 繁 on Login screen
+                const loginSignInZH = document.querySelector('[data-i18n="btnSignIn"]').textContent.trim();
+                const loginBadgeZH = badgeOnLogin.textContent.trim();
+                loginLangBtn.click(); // Switch 繁 -> EN on Login screen
+                const loginSignInEN = document.querySelector('[data-i18n="btnSignIn"]').textContent.trim();
+                const loginLangSwitchPass = loginBtnVisible && loginSignInZH === '登入帳號' && loginBadgeZH === '已排程（準備發布）' && loginSignInEN === 'Sign In';
+
+                // Re-authenticate Host for remaining checks
+                currentUser = users.find(u => u.name === 'Host') || { name: 'Host', role: 'host', pass: '1234', avatar_url: '' };
+                safeSetStorage('quiz_current_user', JSON.stringify(currentUser));
+                updateUI();
+
+                // 2c. Verify Pending stage text is 'Pending (Locked)' and button label stays 'Already Scheduled' after clicking and leaving
+                const future10m = new Date(Date.now() + 10 * 60 * 1000).toISOString();
+                await _supabase.from('app_state').update({
+                    is_published: false,
+                    is_pending: true,
+                    scheduled_publish_time: future10m
+                }).eq('id', 1);
+                await fetchCloudState();
+                updateUI();
+                switchTab('host-controls');
+                const pendingStatusText = document.getElementById('hostPublishStatusText').textContent.trim();
+                handlePublishActionClick(); // click 'Already Scheduled'
+                closeModal('scheduleDetailsModal');
+                switchTab('dashboard');
+                switchTab('host-controls');
+                const btnLabelAfterClickAndLeave = document.getElementById('ctrlCenterPublishBtnText').textContent.trim();
+                // Check My Questions locked pending countdown in EN and after switching to Traditional Chinese (繁)
+                const future3m = new Date(Date.now() + 3 * 60 * 1000).toISOString();
+                scheduledPublishTime = future3m;
+                switchTab('my-questions');
+                const lockedNoticeEN = document.getElementById('questionsLockedNoticeText').textContent.trim();
+                toggleLanguage(); // Switch EN -> 繁
+                const lockedNoticeZH = document.getElementById('questionsLockedNoticeText').textContent.trim();
+                toggleLanguage(); // Switch 繁 -> EN
+                const pendingI18nPass = lockedNoticeEN.includes('Quiz Phase Locked (Pending): The quiz starts in') &&
+                                        lockedNoticeZH.includes('測驗階段已鎖定（準備發布）：測驗將於');
+                const pendingAndBtnPass = scheduledPendingStagePass && loginLangSwitchPass && (pendingStatusText === 'Pending (Locked)') && (btnLabelAfterClickAndLeave === 'Already Scheduled') && pendingI18nPass;
+
+                // 3. Verify 'Take Quiz' countdown timer continues running (does not restart) when leaving to 'Dashboard' and returning
+                resetQuizTimerState();
+                await _supabase.from('app_state').update({
+                    is_published: true,
+                    is_pending: false,
+                    scheduled_publish_time: null,
+                    duration_mins: 10
+                }).eq('id', 1);
+                await fetchCloudState();
+                updateUI();
+                switchTab('take-quiz');
+                // Simulate 5 seconds elapsed on the active quiz timer
+                quizStartTime = new Date(Date.now() - 5000);
+                safeSetStorage('quiz_timer_state', JSON.stringify({ key: quizActiveSessionKey, startTime: quizStartTime.getTime() }));
+                renderTakeQuiz();
+                const timerBeforeLeave = document.getElementById('quizTimerDisplay').textContent.trim();
+                switchTab('dashboard');
+                // Simulate another 3 seconds elapsed while on Dashboard
+                quizStartTime = new Date(Date.now() - 8000);
+                safeSetStorage('quiz_timer_state', JSON.stringify({ key: quizActiveSessionKey, startTime: quizStartTime.getTime() }));
+                switchTab('take-quiz');
+                const timerAfterReturn = document.getElementById('quizTimerDisplay').textContent.trim();
+                const parseTimerSecs = (str) => {
+                    const [m, s] = str.split(':').map(Number);
+                    return (m * 60) + s;
+                };
+                const secsBefore = parseTimerSecs(timerBeforeLeave);
+                const secsAfter = parseTimerSecs(timerAfterReturn);
+                const timerPass = secsBefore <= 595 && secsAfter <= secsBefore && secsAfter < 600;
+
+                // Restore default state
+                resetQuizTimerState();
+                await _supabase.from('app_state').update({
+                    is_published: false,
+                    is_pending: false,
+                    scheduled_publish_time: null,
+                    duration_mins: 10,
+                    current_quiz_session: 1
+                }).eq('id', 1);
+                await fetchCloudState();
+
+                return {
+                    passed: liveStatusPass && pendingAndBtnPass && timerPass,
+                    liveStatusPass,
+                    statusAfterReload,
+                    scheduledPendingStagePass,
+                    schedPendingStatusEN,
+                    schedPendingBadgeEN,
+                    schedPendingStatusZH,
+                    schedPendingBadgeZH,
+                    repoEditableWhenScheduledPending,
+                    loginLangSwitchPass,
+                    pendingAndBtnPass,
+                    pendingStatusText,
+                    btnLabelAfterClickAndLeave,
+                    timerPass,
+                    timerBeforeLeave,
+                    timerAfterReturn
+                };
+            } finally {
+                currentLang = backupLang;
+                currentUser = backupUser;
+                activeTab = backupTab;
+                applyLanguage();
+                updateUI();
+                if (currentUser) renderCurrentView();
+            }
+        }
+
+        // --- SELF-CHECK UNIT TEST SUITE (Language Switching & Untranslated Phrases) ---
+        async function runI18nCompletenessUnitTests() {
+            const backupUser = currentUser;
+            const backupTab = activeTab;
+            const backupLang = currentLang;
+            const backupXLSX = window.XLSX;
+            try {
+                currentUser = users.find(u => u.name === 'Host') || { name: 'Host', role: 'host', pass: '1234', avatar_url: '' };
+                safeSetStorage('quiz_current_user', JSON.stringify(currentUser));
+                isPublished = false;
+                isPending = false;
+                currentLang = 'EN';
+                toggleLanguage(); // Switch to '繁'
+
+                const toasts = [];
+                const origShowToast = window.showToast;
+                window.showToast = (msg, type) => { toasts.push(msg); origShowToast(msg, type); };
+
+                window.XLSX = {
+                    utils: {
+                        aoa_to_sheet: () => ({}),
+                        book_new: () => ({}),
+                        book_append_sheet: () => {},
+                        sheet_to_json: () => [
+                            ["{Q_id}", "{Q_type}", "{Q_msg}", "{Choice_Pool}", "{A_msg}", "{Soln_exp}", "{Actn}"],
+                            [201, "MATCHING", "I18N Match Q", "A|B", "1|2", "Exp M", "A"],
+                            [202, "ORDERING", "I18N Order Q", "X|Y", "X|Y", "Exp O", "A"]
+                        ]
+                    },
+                    writeFile: () => {},
+                    read: () => ({ SheetNames: ['S1'], Sheets: { S1: {} } })
+                };
+
+                downloadUnifiedTemplate();
+                downloadUnifiedBatchExcel();
+
+                await new Promise(resolve => {
+                    const prevToast = window.showToast;
+                    window.showToast = (msg, type) => {
+                        prevToast(msg, type);
+                        window.showToast = prevToast;
+                        resolve();
+                    };
+                    handleBatchFileUpload({ target: { files: [new Blob(["x"])] } });
+                });
+
+                openQuestionModal();
+                document.getElementById('qType').value = 'fill';
+                renderQuestionTypeInputs();
+                document.getElementById('qPrompt').value = 'I18N Fill Q';
+                document.getElementById('fillCorrectAnswer').value = 'Ans';
+                document.getElementById('qExplanation').value = 'Exp F';
+                await handleSaveQuestion(new Event('submit'));
+
+                switchTab('my-questions');
+                const repoText = document.getElementById('myQuestionsList').innerText;
+
+                const qToDel = questions.find(q => q.prompt === 'I18N Fill Q');
+                const delPromise = deleteQuestion(qToDel.id);
+                await new Promise(r => setTimeout(r, 40));
+                const dialogTitle = document.getElementById('customDialogTitle').textContent.trim();
+                const dialogMsg = document.getElementById('customDialogMessage').textContent.trim();
+                document.getElementById('customDialogConfirmBtn').click();
+                await delPromise;
+
+                window.showToast = origShowToast;
+
+                openPublishModal();
+                const resetFieldsBtnText = document.querySelector('button[onclick="resetPublishModalForm()"]').textContent.trim();
+                closeModal('publishModal');
+
+                // Clean up batch uploaded test questions
+                for (const tq of questions.filter(q => q.prompt === 'I18N Match Q' || q.prompt === 'I18N Order Q')) {
+                    await _supabase.from('questions').delete().eq('id', tq.id);
+                }
+                await fetchCloudState();
+
+                const toastsPass =
+                    toasts.includes('已成功產生並下載空白範本 CSV！') &&
+                    toasts.includes('已成功以統一格式匯出題目儲存庫！') &&
+                    toasts.some(m => m.startsWith('批次上傳成功！新增：2，更新：0，刪除：0')) &&
+                    toasts.includes('題目已成功儲存！') &&
+                    toasts.includes('題目已成功刪除。');
+
+                const repoTermsPass =
+                    repoText.includes('題目 #1') &&
+                    repoText.includes('解析說明：') &&
+                    repoText.includes('正確答案：') &&
+                    repoText.includes('配對組合：') &&
+                    repoText.includes('正確排序順序：') &&
+                    !repoText.includes('Question #') &&
+                    !repoText.includes('Explanation:') &&
+                    !repoText.includes('Correct Answer:') &&
+                    !repoText.includes('Matching Pairs:') &&
+                    !repoText.includes('Correct Sequence Order:');
+
+                const dialogAndResetPass =
+                    dialogTitle === '刪除題目' &&
+                    dialogMsg === '您確定要刪除此題目嗎？' &&
+                    resetFieldsBtnText === '重置欄位';
+
+                return {
+                    passed: toastsPass && repoTermsPass && dialogAndResetPass,
+                    toastsPass,
+                    repoTermsPass,
+                    dialogAndResetPass,
+                    toasts,
+                    dialogTitle,
+                    dialogMsg,
+                    resetFieldsBtnText
+                };
+            } finally {
+                window.XLSX = backupXLSX;
+                currentLang = backupLang;
+                currentUser = backupUser;
+                activeTab = backupTab;
+                applyLanguage();
+                updateUI();
+                if (currentUser) renderCurrentView();
             }
         }
     </script>
