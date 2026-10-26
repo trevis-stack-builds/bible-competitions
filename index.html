@@ -1800,6 +1800,17 @@
         let isAnnouncementMode = false;
         let isGuestMode = false;
         let guestChallengeConfig = { active: false, duration: 10, maxQuestions: 5, questionIds: [] };
+
+        function normalizeGuestChallengeConfig(cfg) {
+            const base = (cfg && typeof cfg === 'object') ? cfg : {};
+            return {
+                ...base,
+                active: Boolean(base.active),
+                duration: parseInt(base.duration, 10) || 10,
+                maxQuestions: parseInt(base.maxQuestions, 10) || 5,
+                questionIds: Array.isArray(base.questionIds) ? base.questionIds.map(String) : []
+            };
+        }
         let activeQuizQuestions = [];
         let quizShuffleCache = {};
         let quizActiveSessionKey = null;
@@ -2094,7 +2105,7 @@
                 quizDurationMins = stateData.duration_mins || 0;
                 quizDueDate = stateData.due_datetime || null;
                 currentQuizSession = stateData.current_quiz_session || 1;
-                if (stateData.guest_challenge_config) guestChallengeConfig = stateData.guest_challenge_config;
+                guestChallengeConfig = normalizeGuestChallengeConfig(stateData.guest_challenge_config || guestChallengeConfig);
                 excludeOwnQuestions = Boolean(
                     stateData.exclude_own_questions !== undefined
                         ? stateData.exclude_own_questions
@@ -2287,8 +2298,10 @@
             isGuestMode = true;
             currentUser = { name: "Guest User", role: "guest", avatar_url: "" };
 
+            guestChallengeConfig = normalizeGuestChallengeConfig(guestChallengeConfig);
             if (guestChallengeConfig.active && guestChallengeConfig.questionIds.length > 0) {
-                let pool = pastQuestions.filter(q => guestChallengeConfig.questionIds.includes(q.id));
+                const selectedSet = new Set(guestChallengeConfig.questionIds.map(String));
+                let pool = pastQuestions.filter(q => selectedSet.has(String(q.id)));
                 pool = pool.sort(() => Math.random() - 0.5);
                 activeQuizQuestions = pool.slice(0, Math.min(guestChallengeConfig.maxQuestions, pool.length));
             } else {
@@ -2875,17 +2888,30 @@
         }
 
         function openRepublishGuestModal() {
+            guestChallengeConfig = normalizeGuestChallengeConfig(guestChallengeConfig);
             const listContainer = document.getElementById('guestVaultSelectionList');
-            if (pastQuestions.length === 0) return showToast(t("toastVaultEmpty"), "error");
+            const durationInput = document.getElementById('guestDurationInput');
+            const maxQInput = document.getElementById('guestMaxQuestionsInput');
+            if (durationInput) durationInput.value = guestChallengeConfig.duration || 10;
+            if (maxQInput) maxQInput.value = guestChallengeConfig.maxQuestions || 5;
 
-            listContainer.innerHTML = pastQuestions.map(q => {
-                const checked = !guestChallengeConfig.questionIds.length || guestChallengeConfig.questionIds.includes(q.id);
-                return `
-                    <label class="flex items-center gap-2 p-1.5 hover:bg-slate-100 rounded cursor-pointer">
-                        <input type="checkbox" value="${escapeAttr(q.id)}" ${checked ? 'checked' : ''} class="guest-q-checkbox w-4 h-4 text-indigo-600">
-                        <span class="truncate font-medium text-slate-700">${escapeHTML(q.prompt)}</span>
-                    </label>`;
-            }).join('');
+            const selectedIds = Array.isArray(guestChallengeConfig.questionIds) ? guestChallengeConfig.questionIds.map(String) : [];
+
+            if (pastQuestions.length === 0) {
+                if (listContainer) {
+                    listContainer.innerHTML = `<div class="text-center text-slate-400 py-4">${escapeHTML(t('Past Paper Vault is Empty'))}</div>`;
+                }
+                showToast(t("toastVaultEmpty"), "info");
+            } else if (listContainer) {
+                listContainer.innerHTML = pastQuestions.map(q => {
+                    const checked = selectedIds.length === 0 || selectedIds.includes(String(q.id));
+                    return `
+                        <label class="flex items-center gap-2 p-1.5 hover:bg-slate-100 rounded cursor-pointer">
+                            <input type="checkbox" value="${escapeAttr(q.id)}" ${checked ? 'checked' : ''} class="guest-q-checkbox w-4 h-4 text-indigo-600">
+                            <span class="truncate font-medium text-slate-700">${escapeHTML(q.prompt)}</span>
+                        </label>`;
+                }).join('');
+            }
 
             openModal('republishGuestModal');
         }
@@ -2900,10 +2926,16 @@
                 return showToast(t("toastSelectAtLeastOneGuestQ"), "error");
             }
 
-            guestChallengeConfig = { active: true, duration, maxQuestions: maxQ, questionIds: selectedIds };
-            await _supabase.from('app_state').update({ guest_challenge_config: guestChallengeConfig }).eq('id', 1);
+            guestChallengeConfig = normalizeGuestChallengeConfig({
+                ...guestChallengeConfig,
+                active: true,
+                duration,
+                maxQuestions: maxQ,
+                questionIds: selectedIds
+            });
             closeModal('republishGuestModal');
             showToast(t("toastRepublishedGuest"), "success");
+            await _supabase.from('app_state').update({ guest_challenge_config: guestChallengeConfig }).eq('id', 1);
         }
 
         async function clearPastPaperVault() {
@@ -3803,7 +3835,7 @@
 
                 const shouldBeLive = !scheduledPubISO;
                 const shouldBePending = Boolean(scheduledPubISO && ((new Date(scheduledPubISO) - now) / (1000 * 60) <= 15));
-                const updatedGuestCfg = { ...guestChallengeConfig, excludeOwnQuestions: excludeOwn };
+                const updatedGuestCfg = normalizeGuestChallengeConfig({ ...guestChallengeConfig, excludeOwnQuestions: excludeOwn });
 
                 let { error } = await _supabase.from('app_state').update({
                     is_published: shouldBeLive,
@@ -3880,7 +3912,7 @@
             else quizRecords.unshift(newRecord);
 
             const lastUnpublishedEvent = { session: endedSession, isAutoClose: Boolean(isAutoClose), at: Date.now() };
-            const resetGuestCfg = { ...guestChallengeConfig, excludeOwnQuestions: false, lastUnpublishedEvent };
+            const resetGuestCfg = normalizeGuestChallengeConfig({ ...guestChallengeConfig, excludeOwnQuestions: false, lastUnpublishedEvent });
             excludeOwnQuestions = false;
             guestChallengeConfig = resetGuestCfg;
             isPublished = false;
@@ -5609,6 +5641,71 @@
                 const banner = document.getElementById('closureLastMinuteBanner');
                 if (banner) banner.classList.add('hidden');
                 applyLanguage();
+                updateUI();
+                if (currentUser) renderCurrentView();
+            }
+        }
+
+        // --- SELF-CHECK UNIT TEST SUITE (Republish Guest Challenge Modal in Past Paper Vault) ---
+        async function runRepublishGuestModalUnitTests() {
+            const backupUser = currentUser;
+            const backupTab = activeTab;
+            const backupPastQuestions = JSON.parse(JSON.stringify(pastQuestions));
+            const backupGuestCfg = JSON.parse(JSON.stringify(guestChallengeConfig));
+            try {
+                currentUser = { name: 'Host', role: 'host', pass: '1234', avatar_url: '' };
+                closeModal('republishGuestModal');
+
+                // Simulate Supabase app_state where guest_challenge_config has no questionIds property (e.g. {} or { excludeOwnQuestions: false })
+                await _supabase.from('app_state').update({
+                    guest_challenge_config: { excludeOwnQuestions: false }
+                }).eq('id', 1);
+                await fetchCloudState();
+
+                pastQuestions = [
+                    { id: 'ut-vault-1', author: 'Host', type: 'mcq', prompt: 'Vault Q1?', options: ['A', 'B', 'C', 'D'], correctAnswer: '0', is_vault: true, quiz_session_id: 1 },
+                    { id: 'ut-vault-2', author: 'Host', type: 'fill', prompt: 'Vault Q2?', correctAnswer: 'Grace', is_vault: true, quiz_session_id: 1 }
+                ];
+
+                switchTab('past-paper-vault');
+                const republishBtn = document.getElementById('republishGuestChallengeBtn');
+                const btnVisibleForHost = Boolean(republishBtn && !republishBtn.classList.contains('hidden'));
+
+                // Click 'Republish Guest Challenge' button
+                republishBtn.click();
+                const modalEl = document.getElementById('republishGuestModal');
+                const modalOpened = Boolean(modalEl && !modalEl.classList.contains('hidden'));
+                const checkboxes = document.querySelectorAll('#guestVaultSelectionList .guest-q-checkbox');
+                const checkboxesRenderedPass = checkboxes.length === 2 && Array.from(checkboxes).every(cb => cb.checked);
+
+                // Configure options (Duration = 15, Max Questions = 2) and submit
+                document.getElementById('guestDurationInput').value = '15';
+                document.getElementById('guestMaxQuestionsInput').value = '2';
+                await handleRepublishGuestSubmit(new Event('submit'));
+
+                const modalClosedAfterSubmit = modalEl.classList.contains('hidden');
+                const configSavedPass =
+                    guestChallengeConfig.active === true &&
+                    guestChallengeConfig.duration === 15 &&
+                    guestChallengeConfig.maxQuestions === 2 &&
+                    JSON.stringify(guestChallengeConfig.questionIds) === JSON.stringify(['ut-vault-1', 'ut-vault-2']);
+
+                return {
+                    passed: btnVisibleForHost && modalOpened && checkboxesRenderedPass && modalClosedAfterSubmit && configSavedPass,
+                    btnVisibleForHost,
+                    modalOpened,
+                    checkboxesCount: checkboxes.length,
+                    checkboxesRenderedPass,
+                    modalClosedAfterSubmit,
+                    configSavedPass
+                };
+            } finally {
+                pastQuestions = backupPastQuestions;
+                guestChallengeConfig = normalizeGuestChallengeConfig(backupGuestCfg);
+                await _supabase.from('app_state').update({ guest_challenge_config: guestChallengeConfig }).eq('id', 1);
+                currentUser = backupUser;
+                activeTab = backupTab;
+                closeModal('republishGuestModal');
                 updateUI();
                 if (currentUser) renderCurrentView();
             }
