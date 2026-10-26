@@ -109,6 +109,15 @@
 
     <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
 
+        <!-- BANNER: LAST 1-MINUTE CLOSURE COUNTDOWN -->
+        <div id="closureLastMinuteBanner" class="hidden bg-red-600 text-white px-4 py-2.5 rounded-xl shadow-lg mb-4 flex items-center justify-between gap-3 animate-pulse">
+            <div class="flex items-center gap-2 text-xs sm:text-sm font-bold">
+                <i data-lucide="alarm-clock" class="w-4 h-4 shrink-0"></i>
+                <span id="closureLastMinuteBannerText">Final Minute! Quiz closes soon!</span>
+            </div>
+            <span id="closureLastMinuteTimerBadge" class="font-mono font-black text-sm sm:text-base bg-white text-red-700 px-2.5 py-0.5 rounded-lg">00:60</span>
+        </div>
+
         <!-- VIEW: LOGIN -->
         <section id="view-login" class="max-w-md mx-auto my-8 sm:my-12 bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden hidden">
             <div class="bg-slate-900 p-8 text-center text-white relative">
@@ -660,6 +669,15 @@
                     </div>
                     <p class="text-xs text-slate-400 mt-1" data-i18n="subClosureDueDate">The quiz will automatically close and unpublish when this deadline passes.</p>
                 </div>
+                <div class="pt-1">
+                    <label class="flex items-start gap-3 p-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100/80 cursor-pointer transition">
+                        <input type="checkbox" id="excludeOwnQuestionsInput" class="mt-0.5 w-4 h-4 text-emerald-600 rounded border-slate-300 focus:ring-emerald-500">
+                        <span class="text-xs text-slate-700 leading-relaxed">
+                            <strong class="block font-bold text-slate-800" data-i18n="lblExcludeOwnQuestions">Users Do Not Answer Their Own Uploaded Questions</strong>
+                            <span class="text-slate-500" data-i18n="subExcludeOwnQuestions">When ticked, each participant only answers questions uploaded by others and skips the questions they uploaded themselves.</span>
+                        </span>
+                    </label>
+                </div>
                 <div class="pt-4 flex justify-between items-center gap-2">
                     <button type="button" onclick="resetPublishModalForm()" class="px-3 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg text-xs font-bold transition" data-i18n="btnResetFields">Reset Fields</button>
                     <div class="flex gap-2">
@@ -700,6 +718,11 @@
                 </div>
 
                 <div id="typeSpecificInputs" class="space-y-4 p-4 bg-slate-50 rounded-xl border border-slate-200"></div>
+
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2" data-i18n="lblQHint">Question Hint (Optional)</label>
+                    <input type="text" id="qHint" data-i18n-placeholder="placeholderQHint" placeholder="Enter an optional hint for this question..." class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 text-sm">
+                </div>
 
                 <div>
                     <label class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2" data-i18n="lblQExplanation">Solution Explanation (Optional)</label>
@@ -978,7 +1001,7 @@
                     { id: 'q-vault-2', author: 'Host', type: 'fill', prompt: 'Jesus was born in the town of ____.', correctAnswer: 'Bethlehem', explanation: 'Prophesied in Micah 5:2 and fulfilled in Matthew 2:1.', is_vault: true, quiz_session_id: 1 },
                     { id: 'q-vault-3', author: 'Host', type: 'matching', prompt: 'Match each biblical figure to their description.', pairs: [{ item: 'David', match: 'Shepherd & King' }, { item: 'Paul', match: 'Apostle to the Gentiles' }, { item: 'Solomon', match: 'Builder of the Temple' }], explanation: 'Key figures of the Old and New Testaments.', is_vault: true, quiz_session_id: 1 }
                 ],
-                app_state: [{ id: 1, is_published: false, is_pending: false, scheduled_publish_time: null, duration_mins: 10, due_datetime: null, current_quiz_session: 1, guest_challenge_config: { active: true, duration: 10, maxQuestions: 5, questionIds: ['q-vault-1', 'q-vault-2', 'q-vault-3'] } }],
+                app_state: [{ id: 1, is_published: false, is_pending: false, scheduled_publish_time: null, duration_mins: 10, due_datetime: null, current_quiz_session: 1, exclude_own_questions: false, guest_challenge_config: { active: true, duration: 10, maxQuestions: 5, questionIds: ['q-vault-1', 'q-vault-2', 'q-vault-3'], excludeOwnQuestions: false } }],
                 submissions: [],
                 quiz_records: [],
                 feedback: [],
@@ -1015,7 +1038,7 @@
                             return { data: isSingle ? (res[0] || null) : res, error: null };
                         }
                         if (table === 'questions' && (op === 'insert' || op === 'upsert' || op === 'update') && payload) {
-                            const validCols = new Set(['id', 'author', 'type', 'prompt', 'explanation', 'is_vault', 'quiz_session_id', 'options', 'correctAnswer', 'pairs']);
+                            const validCols = new Set(['id', 'author', 'type', 'prompt', 'hint', 'explanation', 'is_vault', 'quiz_session_id', 'options', 'correctAnswer', 'pairs']);
                             const checkItems = Array.isArray(payload) ? payload : [payload];
                             for (const it of checkItems) {
                                 for (const k of Object.keys(it)) {
@@ -1218,9 +1241,16 @@
                 subScheduledPublish: "Quiz will automatically go live at this exact time. Enters 'Pending' phase 15 minutes prior.",
                 lblClosureDueDate: "Automatic Closure Due Date & Time",
                 subClosureDueDate: "The quiz will automatically close and unpublish when this deadline passes.",
+                lblExcludeOwnQuestions: "Users Do Not Answer Their Own Uploaded Questions",
+                subExcludeOwnQuestions: "When ticked, each participant only answers questions uploaded by others and skips the questions they uploaded themselves.",
                 btnPublishNow: "Save & Publish",
                 lblQType: "Question Type",
                 lblQPrompt: "Question Text / Prompt",
+                lblQHint: "Question Hint (Optional)",
+                placeholderQHint: "Enter an optional hint for this question...",
+                lblHint: "Hint:",
+                btnShowHint: "Show Hint",
+                btnHideHint: "Hide Hint",
                 lblQExplanation: "Solution Explanation (Optional)",
                 btnSaveQuestion: "Save Question",
                 titleAccountSettings: "Account Settings",
@@ -1387,6 +1417,11 @@
                 toastQuizPublishedLive: "Quiz #{session} Published Live successfully!",
                 toastQuizScheduled: "Quiz scheduled successfully!",
                 toastPublishFailed: "Failed to publish quiz. Check your configuration or connection.",
+                toastClosure30m: "Notice: 30 minutes left until Quiz #{session} closes!",
+                toastClosure15m: "Notice: 15 minutes left until Quiz #{session} closes!",
+                toastClosure5m: "Warning: Last 5 minutes left before Quiz #{session} closes!",
+                toastClosure1m: "Final Minute! Quiz #{session} closes in {secs} seconds!",
+                toastQuizEndedManual: "Host/Co-host has unpublished the Quiz Bank (Quiz #{session} has ended). Redirecting to Achievements...",
                 toastQuizAutoClosed: "Quiz closed automatically (due date reached).",
                 toastQuizUnpublished: "Quiz Unpublished! Questions archived.",
                 toastRecordsReset: "Historical quiz records, leaderboard submissions, and Quiz Session Number reset to #1.",
@@ -1525,9 +1560,16 @@
                 subScheduledPublish: "測驗將在此時間自動開放。發布前15分鐘自動進入「準備發布」鎖定狀態。",
                 lblClosureDueDate: "自動截止關閉時間",
                 subClosureDueDate: "當到達此截止時間，測驗將自動結束並取消發布。",
+                lblExcludeOwnQuestions: "參與者無需作答自己上傳的題目",
+                subExcludeOwnQuestions: "勾選後，每位參與者在測驗中只需作答其他人上傳的題目，無需作答自己上傳的題目。",
                 btnPublishNow: "儲存並設定發布",
                 lblQType: "題目類型",
                 lblQPrompt: "題目內容 / 敘述",
+                lblQHint: "題目提示 (可選)",
+                placeholderQHint: "請輸入此題目的選填提示...",
+                lblHint: "提示：",
+                btnShowHint: "顯示提示",
+                btnHideHint: "隱藏提示",
                 lblQExplanation: "解答說明 (可選)",
                 btnSaveQuestion: "儲存題目",
                 titleAccountSettings: "帳號設定",
@@ -1694,6 +1736,11 @@
                 toastQuizPublishedLive: "第 #{session} 期測驗已成功即時發布！",
                 toastQuizScheduled: "測驗排程設定成功！",
                 toastPublishFailed: "發布測驗失敗，請檢查設定或網路連線。",
+                toastClosure30m: "提醒：距離第 #{session} 期測驗截止關閉還剩 30 分鐘！",
+                toastClosure15m: "提醒：距離第 #{session} 期測驗截止關閉還剩 15 分鐘！",
+                toastClosure5m: "警告：距離第 #{session} 期測驗截止關閉僅剩最後 5 分鐘！",
+                toastClosure1m: "最後一分鐘倒數！第 #{session} 期測驗將於 {secs} 秒後關閉！",
+                toastQuizEndedManual: "主持人／副主持人已取消發布題庫（第 #{session} 期測驗已結束），正在前往排行榜與成就頁面...",
                 toastQuizAutoClosed: "測驗已到達截止時間並自動結束。",
                 toastQuizUnpublished: "已取消發布測驗！題目已封存至歷屆試題庫。",
                 toastRecordsReset: "歷屆測驗紀錄、排行榜提交紀錄已清空，且測驗期數已重置為 #1。",
@@ -1735,6 +1782,15 @@
         let quizDurationMins = 0;
         let quizDueDate = null;
         let currentQuizSession = 1;
+        let excludeOwnQuestions = false;
+
+        function getQuizQuestionsForUser(username = currentUser ? currentUser.name : '') {
+            if (isGuestMode) return activeQuizQuestions;
+            if (excludeOwnQuestions && username) {
+                return questions.filter(q => q.author !== username);
+            }
+            return questions;
+        }
         let currentUser = null;
         let activeTab = 'dashboard';
         let timerInterval = null;
@@ -1748,6 +1804,10 @@
         let quizShuffleCache = {};
         let quizActiveSessionKey = null;
         let quizDraftAnswers = {};
+        let quizExpandedHints = {};
+        let closureNotifiedMilestones = {};
+        let joinedQuizParticipants = {};
+        let notifiedUnpublishedSessions = {};
 
         function resetQuizTimerState() {
             if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
@@ -1755,6 +1815,7 @@
             quizActiveSessionKey = null;
             quizShuffleCache = {};
             quizDraftAnswers = {};
+            quizExpandedHints = {};
             safeRemoveStorage('quiz_timer_state');
         }
 
@@ -1845,6 +1906,76 @@
             safeSetStorage('quiz_deleted_question_ids', JSON.stringify(deletedIds));
         }
 
+        function getLocalHintsMap() {
+            try { return JSON.parse(safeGetStorage('quiz_question_hints', '{}')) || {}; }
+            catch (e) { return {}; }
+        }
+
+        function setLocalQuestionHint(id, hint) {
+            const map = getLocalHintsMap();
+            if (hint) map[String(id)] = hint;
+            else delete map[String(id)];
+            safeSetStorage('quiz_question_hints', JSON.stringify(map));
+        }
+
+        function getQuestionOrderList() {
+            try {
+                const raw = JSON.parse(safeGetStorage('quiz_question_order_ids', '[]'));
+                return Array.isArray(raw) ? raw.map(String) : [];
+            } catch (e) { return []; }
+        }
+
+        function saveQuestionOrderList(ids) {
+            safeSetStorage('quiz_question_order_ids', JSON.stringify(ids.map(String)));
+        }
+
+        function sortAndSyncQuestionsOrder(qList) {
+            if (!Array.isArray(qList)) return [];
+            const orderIds = getQuestionOrderList();
+            const currentIds = new Set(qList.map(q => String(q.id)));
+            // Keep existing IDs that are still active, in their original order
+            const nextOrder = orderIds.filter(id => currentIds.has(id));
+            // Append any newly added question IDs at the end
+            qList.forEach(q => {
+                const sid = String(q.id);
+                if (!nextOrder.includes(sid)) nextOrder.push(sid);
+            });
+            saveQuestionOrderList(nextOrder);
+            const posMap = new Map(nextOrder.map((id, idx) => [id, idx]));
+            return qList.slice().sort((a, b) => (posMap.get(String(a.id)) ?? 0) - (posMap.get(String(b.id)) ?? 0));
+        }
+
+        function removeQuestionFromOrderList(id) {
+            const strId = String(id);
+            const nextOrder = getQuestionOrderList().filter(item => item !== strId);
+            saveQuestionOrderList(nextOrder);
+        }
+
+        function markUserJoinedQuizSession(username, sessionNum) {
+            if (!username || !sessionNum || sessionNum === 999999) return;
+            joinedQuizParticipants[`${username}_${sessionNum}`] = true;
+            try {
+                const saved = JSON.parse(safeGetStorage('quiz_joined_participants', '{}')) || {};
+                saved[`${username}_${sessionNum}`] = true;
+                safeSetStorage('quiz_joined_participants', JSON.stringify(saved));
+            } catch (e) {}
+        }
+
+        function hasUserJoinedQuizSession(username, sessionNum) {
+            if (!username || !sessionNum) return false;
+            if (joinedQuizParticipants[`${username}_${sessionNum}`]) return true;
+            try {
+                const saved = JSON.parse(safeGetStorage('quiz_joined_participants', '{}')) || {};
+                if (saved[`${username}_${sessionNum}`]) return true;
+            } catch (e) {}
+            const userSubs = submissions[username] || [];
+            if (userSubs.some(s => Number(s.quiz_session_id) === Number(sessionNum))) return true;
+            if (currentUser && currentUser.name === username && (activeTab === 'take-quiz' || quizActiveSessionKey === `${username}_${sessionNum}`)) {
+                return true;
+            }
+            return false;
+        }
+
         function isMobileView() {
             return window.innerWidth < 768;
         }
@@ -1882,6 +2013,7 @@
             lucide.createIcons();
 
             setInterval(checkScheduledPublishAndClosure, 5000);
+            setInterval(() => { if (isPublished && quizDueDate) checkClosureDueNotifications(); }, 1000);
             window.addEventListener('resize', applyMobileRules);
         };
 
@@ -1920,7 +2052,26 @@
         async function fetchCloudState() {
             const deletedIds = getDeletedQuestionIds();
 
-            const { data: userData } = await _supabase.from('app_users').select('*').order('sort_order', { ascending: true, nullsFirst: false });
+            const [
+                { data: userData },
+                { data: qData },
+                { data: pastQData },
+                { data: stateData },
+                { data: subData },
+                { data: recData },
+                { data: fbData },
+                { data: chatData }
+            ] = await Promise.all([
+                _supabase.from('app_users').select('*').order('sort_order', { ascending: true, nullsFirst: false }),
+                _supabase.from('questions').select('*').eq('is_vault', false),
+                _supabase.from('questions').select('*').eq('is_vault', true),
+                _supabase.from('app_state').select('*').eq('id', 1).single(),
+                _supabase.from('submissions').select('*'),
+                _supabase.from('quiz_records').select('*').order('quiz_session_id', { ascending: false }),
+                _supabase.from('feedback').select('*').order('created_at', { ascending: false }),
+                _supabase.from('chat_messages').select('*').order('created_at', { ascending: true })
+            ]);
+
             if (userData) {
                 users = userData;
                 if (currentUser && !isGuestMode) {
@@ -1928,14 +2079,14 @@
                     if (match) currentUser = match;
                 }
             }
+            const hintsMap = getLocalHintsMap();
+            const attachHint = q => ({ ...q, hint: q.hint !== undefined && q.hint !== null ? q.hint : (hintsMap[String(q.id)] || '') });
+            if (qData) questions = sortAndSyncQuestionsOrder(qData.filter(q => !deletedIds.includes(String(q.id))).map(attachHint));
+            if (pastQData) pastQuestions = pastQData.filter(q => !deletedIds.includes(String(q.id))).map(attachHint);
 
-            const { data: qData } = await _supabase.from('questions').select('*').eq('is_vault', false);
-            if (qData) questions = qData.filter(q => !deletedIds.includes(String(q.id)));
+            const wasPublishedBeforeFetch = isPublished;
+            const prevSessionBeforeFetch = currentQuizSession;
 
-            const { data: pastQData } = await _supabase.from('questions').select('*').eq('is_vault', true);
-            if (pastQData) pastQuestions = pastQData.filter(q => !deletedIds.includes(String(q.id)));
-
-            const { data: stateData } = await _supabase.from('app_state').select('*').eq('id', 1).single();
             if (stateData) {
                 isPublished = stateData.is_published || false;
                 isPending = stateData.is_pending || false;
@@ -1944,9 +2095,13 @@
                 quizDueDate = stateData.due_datetime || null;
                 currentQuizSession = stateData.current_quiz_session || 1;
                 if (stateData.guest_challenge_config) guestChallengeConfig = stateData.guest_challenge_config;
+                excludeOwnQuestions = Boolean(
+                    stateData.exclude_own_questions !== undefined
+                        ? stateData.exclude_own_questions
+                        : (stateData.guest_challenge_config && stateData.guest_challenge_config.excludeOwnQuestions)
+                );
             }
 
-            const { data: subData } = await _supabase.from('submissions').select('*');
             if (subData) {
                 submissions = {};
                 subData.forEach(s => {
@@ -1954,15 +2109,18 @@
                     submissions[s.username].push(s);
                 });
             }
-
-            const { data: recData } = await _supabase.from('quiz_records').select('*').order('quiz_session_id', { ascending: false });
             if (recData) quizRecords = recData;
-
-            const { data: fbData } = await _supabase.from('feedback').select('*').order('created_at', { ascending: false });
             if (fbData) feedbackComments = fbData;
-
-            const { data: chatData } = await _supabase.from('chat_messages').select('*').order('created_at', { ascending: true });
             if (chatData) chatMessages = chatData;
+
+            if (wasPublishedBeforeFetch && !isPublished && currentUser && !isGuestMode) {
+                handleParticipantUnpublishNotificationAndRedirect(prevSessionBeforeFetch, false);
+            } else if (!isPublished && currentUser && !isGuestMode && guestChallengeConfig && guestChallengeConfig.lastUnpublishedEvent) {
+                const evt = guestChallengeConfig.lastUnpublishedEvent;
+                if (evt && evt.session && !notifiedUnpublishedSessions[`${currentUser.name}_${evt.session}`] && hasUserJoinedQuizSession(currentUser.name, evt.session)) {
+                    handleParticipantUnpublishNotificationAndRedirect(evt.session, Boolean(evt.isAutoClose));
+                }
+            }
         }
 
         async function checkScheduledPublishAndClosure() {
@@ -2003,11 +2161,92 @@
             }
 
             if (isPublished && quizDueDate) {
+                checkClosureDueNotifications(now);
                 const deadline = new Date(quizDueDate);
                 if (!isNaN(deadline.getTime()) && now >= deadline) {
                     await unpublishQuiz(true);
                 }
+            } else {
+                const banner = document.getElementById('closureLastMinuteBanner');
+                if (banner) banner.classList.add('hidden');
             }
+        }
+
+        function checkClosureDueNotifications(now = new Date()) {
+            const banner = document.getElementById('closureLastMinuteBanner');
+            if (!isPublished || !quizDueDate) {
+                if (banner) banner.classList.add('hidden');
+                return null;
+            }
+            const deadline = new Date(quizDueDate);
+            if (isNaN(deadline.getTime())) {
+                if (banner) banner.classList.add('hidden');
+                return null;
+            }
+            const diffSecs = Math.ceil((deadline - now) / 1000);
+            if (diffSecs <= 0) {
+                if (banner) banner.classList.add('hidden');
+                return 0;
+            }
+
+            const sess = currentQuizSession;
+            if (diffSecs <= 30 * 60 && diffSecs > 15 * 60) {
+                if (!closureNotifiedMilestones[`${sess}_30`]) {
+                    closureNotifiedMilestones[`${sess}_30`] = true;
+                    showToast(t("toastClosure30m").replace("{session}", sess), "info");
+                }
+            } else if (diffSecs <= 15 * 60 && diffSecs > 5 * 60) {
+                if (!closureNotifiedMilestones[`${sess}_15`]) {
+                    closureNotifiedMilestones[`${sess}_15`] = true;
+                    showToast(t("toastClosure15m").replace("{session}", sess), "info");
+                }
+            } else if (diffSecs <= 5 * 60 && diffSecs > 60) {
+                if (!closureNotifiedMilestones[`${sess}_5`]) {
+                    closureNotifiedMilestones[`${sess}_5`] = true;
+                    showToast(t("toastClosure5m").replace("{session}", sess), "error");
+                }
+            }
+
+            if (diffSecs <= 60 && diffSecs > 0) {
+                const msg = t("toastClosure1m").replace("{session}", sess).replace("{secs}", diffSecs);
+                if (!closureNotifiedMilestones[`${sess}_1`]) {
+                    closureNotifiedMilestones[`${sess}_1`] = true;
+                    showToast(msg, "error");
+                }
+                if (banner) {
+                    banner.classList.remove('hidden');
+                    const txtEl = document.getElementById('closureLastMinuteBannerText');
+                    const badgeEl = document.getElementById('closureLastMinuteTimerBadge');
+                    if (txtEl) txtEl.textContent = msg;
+                    if (badgeEl) badgeEl.textContent = `00:${String(diffSecs).padStart(2, '0')}`;
+                }
+            } else if (banner) {
+                banner.classList.add('hidden');
+            }
+            return diffSecs;
+        }
+
+        function handleParticipantUnpublishNotificationAndRedirect(endedSession, isAutoClose = false) {
+            if (!currentUser || isGuestMode) return false;
+            const key = `${currentUser.name}_${endedSession}`;
+            if (notifiedUnpublishedSessions[key]) return false;
+            notifiedUnpublishedSessions[key] = true;
+
+            const joined = hasUserJoinedQuizSession(currentUser.name, endedSession);
+            const banner = document.getElementById('closureLastMinuteBanner');
+            if (banner) banner.classList.add('hidden');
+
+            if (joined) {
+                showToast(
+                    isAutoClose
+                        ? t("toastQuizAutoClosed")
+                        : t("toastQuizEndedManual").replace("{session}", endedSession),
+                    "info"
+                );
+                switchTab('achievements');
+                return true;
+            }
+            return false;
         }
 
         function setupRealtimeSubscriptions() {
@@ -2118,12 +2357,14 @@
 
             if (tabId === 'take-quiz' && (isPublished || isGuestMode)) {
                 const targetSession = isGuestMode ? 999999 : currentQuizSession;
+                if (!isGuestMode) markUserJoinedQuizSession(currentUser.name, currentQuizSession);
                 const sessionKey = `${currentUser.name}_${targetSession}`;
                 if (quizActiveSessionKey !== sessionKey || !quizStartTime) {
                     quizActiveSessionKey = sessionKey;
                     quizStartTime = new Date();
                     quizShuffleCache = {};
                     quizDraftAnswers = {};
+                    quizExpandedHints = {};
                     safeSetStorage('quiz_timer_state', JSON.stringify({ key: sessionKey, startTime: quizStartTime.getTime() }));
                 }
             }
@@ -2550,9 +2791,10 @@
                 return;
             }
 
-            let myQs = questions.filter(q => q.author === currentUser.name);
+            const allMyQs = questions.filter(q => q.author === currentUser.name);
+            let myQs = allMyQs;
             if (filterVal !== 'ALL') {
-                myQs = myQs.filter(q => formatTypeBadgeLabel(q.type) === filterVal);
+                myQs = allMyQs.filter(q => formatTypeBadgeLabel(q.type) === filterVal);
             }
 
             if (myQs.length === 0) {
@@ -2566,12 +2808,14 @@
                 return;
             }
 
-            list.innerHTML = myQs.map((q, idx) => `
-                <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm space-y-3">
+            list.innerHTML = myQs.map(q => {
+                const k = allMyQs.findIndex(item => String(item.id) === String(q.id)) + 1;
+                return `
+                <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm space-y-3" data-question-k="${k}">
                     <div class="flex justify-between items-start gap-4">
                         <div class="flex items-center gap-2">
                             <span class="px-2.5 py-1 bg-slate-100 text-slate-700 font-bold text-xs rounded-md uppercase">${formatTypeBadgeLabel(q.type)}</span>
-                            <span class="text-xs text-slate-400">${escapeHTML(t('lblQuestionNum').replace('{n}', idx + 1))}</span>
+                            <span class="text-xs text-slate-400 question-k-label">${escapeHTML(t('lblQuestionNum').replace('{n}', k))}</span>
                         </div>
                         <div class="flex items-center gap-1">
                             <button onclick="editQuestion('${escapeAttr(q.id)}')" class="p-1.5 text-slate-500 hover:text-blue-600 rounded hover:bg-slate-100"><i data-lucide="pencil" class="w-4 h-4"></i></button>
@@ -2580,8 +2824,10 @@
                     </div>
                     <h4 class="font-semibold text-slate-800 text-base">${escapeHTML(q.prompt)}</h4>
                     ${renderQuestionDetailsPreview(q)}
+                    ${q.hint ? `<div class="text-xs text-amber-700 bg-amber-50 p-2.5 rounded border border-amber-100"><strong>${escapeHTML(t('lblHint'))}</strong> ${escapeHTML(q.hint)}</div>` : ''}
                     ${q.explanation ? `<div class="text-xs text-slate-500 bg-slate-50 p-2.5 rounded border border-slate-100"><strong>${escapeHTML(t('lblExplanation'))}</strong> ${escapeHTML(q.explanation)}</div>` : ''}
-                </div>`).join('');
+                </div>`;
+            }).join('');
             lucide.createIcons();
         }
 
@@ -2622,6 +2868,7 @@
                     </div>
                     <h4 class="font-semibold text-slate-800 text-base">${escapeHTML(q.prompt)}</h4>
                     ${renderQuestionDetailsPreview(q)}
+                    ${q.hint ? `<div class="text-xs text-amber-700 bg-amber-50 p-2.5 rounded border border-amber-100"><strong>${escapeHTML(t('lblHint'))}</strong> ${escapeHTML(q.hint)}</div>` : ''}
                     ${q.explanation ? `<div class="text-xs text-slate-500 bg-slate-50 p-2.5 rounded border border-slate-100"><strong>${escapeHTML(t('lblExplanation'))}</strong> ${escapeHTML(q.explanation)}</div>` : ''}
                 </div>`).join('');
             lucide.createIcons();
@@ -2890,7 +3137,7 @@
             notPub.classList.add('hidden');
             container.classList.remove('hidden');
 
-            const pool = isGuestMode ? activeQuizQuestions : questions;
+            const pool = getQuizQuestionsForUser();
             const duration = isGuestMode ? guestChallengeConfig.duration : quizDurationMins;
 
             document.getElementById('quizTitleHeader').textContent = isGuestMode ? t('titleGuestModeChallenge') : t('Live Bible Quiz Assessment');
@@ -2942,6 +3189,7 @@
                         </div>
                         <h3 class="text-lg font-bold text-slate-800">${escapeHTML(q.prompt)}</h3>
                         <div>${renderQuizInputForType(qToRender, idx, hasSubmitted, ansObj)}</div>
+                        ${renderQuizQuestionHint(q)}
                     </div>`;
             }).join('');
 
@@ -2955,6 +3203,49 @@
                 ? "bg-slate-400 text-white font-semibold px-6 py-3 rounded-lg shadow-inner opacity-50 cursor-not-allowed flex items-center gap-2"
                 : "bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-6 py-3 rounded-lg shadow-lg transition flex items-center gap-2";
 
+            lucide.createIcons();
+        }
+
+        function renderQuizQuestionHint(q) {
+            const hintText = q && q.hint ? String(q.hint).trim() : '';
+            if (!hintText) return '';
+            const strId = String(q.id);
+            const isExpanded = Boolean(quizExpandedHints[strId]);
+            return `
+                <div class="pt-2 border-t border-slate-100 question-hint-wrapper" data-question-id="${escapeAttr(strId)}">
+                    <button type="button" id="hintToggleBtn_${escapeAttr(strId)}" onclick="toggleQuizHint('${escapeAttr(strId)}')" aria-expanded="${isExpanded ? 'true' : 'false'}" class="inline-flex items-center gap-1.5 text-xs font-semibold text-amber-700 bg-amber-50 hover:bg-amber-100 border border-amber-200 px-3 py-1.5 rounded-lg transition">
+                        <i data-lucide="lightbulb" class="w-3.5 h-3.5 text-amber-600"></i>
+                        <span id="hintToggleLabel_${escapeAttr(strId)}" data-i18n="${isExpanded ? 'btnHideHint' : 'btnShowHint'}">${escapeHTML(t(isExpanded ? 'btnHideHint' : 'btnShowHint'))}</span>
+                        <i id="hintArrowIcon_${escapeAttr(strId)}" data-lucide="${isExpanded ? 'chevron-up' : 'chevron-down'}" data-arrow-dir="${isExpanded ? 'up' : 'down'}" class="w-4 h-4 transition-transform">${isExpanded ? '▲' : '▼'}</i>
+                    </button>
+                    <div id="hintContent_${escapeAttr(strId)}" class="${isExpanded ? '' : 'hidden '}mt-2 p-3 rounded-lg bg-amber-50/80 border border-amber-200 text-xs text-amber-900">
+                        <strong>${escapeHTML(t('lblHint'))}</strong> <span class="question-hint-text">${escapeHTML(hintText)}</span>
+                    </div>
+                </div>`;
+        }
+
+        function toggleQuizHint(qId) {
+            const strId = String(qId);
+            const isNowExpanded = !quizExpandedHints[strId];
+            quizExpandedHints[strId] = isNowExpanded;
+
+            const contentEl = document.getElementById(`hintContent_${strId}`);
+            const btnEl = document.getElementById(`hintToggleBtn_${strId}`);
+            const labelEl = document.getElementById(`hintToggleLabel_${strId}`);
+            const arrowEl = document.getElementById(`hintArrowIcon_${strId}`);
+
+            if (contentEl) contentEl.classList.toggle('hidden', !isNowExpanded);
+            if (btnEl) btnEl.setAttribute('aria-expanded', isNowExpanded ? 'true' : 'false');
+            if (labelEl) {
+                const key = isNowExpanded ? 'btnHideHint' : 'btnShowHint';
+                labelEl.setAttribute('data-i18n', key);
+                labelEl.textContent = t(key);
+            }
+            if (arrowEl) {
+                arrowEl.setAttribute('data-lucide', isNowExpanded ? 'chevron-up' : 'chevron-down');
+                arrowEl.setAttribute('data-arrow-dir', isNowExpanded ? 'up' : 'down');
+                arrowEl.textContent = isNowExpanded ? '▲' : '▼';
+            }
             lucide.createIcons();
         }
 
@@ -3111,12 +3402,12 @@
 
         function downloadUnifiedTemplate() {
             const data = [
-                ["{Q_id}", "{Q_type}", "{Q_msg}", "{Choice_Pool}", "{A_msg}", "{Soln_exp}", "{Actn}"],
-                [101, "MCQ", "Which book comes first in the New Testament?", "Matthew|Mark|Luke|John", "A", "Matthew is the first Gospel.", "A"],
-                [102, "TFNGQ", "King David committed no sins in his entire life.", "True|False|Not Given", "False", "David committed grave sins such as adultery.", "A"],
-                [103, "FILL_BLANK", "Jesus was born in the town of ____.", "", "Bethlehem", "Prophesied in Micah 5:2.", "A"],
-                [104, "MATCHING", "Match each apostle to their symbolic identifier.", "Peter|Paul|John|Matthew", "Rock|Epistles Writer|Revelation Visionary|Tax Collector", "Apostolic traditions and writings.", "A"],
-                [105, "ORDERING", "Arrange the following major Old Testament prophets in chronological order.", "Isaiah|Jeremiah|Ezekiel|Daniel", "Isaiah|Jeremiah|Ezekiel|Daniel", "Chronological prophetic timeline.", "A"]
+                ["{Q_id}", "{Q_type}", "{Q_msg}", "{Choice_Pool}", "{A_msg}", "{Hint}", "{Soln_exp}", "{Actn}"],
+                [1, "MCQ", "Which book comes first in the New Testament?", "Matthew|Mark|Luke|John", "A", "Written by a former tax collector.", "Matthew is the first Gospel.", "A"],
+                [2, "TFNGQ", "King David committed no sins in his entire life.", "True|False|Not Given", "False", "Consider the story of Uriah in 2 Samuel 11.", "David committed grave sins such as adultery.", "A"],
+                [3, "FILL_BLANK", "Jesus was born in the town of ____.", "", "Bethlehem", "Also called the City of David.", "Prophesied in Micah 5:2.", "A"],
+                [4, "MATCHING", "Match each apostle to their symbolic identifier.", "Peter|Paul|John|Matthew", "Rock|Epistles Writer|Revelation Visionary|Tax Collector", "Think of their New Testament roles.", "Apostolic traditions and writings.", "A"],
+                [5, "ORDERING", "Arrange the following major Old Testament prophets in chronological order.", "Isaiah|Jeremiah|Ezekiel|Daniel", "Isaiah|Jeremiah|Ezekiel|Daniel", "From 8th century BC to Babylonian exile.", "Chronological prophetic timeline.", "A"]
             ];
 
             const ws = XLSX.utils.aoa_to_sheet(data);
@@ -3128,10 +3419,10 @@
 
         function downloadUnifiedBatchExcel() {
             const myQs = questions.filter(q => q.author === currentUser.name);
-            const data = [["{Q_id}", "{Q_type}", "{Q_msg}", "{Choice_Pool}", "{A_msg}", "{Soln_exp}", "{Actn}"]];
+            const data = [["{Q_id}", "{Q_type}", "{Q_msg}", "{Choice_Pool}", "{A_msg}", "{Hint}", "{Soln_exp}", "{Actn}"]];
 
             myQs.forEach((q, idx) => {
-                const qId = 101 + idx;
+                const qId = idx + 1;
                 const qType = formatTypeBadgeLabel(q.type);
                 let choicePool = '';
                 let aMsg = '';
@@ -3154,7 +3445,7 @@
                     aMsg = items.join('|');
                 }
 
-                data.push([qId, qType, q.prompt || '', choicePool, aMsg, q.explanation || '', 'U']);
+                data.push([qId, qType, q.prompt || '', choicePool, aMsg, q.hint || '', q.explanation || '', 'U']);
             });
 
             const ws = XLSX.utils.aoa_to_sheet(data);
@@ -3168,6 +3459,7 @@
             const fields = {
                 type: targetType,
                 prompt: item.prompt || fallback.prompt || '',
+                hint: item.hint !== undefined ? item.hint : (fallback.hint || ''),
                 explanation: item.soln || fallback.explanation || '',
                 options: null,
                 pairs: null,
@@ -3217,11 +3509,12 @@
                     const qMsgIdx = headers.indexOf("Q_MSG");
                     const choicePoolIdx = headers.indexOf("CHOICE_POOL");
                     const aMsgIdx = headers.indexOf("A_MSG");
+                    const hintIdx = headers.indexOf("HINT");
                     const solnIdx = headers.indexOf("SOLN_EXP");
                     const actnIdx = headers.indexOf("ACTN");
 
                     if ([qIdIdx, qTypeIdx, qMsgIdx, aMsgIdx, actnIdx].includes(-1)) {
-                        throw new Error("試算表標題不符合規定的 7 欄格式。");
+                        throw new Error("試算表標題不符合規定的 8 欄格式。");
                     }
 
                     const rawRows = [];
@@ -3252,6 +3545,7 @@
                             prompt: row[qMsgIdx] != null ? String(row[qMsgIdx]).trim() : '',
                             choicePool: choicePoolIdx !== -1 && row[choicePoolIdx] != null ? String(row[choicePoolIdx]).trim() : '',
                             aMsg: row[aMsgIdx] != null ? String(row[aMsgIdx]).trim() : '',
+                            hint: hintIdx !== -1 && row[hintIdx] != null ? String(row[hintIdx]).trim() : '',
                             soln: solnIdx !== -1 && row[solnIdx] != null ? String(row[solnIdx]).trim() : ''
                         });
                     }
@@ -3275,10 +3569,17 @@
                             const { error } = await _supabase.from('questions').delete().eq('id', existingMatch.id);
                             if (error) throw new Error(error.message || 'Delete failed');
                             markQuestionAsDeletedLocally(existingMatch.id);
+                            removeQuestionFromOrderList(existingMatch.id);
                             deleted++;
                         } else if (item.actn === 'U' && existingMatch) {
                             const updatePayload = buildQuestionFieldsFromBatchItem(item, targetType, existingMatch);
-                            const { error } = await _supabase.from('questions').update(updatePayload).eq('id', existingMatch.id);
+                            setLocalQuestionHint(existingMatch.id, updatePayload.hint);
+                            let { error } = await _supabase.from('questions').update(updatePayload).eq('id', existingMatch.id);
+                            if (error && String(error.message || '').includes('hint')) {
+                                const { hint: _h, ...fallbackPayload } = updatePayload;
+                                const retryRes = await _supabase.from('questions').update(fallbackPayload).eq('id', existingMatch.id);
+                                error = retryRes.error;
+                            }
                             if (error) throw new Error(error.message || 'Update failed');
                             unmarkQuestionAsDeletedLocally(existingMatch.id);
                             updated++;
@@ -3290,7 +3591,13 @@
                                 quiz_session_id: currentQuizSession,
                                 ...buildQuestionFieldsFromBatchItem(item, targetType)
                             };
-                            const { error } = await _supabase.from('questions').insert(newQ);
+                            setLocalQuestionHint(newQ.id, newQ.hint);
+                            let { error } = await _supabase.from('questions').insert(newQ);
+                            if (error && String(error.message || '').includes('hint')) {
+                                const { hint: _h, ...fallbackNewQ } = newQ;
+                                const retryRes = await _supabase.from('questions').insert(fallbackNewQ);
+                                error = retryRes.error;
+                            }
                             if (error) throw new Error(error.message || 'Insert failed');
                             unmarkQuestionAsDeletedLocally(newQ.id);
                             added++;
@@ -3426,8 +3733,8 @@
 
         function openPublishModal() {
             if (!isHostOrCoHost()) return;
-            const fields = ['quizDurationInput', 'quizPublishDateInput', 'quizPublishTimeInput', 'quizDueDateDateInput', 'quizDueDateTimeInput'].map(id => document.getElementById(id));
-            const [durationInput, pubDateInput, pubTimeInput, dueDateInput, dueTimeInput] = fields;
+            const fields = ['quizDurationInput', 'quizPublishDateInput', 'quizPublishTimeInput', 'quizDueDateDateInput', 'quizDueDateTimeInput', 'excludeOwnQuestionsInput'].map(id => document.getElementById(id));
+            const [durationInput, pubDateInput, pubTimeInput, dueDateInput, dueTimeInput, excludeOwnInput] = fields;
             const submitBtn = document.getElementById('publishModalSubmitBtn');
 
             const isLockedSchedule = Boolean(scheduledPublishTime && !isPending);
@@ -3442,6 +3749,7 @@
                     dueTimeInput.value = dueDT.toTimeString().substring(0, 5);
                 }
             }
+            if (excludeOwnInput) excludeOwnInput.checked = Boolean(excludeOwnQuestions);
             fields.forEach(el => { if (el) el.disabled = isLockedSchedule; });
             if (submitBtn) submitBtn.style.display = isLockedSchedule ? 'none' : 'inline-block';
 
@@ -3453,6 +3761,8 @@
                 const el = document.getElementById(id);
                 if (el) el.value = '';
             });
+            const excludeOwnInput = document.getElementById('excludeOwnQuestionsInput');
+            if (excludeOwnInput) excludeOwnInput.checked = false;
         }
 
         async function confirmPublishQuiz(e) {
@@ -3463,6 +3773,7 @@
                 const pubTime = document.getElementById('quizPublishTimeInput').value;
                 const dueDate = document.getElementById('quizDueDateDateInput').value;
                 const dueTime = document.getElementById('quizDueDateTimeInput').value;
+                const excludeOwn = Boolean(document.getElementById('excludeOwnQuestionsInput')?.checked);
                 const now = new Date();
 
                 let scheduledPubISO = null;
@@ -3492,18 +3803,35 @@
 
                 const shouldBeLive = !scheduledPubISO;
                 const shouldBePending = Boolean(scheduledPubISO && ((new Date(scheduledPubISO) - now) / (1000 * 60) <= 15));
+                const updatedGuestCfg = { ...guestChallengeConfig, excludeOwnQuestions: excludeOwn };
 
-                const { error } = await _supabase.from('app_state').update({
+                let { error } = await _supabase.from('app_state').update({
                     is_published: shouldBeLive,
                     is_pending: shouldBePending,
                     scheduled_publish_time: scheduledPubISO,
                     duration_mins: duration,
-                    due_datetime: quizDueISO
+                    due_datetime: quizDueISO,
+                    exclude_own_questions: excludeOwn,
+                    guest_challenge_config: updatedGuestCfg
                 }).eq('id', 1);
+
+                if (error) {
+                    const fallbackRes = await _supabase.from('app_state').update({
+                        is_published: shouldBeLive,
+                        is_pending: shouldBePending,
+                        scheduled_publish_time: scheduledPubISO,
+                        duration_mins: duration,
+                        due_datetime: quizDueISO,
+                        guest_challenge_config: updatedGuestCfg
+                    }).eq('id', 1);
+                    error = fallbackRes.error;
+                }
                 if (error) throw error;
 
-                await fetchCloudState();
+                excludeOwnQuestions = excludeOwn;
+                guestChallengeConfig = updatedGuestCfg;
                 closeModal('publishModal');
+                await fetchCloudState();
                 updateUI();
                 renderCurrentView();
                 showToast(shouldBeLive ? t("toastQuizPublishedLive").replace("{session}", currentQuizSession) : t("toastQuizScheduled"), shouldBeLive ? "success" : "info");
@@ -3522,32 +3850,85 @@
                 if (!confirmed) return;
             }
 
+            const endedSession = currentQuizSession;
+            const prevDueDate = quizDueDate;
             const activeQuestionsToArchive = [...questions];
-            for (const q of activeQuestionsToArchive) {
-                await _supabase.from('questions').update({ is_vault: true, quiz_session_id: currentQuizSession }).eq('id', q.id);
-            }
+            const archivedQuestions = activeQuestionsToArchive.map(q => ({
+                ...q,
+                is_vault: true,
+                quiz_session_id: endedSession
+            }));
 
-            await _supabase.from('quiz_records').upsert({
-                quiz_session_id: currentQuizSession,
+            // Optimistic immediate UI & state transition (< 0.5s)
+            closeModal('customDialogModal');
+            closeModal('publishModal');
+            const banner = document.getElementById('closureLastMinuteBanner');
+            if (banner) banner.classList.add('hidden');
+
+            questions = [];
+            pastQuestions = [...pastQuestions, ...archivedQuestions];
+            saveQuestionOrderList([]);
+
+            const newRecord = {
+                quiz_session_id: endedSession,
                 total_questions: activeQuestionsToArchive.length,
                 published_at: new Date().toISOString(),
-                due_datetime: quizDueDate
-            });
+                due_datetime: prevDueDate
+            };
+            const recIdx = quizRecords.findIndex(r => r.quiz_session_id === endedSession);
+            if (recIdx >= 0) quizRecords[recIdx] = { ...quizRecords[recIdx], ...newRecord };
+            else quizRecords.unshift(newRecord);
 
-            await _supabase.from('app_state').update({
-                is_published: false,
-                is_pending: false,
-                scheduled_publish_time: null,
-                duration_mins: 0,
-                due_datetime: null,
-                current_quiz_session: currentQuizSession + 1
-            }).eq('id', 1);
+            const lastUnpublishedEvent = { session: endedSession, isAutoClose: Boolean(isAutoClose), at: Date.now() };
+            const resetGuestCfg = { ...guestChallengeConfig, excludeOwnQuestions: false, lastUnpublishedEvent };
+            excludeOwnQuestions = false;
+            guestChallengeConfig = resetGuestCfg;
+            isPublished = false;
+            isPending = false;
+            scheduledPublishTime = null;
+            quizDurationMins = 0;
+            quizDueDate = null;
+            currentQuizSession = endedSession + 1;
 
+            const currentJoined = currentUser && !isGuestMode && hasUserJoinedQuizSession(currentUser.name, endedSession);
             resetQuizTimerState();
-            await fetchCloudState();
             updateUI();
-            renderCurrentView();
-            showToast(isAutoClose ? t("toastQuizAutoClosed") : t("toastQuizUnpublished"), "info");
+
+            if (currentJoined) {
+                handleParticipantUnpublishNotificationAndRedirect(endedSession, isAutoClose);
+            } else {
+                renderCurrentView();
+                showToast(isAutoClose ? t("toastQuizAutoClosed") : t("toastQuizUnpublished"), "info");
+            }
+
+            // Persist all changes in parallel in the background
+            await Promise.all([
+                _supabase.from('questions').update({ is_vault: true, quiz_session_id: endedSession }).eq('is_vault', false),
+                _supabase.from('quiz_records').upsert(newRecord),
+                (async () => {
+                    const { error } = await _supabase.from('app_state').update({
+                        is_published: false,
+                        is_pending: false,
+                        scheduled_publish_time: null,
+                        duration_mins: 0,
+                        due_datetime: null,
+                        exclude_own_questions: false,
+                        guest_challenge_config: resetGuestCfg,
+                        current_quiz_session: endedSession + 1
+                    }).eq('id', 1);
+                    if (error) {
+                        await _supabase.from('app_state').update({
+                            is_published: false,
+                            is_pending: false,
+                            scheduled_publish_time: null,
+                            duration_mins: 0,
+                            due_datetime: null,
+                            guest_challenge_config: resetGuestCfg,
+                            current_quiz_session: endedSession + 1
+                        }).eq('id', 1);
+                    }
+                })()
+            ]);
         }
 
         function renderHostControls() {
@@ -3680,6 +4061,7 @@
                 const id = document.getElementById('qId').value;
                 const type = document.getElementById('qType').value || 'mcq';
                 const promptText = document.getElementById('qPrompt').value.trim();
+                const hint = (document.getElementById('qHint')?.value || '').trim();
                 const explanation = document.getElementById('qExplanation').value.trim();
                 const isVault = document.getElementById('qIsVault').value === 'true';
 
@@ -3690,6 +4072,7 @@
                     author: existingQ ? existingQ.author : currentUser.name,
                     type,
                     prompt: promptText,
+                    hint,
                     explanation,
                     is_vault: isVault,
                     quiz_session_id: existingQ ? (existingQ.quiz_session_id || currentQuizSession) : currentQuizSession
@@ -3722,15 +4105,34 @@
                     qData.correctAnswer = items.join('|');
                 }
 
-                const { error } = await _supabase.from('questions').upsert(qData);
-                if (error) throw error;
+                const prevQuestions = [...questions];
+                const prevPastQuestions = [...pastQuestions];
+                const targetArr = isVault ? pastQuestions : questions;
+                const existingIdx = targetArr.findIndex(q => String(q.id) === String(qData.id));
+                if (existingIdx >= 0) targetArr[existingIdx] = { ...targetArr[existingIdx], ...qData };
+                else targetArr.push(qData);
+                if (!isVault) questions = sortAndSyncQuestionsOrder(questions);
 
+                setLocalQuestionHint(qData.id, qData.hint);
                 unmarkQuestionAsDeletedLocally(qData.id);
-                await fetchCloudState();
                 closeModal('questionModal');
                 updateUI();
                 renderCurrentView();
                 showToast(t("toastQuestionSaved"), "success");
+
+                let { error } = await _supabase.from('questions').upsert(qData);
+                if (error && String(error.message || '').includes('hint')) {
+                    const { hint: _h, ...fallbackQData } = qData;
+                    const retryRes = await _supabase.from('questions').upsert(fallbackQData);
+                    error = retryRes.error;
+                }
+                if (error) {
+                    questions = prevQuestions;
+                    pastQuestions = prevPastQuestions;
+                    updateUI();
+                    renderCurrentView();
+                    throw error;
+                }
             } catch (err) {
                 showToast(t("toastQuestionSaveFailed"), "error");
             }
@@ -3760,6 +4162,7 @@
 
                 questions = questions.filter(q => String(q.id) !== targetIdStr);
                 pastQuestions = pastQuestions.filter(q => String(q.id) !== targetIdStr);
+                removeQuestionFromOrderList(targetIdStr);
                 updateUI();
                 renderCurrentView();
 
@@ -3806,6 +4209,8 @@
                 qIdInput.value = q.id || '';
                 document.getElementById('qType').value = (q.type === 'order' ? 'ordering' : q.type) || 'mcq';
                 document.getElementById('qPrompt').value = q.prompt || '';
+                const qHintEl = document.getElementById('qHint');
+                if (qHintEl) qHintEl.value = q.hint || '';
                 document.getElementById('qExplanation').value = q.explanation || '';
                 renderQuestionTypeInputs(q);
             } else {
@@ -3815,13 +4220,6 @@
             }
 
             openModal('questionModal');
-            if (editId) {
-                const q = questions.find(item => String(item.id) === String(editId)) ||
-                          pastQuestions.find(item => String(item.id) === String(editId));
-                if (q) renderQuestionTypeInputs(q);
-            } else {
-                renderQuestionTypeInputs();
-            }
         }
 
         function renderQuestionTypeInputs(existingQ = null) {
@@ -3925,7 +4323,7 @@
             if (e) e.preventDefault();
 
             const submitBtn = document.getElementById('submitQuizBtn');
-            const pool = isGuestMode ? activeQuizQuestions : questions;
+            const pool = getQuizQuestionsForUser();
             const form = document.getElementById('quizActiveForm');
             if (!form) return;
             const formData = new FormData(form);
@@ -4018,6 +4416,11 @@
             };
 
             if (!isGuestMode) {
+                markUserJoinedQuizSession(currentUser.name, currentQuizSession);
+                if (!submissions[currentUser.name]) submissions[currentUser.name] = [];
+                const existingSubIdx = submissions[currentUser.name].findIndex(s => s.quiz_session_id === currentQuizSession);
+                if (existingSubIdx >= 0) submissions[currentUser.name][existingSubIdx] = submissionData;
+                else submissions[currentUser.name].push(submissionData);
                 await _supabase.from('submissions').upsert(submissionData);
                 await fetchCloudState();
             } else {
@@ -4126,7 +4529,7 @@
             document.getElementById('resultPercentage').textContent = `${userSub.percentage}%`;
             document.getElementById('resultSubmittedTime').textContent = t('lblSubmittedOn').replace('{time}', userSub.timestamp || '-');
 
-            const pool = isGuestMode ? activeQuizQuestions : questions;
+            const pool = getQuizQuestionsForUser();
             const breakdown = document.getElementById('solutionsBreakdownList');
             breakdown.innerHTML = pool.map(q => {
                 const ansObj = (userSub.answers && userSub.answers[q.id]) || { isCorrect: false, userVal: 'None' };
@@ -4339,10 +4742,10 @@
                     read: () => ({ SheetNames: ['Sheet1'], Sheets: { Sheet1: {} } }),
                     utils: {
                         sheet_to_json: () => [
-                            ["{Q_id}", "{Q_type}", "{Q_msg}", "{Choice_Pool}", "{A_msg}", "{Soln_exp}", "{Actn}"],
-                            [101, "MCQ", "UT Batch Q1?", "A|B|C|D", "A", "Exp 1", "A"],
-                            [102, "TFNGQ", "UT Batch Q2?", "True|False|Not Given", "True", "Exp 2", "A"],
-                            [103, "ORDERING", "UT Batch Q3?", "Step1|Step2|Step3", "Step1|Step2|Step3", "Exp 3", "A"]
+                            ["{Q_id}", "{Q_type}", "{Q_msg}", "{Choice_Pool}", "{A_msg}", "{Hint}", "{Soln_exp}", "{Actn}"],
+                            [101, "MCQ", "UT Batch Q1?", "A|B|C|D", "A", "Hint 1", "Exp 1", "A"],
+                            [102, "TFNGQ", "UT Batch Q2?", "True|False|Not Given", "True", "", "Exp 2", "A"],
+                            [103, "ORDERING", "UT Batch Q3?", "Step1|Step2|Step3", "Step1|Step2|Step3", "Hint 3", "Exp 3", "A"]
                         ]
                     }
                 };
@@ -4582,9 +4985,9 @@
                         book_new: () => ({}),
                         book_append_sheet: () => {},
                         sheet_to_json: () => [
-                            ["{Q_id}", "{Q_type}", "{Q_msg}", "{Choice_Pool}", "{A_msg}", "{Soln_exp}", "{Actn}"],
-                            [201, "MATCHING", "I18N Match Q", "A|B", "1|2", "Exp M", "A"],
-                            [202, "ORDERING", "I18N Order Q", "X|Y", "X|Y", "Exp O", "A"]
+                            ["{Q_id}", "{Q_type}", "{Q_msg}", "{Choice_Pool}", "{A_msg}", "{Hint}", "{Soln_exp}", "{Actn}"],
+                            [201, "MATCHING", "I18N Match Q", "A|B", "1|2", "提示 M", "Exp M", "A"],
+                            [202, "ORDERING", "I18N Order Q", "X|Y", "X|Y", "", "Exp O", "A"]
                         ]
                     },
                     writeFile: () => {},
@@ -4674,6 +5077,537 @@
                 currentLang = backupLang;
                 currentUser = backupUser;
                 activeTab = backupTab;
+                applyLanguage();
+                updateUI();
+                if (currentUser) renderCurrentView();
+            }
+        }
+
+        // --- SELF-CHECK UNIT TEST SUITE (Save Question Modal < 0.5s Closure & Exclude Own Uploaded Questions) ---
+        async function runSaveLatencyAndExcludeOwnUnitTests() {
+            const backupUser = currentUser;
+            const backupTab = activeTab;
+            const backupLang = currentLang;
+            const backupQuestions = JSON.parse(JSON.stringify(questions));
+            const backupExclude = excludeOwnQuestions;
+            const backupPublished = isPublished;
+            try {
+                // Part 1: Verify 'Save Question' automatically closes #questionModal in < 0.5s (500ms) even with 350ms network latency
+                currentUser = { name: 'Host', role: 'host', pass: '1234', avatar_url: '' };
+                isPublished = false;
+                isPending = false;
+                switchTab('my-questions');
+                openQuestionModal();
+                document.getElementById('qType').value = 'fill';
+                renderQuestionTypeInputs();
+                document.getElementById('qPrompt').value = 'Fast Close Modal Test Q';
+                document.getElementById('fillCorrectAnswer').value = 'Immediate';
+
+                const origFrom = _supabase.from.bind(_supabase);
+                _supabase.from = (table) => {
+                    const builder = origFrom(table);
+                    const origThen = builder.then.bind(builder);
+                    builder.then = (onF, onR) => new Promise(r => setTimeout(r, 350)).then(() => origThen(onF, onR));
+                    return builder;
+                };
+
+                const t0 = performance.now();
+                let modalClosedMs = null;
+                const obs = new MutationObserver(() => {
+                    if (document.getElementById('questionModal').classList.contains('hidden') && modalClosedMs === null) {
+                        modalClosedMs = performance.now() - t0;
+                    }
+                });
+                obs.observe(document.getElementById('questionModal'), { attributes: true, attributeFilter: ['class'] });
+
+                const savePromise = handleSaveQuestion(new Event('submit'));
+                if (document.getElementById('questionModal').classList.contains('hidden') && modalClosedMs === null) {
+                    modalClosedMs = performance.now() - t0;
+                }
+                await savePromise;
+                obs.disconnect();
+                _supabase.from = origFrom;
+
+                const savedFastQ = questions.find(q => q.prompt === 'Fast Close Modal Test Q');
+                if (savedFastQ) await _supabase.from('questions').delete().eq('id', savedFastQ.id);
+                await fetchCloudState();
+
+                const modalLatencyPass = modalClosedMs !== null && modalClosedMs < 500 && Boolean(savedFastQ);
+
+                // Part 2: Verify Exclude Own Uploaded Questions checkbox in Publish Modal (Ken: 5 questions, Others: 20 questions)
+                const seedQuestions = [];
+                for (let i = 1; i <= 5; i++) {
+                    seedQuestions.push({
+                        id: `ut-ken-${i}`,
+                        author: 'Ken',
+                        type: 'fill',
+                        prompt: `Ken Question #${i}`,
+                        correctAnswer: `ans${i}`,
+                        explanation: '',
+                        is_vault: false,
+                        quiz_session_id: currentQuizSession
+                    });
+                }
+                for (let i = 1; i <= 20; i++) {
+                    seedQuestions.push({
+                        id: `ut-other-${i}`,
+                        author: i % 2 === 0 ? 'Host' : 'Participant',
+                        type: 'fill',
+                        prompt: `Other Question #${i}`,
+                        correctAnswer: `other${i}`,
+                        explanation: '',
+                        is_vault: false,
+                        quiz_session_id: currentQuizSession
+                    });
+                }
+                questions = seedQuestions;
+
+                // Check i18n of checkbox in Publish Modal
+                currentLang = 'EN';
+                openPublishModal();
+                const lblEN = document.querySelector('[data-i18n="lblExcludeOwnQuestions"]').textContent.trim();
+                toggleLanguage(); // EN -> 繁
+                const lblZH = document.querySelector('[data-i18n="lblExcludeOwnQuestions"]').textContent.trim();
+                toggleLanguage(); // 繁 -> EN
+                const checkboxI18nPass = lblEN === 'Users Do Not Answer Their Own Uploaded Questions' && lblZH === '參與者無需作答自己上傳的題目';
+
+                // Case A: Host ticks checkbox (#excludeOwnQuestionsInput = true) and publishes
+                const excludeCheckbox = document.getElementById('excludeOwnQuestionsInput');
+                excludeCheckbox.checked = true;
+                await confirmPublishQuiz(new Event('submit'));
+                // Restore in-memory 25 questions (5 by Ken, 20 by others) for active session test
+                questions = seedQuestions;
+
+                currentUser = { name: 'Ken', role: 'participant', pass: '1234', avatar_url: '' };
+                delete submissions['Ken'];
+                switchTab('take-quiz');
+                const kenCountWhenTicked = parseInt(document.getElementById('quizTotalQuestionsCount').textContent, 10);
+                const kenRenderedAuthorsTicked = getQuizQuestionsForUser('Ken').filter(q => q.author === 'Ken').length;
+
+                // Fill all 20 questions for Ken and submit
+                document.querySelectorAll('#quizActiveForm input[type="text"]').forEach((inp, idx) => {
+                    inp.value = `other${idx + 1}`;
+                });
+                await handleQuizSubmit(new Event('submit'));
+                const kenSubTicked = (submissions['Ken'] || []).find(s => s.quiz_session_id === currentQuizSession);
+                const tickedPass = excludeOwnQuestions === true &&
+                                   kenCountWhenTicked === 20 &&
+                                   kenRenderedAuthorsTicked === 0 &&
+                                   Boolean(kenSubTicked && kenSubTicked.total === 20 && kenSubTicked.score === 20);
+
+                // Clean up Ken's test submission
+                await _supabase.from('submissions').delete().eq('username', 'Ken');
+                delete submissions['Ken'];
+
+                // Case B: Host unticks checkbox (#excludeOwnQuestionsInput = false) and publishes
+                currentUser = { name: 'Host', role: 'host', pass: '1234', avatar_url: '' };
+                isPublished = false;
+                openPublishModal();
+                excludeCheckbox.checked = false;
+                await confirmPublishQuiz(new Event('submit'));
+                questions = seedQuestions;
+
+                currentUser = { name: 'Ken', role: 'participant', pass: '1234', avatar_url: '' };
+                switchTab('take-quiz');
+                const kenCountWhenUnticked = parseInt(document.getElementById('quizTotalQuestionsCount').textContent, 10);
+                const kenOwnIncludedUnticked = getQuizQuestionsForUser('Ken').filter(q => q.author === 'Ken').length;
+                const untickedPass = excludeOwnQuestions === false &&
+                                     kenCountWhenUnticked === 25 &&
+                                     kenOwnIncludedUnticked === 5;
+
+                // Restore clean app_state
+                await _supabase.from('app_state').update({
+                    is_published: backupPublished,
+                    is_pending: false,
+                    scheduled_publish_time: null,
+                    exclude_own_questions: backupExclude,
+                    guest_challenge_config: { ...guestChallengeConfig, excludeOwnQuestions: backupExclude }
+                }).eq('id', 1);
+
+                return {
+                    passed: modalLatencyPass && checkboxI18nPass && tickedPass && untickedPass,
+                    modalClosedMs: Math.round(modalClosedMs),
+                    modalLatencyPass,
+                    checkboxI18nPass,
+                    tickedPass,
+                    kenCountWhenTicked,
+                    untickedPass,
+                    kenCountWhenUnticked
+                };
+            } finally {
+                questions = backupQuestions;
+                excludeOwnQuestions = backupExclude;
+                isPublished = backupPublished;
+                currentLang = backupLang;
+                currentUser = backupUser;
+                activeTab = backupTab;
+                applyLanguage();
+                updateUI();
+                if (currentUser) renderCurrentView();
+            }
+        }
+
+        // --- SELF-CHECK UNIT TEST SUITE (Question Hint Modal Input, 8-Column Spreadsheet & Collapsible Quiz Hints) ---
+        async function runHintFeatureAndBatchSpreadsheetUnitTests() {
+            const backupUser = currentUser;
+            const backupTab = activeTab;
+            const backupLang = currentLang;
+            const backupXLSX = window.XLSX;
+            const backupQuestions = JSON.parse(JSON.stringify(questions));
+            const backupPublished = isPublished;
+            const backupExclude = excludeOwnQuestions;
+            try {
+                currentUser = { name: 'HintTestUser', role: 'host', pass: '1234', avatar_url: '' };
+                isPublished = false;
+                isPending = false;
+                excludeOwnQuestions = false;
+                currentLang = 'EN';
+                applyLanguage();
+
+                // 1. Verify #qHint exists in #questionModal BEFORE #qExplanation
+                openQuestionModal();
+                const qHintInput = document.getElementById('qHint');
+                const qExpInput = document.getElementById('qExplanation');
+                const hintBeforeExpInDOM = Boolean(
+                    qHintInput && qExpInput &&
+                    (qHintInput.compareDocumentPosition(qExpInput) & Node.DOCUMENT_POSITION_FOLLOWING)
+                );
+
+                // Save a question WITH a hint via Question Modal
+                document.getElementById('qType').value = 'mcq';
+                renderQuestionTypeInputs();
+                document.getElementById('qPrompt').value = 'Question With Hint';
+                const mcqOpts = document.querySelectorAll('.mcq-option-input');
+                mcqOpts[0].value = 'Opt A';
+                mcqOpts[1].value = 'Opt B';
+                mcqOpts[2].value = 'Opt C';
+                mcqOpts[3].value = 'Opt D';
+                qHintInput.value = 'Check Genesis chapter 1';
+                qExpInput.value = 'Genesis 1:1 explanation';
+                await handleSaveQuestion(new Event('submit'));
+
+                const savedWithHint = questions.find(q => q.author === 'HintTestUser' && q.prompt === 'Question With Hint');
+                const modalHintSavePass = Boolean(savedWithHint && savedWithHint.hint === 'Check Genesis chapter 1' && hintBeforeExpInDOM);
+
+                // 2. Verify Download Template & Batch Download produce 8-column header with {Hint} between {A_msg} and {Soln_exp}, and Batch Upload works for Add/Update/Delete
+                let templateAoA = null;
+                let exportedAoA = null;
+                window.XLSX = {
+                    utils: {
+                        aoa_to_sheet: (data) => {
+                            if (data[1] && data[1][2] === 'Which book comes first in the New Testament?') templateAoA = data;
+                            else exportedAoA = data;
+                            return {};
+                        },
+                        book_new: () => ({}),
+                        book_append_sheet: () => {},
+                        sheet_to_json: () => [
+                            ["{Q_id}", "{Q_type}", "{Q_msg}", "{Choice_Pool}", "{A_msg}", "{Hint}", "{Soln_exp}", "{Actn}"],
+                            [101, "MCQ", "Question With Hint Updated", "Opt A|Opt B|Opt C|Opt D", "A", "Updated Genesis 1 Hint", "Genesis 1:1 explanation", "U"],
+                            [102, "FILL_BLANK", "Question Without Hint", "", "Ark", "", "Noah built the Ark", "A"]
+                        ]
+                    },
+                    writeFile: () => {},
+                    read: () => ({ SheetNames: ['Sheet1'], Sheets: { Sheet1: {} } })
+                };
+
+                downloadUnifiedTemplate();
+                downloadUnifiedBatchExcel();
+
+                const expectedHeaders = ["{Q_id}", "{Q_type}", "{Q_msg}", "{Choice_Pool}", "{A_msg}", "{Hint}", "{Soln_exp}", "{Actn}"];
+                const templateHeaderPass = Boolean(
+                    templateAoA &&
+                    JSON.stringify(templateAoA[0]) === JSON.stringify(expectedHeaders) &&
+                    templateAoA.slice(1).every(row => row.length === 8)
+                );
+                const exportHeaderAndRowPass = Boolean(
+                    exportedAoA &&
+                    JSON.stringify(exportedAoA[0]) === JSON.stringify(expectedHeaders) &&
+                    exportedAoA[1] &&
+                    exportedAoA[1][5] === 'Check Genesis chapter 1' &&
+                    exportedAoA[1][6] === 'Genesis 1:1 explanation'
+                );
+
+                // Perform Batch Upload with 8-column format (updating Q 101 hint & adding Q 102 without hint)
+                await new Promise(resolve => {
+                    const prevToast = window.showToast;
+                    window.showToast = (msg, type) => {
+                        prevToast(msg, type);
+                        window.showToast = prevToast;
+                        resolve();
+                    };
+                    handleBatchFileUpload({ target: { files: [new Blob(["dummy"])] } });
+                });
+
+                const qWithHint = questions.find(q => q.author === 'HintTestUser' && q.prompt === 'Question With Hint Updated');
+                const qWithoutHint = questions.find(q => q.author === 'HintTestUser' && q.prompt === 'Question Without Hint');
+                const batchUpload8ColPass = Boolean(
+                    qWithHint && qWithHint.hint === 'Updated Genesis 1 Hint' &&
+                    qWithoutHint && !qWithoutHint.hint
+                );
+
+                // 3. Verify 'Take Quiz' collapsible hint behavior (default collapsed, downward->upward->downward arrow, positioned at end of question, no hint UI for questions without hint)
+                questions = [qWithHint, qWithoutHint];
+                isPublished = true;
+                quizExpandedHints = {};
+                switchTab('take-quiz');
+
+                const hintBtn = document.getElementById(`hintToggleBtn_${qWithHint.id}`);
+                const hintContent = document.getElementById(`hintContent_${qWithHint.id}`);
+                const hintArrow = document.getElementById(`hintArrowIcon_${qWithHint.id}`);
+                const noHintBtn = document.getElementById(`hintToggleBtn_${qWithoutHint.id}`);
+                const noHintContent = document.getElementById(`hintContent_${qWithoutHint.id}`);
+
+                // Check position: hintWrapper is after the question's input container
+                const hintWrapper = document.querySelector(`.question-hint-wrapper[data-question-id="${qWithHint.id}"]`);
+                const firstMcqInput = document.querySelector(`input[name="ans_${qWithHint.id}"]`);
+                const hintAtEndOfQuestion = Boolean(
+                    hintWrapper && firstMcqInput &&
+                    (firstMcqInput.compareDocumentPosition(hintWrapper) & Node.DOCUMENT_POSITION_FOLLOWING)
+                );
+
+                // Default collapsed check
+                const defaultCollapsedPass = Boolean(
+                    hintBtn && hintContent && hintArrow &&
+                    hintContent.classList.contains('hidden') &&
+                    hintArrow.getAttribute('data-arrow-dir') === 'down' &&
+                    hintArrow.getAttribute('data-lucide') === 'chevron-down' &&
+                    !noHintBtn && !noHintContent
+                );
+
+                // Click downward-arrow button -> shows hint & changes arrow to upward
+                hintBtn.click();
+                const expandedAfterClickPass = Boolean(
+                    !hintContent.classList.contains('hidden') &&
+                    hintContent.textContent.includes('Updated Genesis 1 Hint') &&
+                    hintArrow.getAttribute('data-arrow-dir') === 'up' &&
+                    hintArrow.getAttribute('data-lucide') === 'chevron-up'
+                );
+
+                // Click upward-arrow button -> hides hint & changes arrow back to downward
+                hintBtn.click();
+                const collapsedAfterSecondClickPass = Boolean(
+                    hintContent.classList.contains('hidden') &&
+                    hintArrow.getAttribute('data-arrow-dir') === 'down' &&
+                    hintArrow.getAttribute('data-lucide') === 'chevron-down'
+                );
+
+                // Clean up test questions from DB
+                for (const tq of [qWithHint, qWithoutHint].filter(Boolean)) {
+                    await _supabase.from('questions').delete().eq('id', tq.id);
+                }
+
+                return {
+                    passed: modalHintSavePass && templateHeaderPass && exportHeaderAndRowPass && batchUpload8ColPass && hintAtEndOfQuestion && defaultCollapsedPass && expandedAfterClickPass && collapsedAfterSecondClickPass,
+                    modalHintSavePass,
+                    templateHeaderPass,
+                    exportHeaderAndRowPass,
+                    batchUpload8ColPass,
+                    hintAtEndOfQuestion,
+                    defaultCollapsedPass,
+                    expandedAfterClickPass,
+                    collapsedAfterSecondClickPass
+                };
+            } finally {
+                window.XLSX = backupXLSX;
+                questions = backupQuestions;
+                isPublished = backupPublished;
+                excludeOwnQuestions = backupExclude;
+                currentLang = backupLang;
+                currentUser = backupUser;
+                activeTab = backupTab;
+                applyLanguage();
+                updateUI();
+                if (currentUser) renderCurrentView();
+            }
+        }
+
+        // --- SELF-CHECK UNIT TEST SUITE (Fast Unpublish < 0.5s, Closure Due Countdown Notifications, Participant Auto-Redirect to Achievements & Constant Question #k = {Q_id}) ---
+        async function runUnpublishNotificationsAndQuestionOrderUnitTests() {
+            const backupUser = currentUser;
+            const backupTab = activeTab;
+            const backupLang = currentLang;
+            const backupXLSX = window.XLSX;
+            const backupQuestions = JSON.parse(JSON.stringify(questions));
+            const backupPastQuestions = JSON.parse(JSON.stringify(pastQuestions));
+            const backupPublished = isPublished;
+            const backupDueDate = quizDueDate;
+            const backupSession = currentQuizSession;
+            try {
+                currentLang = 'EN';
+                applyLanguage();
+
+                // Part 1: Verify Scheduled Closure Due Date Notifications (30m, 15m, 5m, and Last 1-Minute Countdown Timer Banner)
+                currentQuizSession = 1;
+                isPublished = true;
+                closureNotifiedMilestones = {};
+                const closureToasts = [];
+                const origShowToast = window.showToast;
+                window.showToast = (msg, type) => { closureToasts.push(msg); origShowToast(msg, type); };
+
+                // 30 minutes left
+                quizDueDate = new Date(Date.now() + 29 * 60 * 1000).toISOString();
+                checkClosureDueNotifications(new Date());
+                // 15 minutes left
+                quizDueDate = new Date(Date.now() + 14 * 60 * 1000).toISOString();
+                checkClosureDueNotifications(new Date());
+                // 5 minutes left
+                quizDueDate = new Date(Date.now() + 4 * 60 * 1000).toISOString();
+                checkClosureDueNotifications(new Date());
+                // Last 1 minute left (45 seconds)
+                quizDueDate = new Date(Date.now() + 45 * 1000).toISOString();
+                checkClosureDueNotifications(new Date());
+
+                const bannerEl = document.getElementById('closureLastMinuteBanner');
+                const badgeTimerText = document.getElementById('closureLastMinuteTimerBadge').textContent.trim();
+                const closureWarningsPass =
+                    closureToasts.some(m => m.includes('30 minutes left')) &&
+                    closureToasts.some(m => m.includes('15 minutes left')) &&
+                    closureToasts.some(m => m.includes('Last 5 minutes left')) &&
+                    closureToasts.some(m => m.includes('Final Minute!')) &&
+                    !bannerEl.classList.contains('hidden') &&
+                    badgeTimerText.startsWith('00:');
+
+                // Part 2: Verify Fast Unpublish Modal Opening & Closure (< 0.5s / 500ms) AND Participant Notification + Auto-Redirect to 'Achievements'
+                currentUser = { name: 'Participant', role: 'participant', pass: '1234', avatar_url: '' };
+                markUserJoinedQuizSession('Participant', 1);
+
+                currentUser = { name: 'Host', role: 'host', pass: '1234', avatar_url: '' };
+                isPublished = true;
+                currentQuizSession = 1;
+                questions = Array.from({ length: 10 }, (_, i) => ({
+                    id: `ut-unpub-q-${i + 1}`,
+                    author: 'Host',
+                    type: 'fill',
+                    prompt: `Unpub Q ${i + 1}`,
+                    correctAnswer: 'Ans',
+                    is_vault: false,
+                    quiz_session_id: 1
+                }));
+
+                const origFrom = _supabase.from.bind(_supabase);
+                _supabase.from = (table) => {
+                    const builder = origFrom(table);
+                    const origThen = builder.then.bind(builder);
+                    builder.then = (onF, onR) => new Promise(r => setTimeout(r, 250)).then(() => origThen(onF, onR));
+                    return builder;
+                };
+
+                const clickOpenStart = performance.now();
+                const unpubPromise = unpublishQuiz(false);
+                const dialogModal = document.getElementById('customDialogModal');
+                const openModalMs = !dialogModal.classList.contains('hidden') ? (performance.now() - clickOpenStart) : 9999;
+
+                let closeModalMs = null;
+                const confirmClickStart = performance.now();
+                document.getElementById('customDialogConfirmBtn').click();
+                await Promise.resolve();
+                if (dialogModal.classList.contains('hidden') && !isPublished) {
+                    closeModalMs = performance.now() - confirmClickStart;
+                }
+                await unpubPromise;
+                _supabase.from = origFrom;
+
+                const fastUnpublishModalPass = openModalMs < 500 && closeModalMs !== null && closeModalMs < 500;
+
+                // Simulate Participant who joined Quiz #1 receiving the unpublish state update -> notified & redirected to 'achievements'
+                currentUser = { name: 'Participant', role: 'participant', pass: '1234', avatar_url: '' };
+                activeTab = 'take-quiz';
+                notifiedUnpublishedSessions = {};
+                const participantToasts = [];
+                window.showToast = (msg, type) => { participantToasts.push(msg); origShowToast(msg, type); };
+                await fetchCloudState();
+                window.showToast = origShowToast;
+
+                const participantRedirectPass =
+                    activeTab === 'achievements' &&
+                    participantToasts.some(m => m.includes('unpublished the Quiz Bank') && m.includes('Quiz #1'));
+
+                // Part 3: Verify Constant Question #k (k = {Q_id} = 1..10) on UI Edit/Update and Renumbering Only on Deletion
+                currentUser = { name: 'RepoOrderUser', role: 'participant', pass: '1234', avatar_url: '' };
+                isPublished = false;
+                isPending = false;
+                saveQuestionOrderList([]);
+                // Create 10 questions for RepoOrderUser
+                const tenQs = Array.from({ length: 10 }, (_, i) => ({
+                    id: `ut-order-${i + 1}`,
+                    author: 'RepoOrderUser',
+                    type: 'fill',
+                    prompt: `Original Prompt #${i + 1}`,
+                    correctAnswer: `Ans ${i + 1}`,
+                    explanation: `Exp ${i + 1}`,
+                    is_vault: false,
+                    quiz_session_id: 1
+                }));
+                questions = sortAndSyncQuestionsOrder(tenQs);
+                switchTab('my-questions');
+
+                // Update Question #2 via UI (openQuestionModal -> handleSaveQuestion)
+                editQuestion('ut-order-2');
+                document.getElementById('qPrompt').value = 'Modified Prompt #2';
+                await handleSaveQuestion(new Event('submit'));
+
+                // Even if database returns updated Question #2 at the end of array, sortAndSyncQuestionsOrder keeps it at Question #2!
+                const scrambledFromDB = [...questions.filter(q => q.id !== 'ut-order-2'), questions.find(q => q.id === 'ut-order-2')];
+                questions = sortAndSyncQuestionsOrder(scrambledFromDB);
+                renderMyQuestions();
+
+                const myRepoAfterUpdate = questions.filter(q => q.author === 'RepoOrderUser');
+                const q2StillAtIndex2 = myRepoAfterUpdate[1] && myRepoAfterUpdate[1].id === 'ut-order-2' && myRepoAfterUpdate[1].prompt === 'Modified Prompt #2';
+
+                // Check Batch Download {Q_id} values equal k (1..10)
+                let exportedBatchAoA = null;
+                window.XLSX = {
+                    utils: {
+                        aoa_to_sheet: (data) => { exportedBatchAoA = data; return {}; },
+                        book_new: () => ({}),
+                        book_append_sheet: () => {}
+                    },
+                    writeFile: () => {}
+                };
+                downloadUnifiedBatchExcel();
+                const exportedQIdsBeforeDelete = exportedBatchAoA.slice(1).map(r => r[0]);
+                const qIdEqualsKBeforeDelete = JSON.stringify(exportedQIdsBeforeDelete) === JSON.stringify([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]) &&
+                                              exportedBatchAoA[2][2] === 'Modified Prompt #2';
+
+                // Now delete Question #2 (ut-order-2) -> original Question #3 becomes Question #2, #4 becomes #3, ..., #10 becomes #9
+                questions = questions.filter(q => q.id !== 'ut-order-2');
+                removeQuestionFromOrderList('ut-order-2');
+                renderMyQuestions();
+                downloadUnifiedBatchExcel();
+                const myRepoAfterDelete = questions.filter(q => q.author === 'RepoOrderUser');
+                const exportedQIdsAfterDelete = exportedBatchAoA.slice(1).map(r => r[0]);
+                const renumberAfterDeletePass =
+                    myRepoAfterDelete.length === 9 &&
+                    myRepoAfterDelete[1].id === 'ut-order-3' && // original #3 is now #2
+                    myRepoAfterDelete[2].id === 'ut-order-4' && // original #4 is now #3
+                    myRepoAfterDelete[3].id === 'ut-order-5' && // original #5 is now #4
+                    myRepoAfterDelete[4].id === 'ut-order-6' && // original #6 is now #5
+                    JSON.stringify(exportedQIdsAfterDelete) === JSON.stringify([1, 2, 3, 4, 5, 6, 7, 8, 9]);
+
+                return {
+                    passed: closureWarningsPass && fastUnpublishModalPass && participantRedirectPass && q2StillAtIndex2 && qIdEqualsKBeforeDelete && renumberAfterDeletePass,
+                    closureWarningsPass,
+                    fastUnpublishModalPass,
+                    openModalMs: Math.round(openModalMs),
+                    closeModalMs: Math.round(closeModalMs),
+                    participantRedirectPass,
+                    q2StillAtIndex2,
+                    qIdEqualsKBeforeDelete,
+                    renumberAfterDeletePass
+                };
+            } finally {
+                window.XLSX = backupXLSX;
+                questions = backupQuestions;
+                pastQuestions = backupPastQuestions;
+                isPublished = backupPublished;
+                quizDueDate = backupDueDate;
+                currentQuizSession = backupSession;
+                currentLang = backupLang;
+                currentUser = backupUser;
+                activeTab = backupTab;
+                const banner = document.getElementById('closureLastMinuteBanner');
+                if (banner) banner.classList.add('hidden');
                 applyLanguage();
                 updateUI();
                 if (currentUser) renderCurrentView();
